@@ -4,6 +4,7 @@ import {
   createAuthorizationError, 
   formatErrorResponse 
 } from './errors';
+import jwt from 'jsonwebtoken';
 
 // User roles and permissions
 export type UserRole = 'ceo' | 'admin' | 'sales';
@@ -23,47 +24,31 @@ export interface AuthResult {
   error?: string;
 }
 
-// Mock JWT validation (in production, use a proper JWT library)
+// Real JWT validation using NextAuth JWT tokens
 export function validateJWT(token: string): AuthResult {
   try {
-    // TODO: Replace with actual JWT validation
-    // For now, we'll use a simple mock validation
-    if (!token || token === 'invalid-token') {
+    if (!token) {
       throw createAuthenticationError('Invalid or missing token');
     }
 
-    // Mock user data based on token
-    const mockUsers: Record<string, User> = {
-      'mock-jwt-token-ceo': {
-        id: 'user-ceo-1',
-        email: 'ceo@propaganda.com',
-        name: 'CEO User',
-        role: 'ceo',
-        clientId: 'client-1',
-        permissions: ['read:all-calls', 'read:all-metrics', 'read:all-users']
-      },
-      'mock-jwt-token-admin': {
-        id: 'user-admin-1',
-        email: 'admin@propaganda.com',
-        name: 'Admin User',
-        role: 'admin',
-        clientId: 'client-1',
-        permissions: ['read:all-calls', 'write:all-calls', 'read:all-metrics', 'read:all-users', 'write:all-users']
-      },
-      'mock-jwt-token-sales': {
-        id: 'user-sales-1',
-        email: 'sales@propaganda.com',
-        name: 'Sales User',
-        role: 'sales',
-        clientId: 'client-1',
-        permissions: ['read:own-calls', 'write:own-calls', 'read:own-metrics']
-      }
-    };
-
-    const user = mockUsers[token];
-    if (!user) {
-      throw createAuthenticationError('User not found');
+    const JWT_SECRET = process.env.JWT_SECRET || 'your-super-secret-jwt-key-change-in-production';
+    
+    // Verify the JWT token
+    const decoded = jwt.verify(token, JWT_SECRET) as any;
+    
+    if (!decoded || !decoded.id || !decoded.email) {
+      throw createAuthenticationError('Invalid token payload');
     }
+
+    // Create user object from JWT payload
+    const user: User = {
+      id: decoded.id,
+      email: decoded.email,
+      name: decoded.name || '',
+      role: decoded.role || 'sales',
+      clientId: decoded.clientId || '',
+      permissions: getUserPermissions(decoded.role)
+    };
 
     return {
       success: true,
@@ -73,8 +58,22 @@ export function validateJWT(token: string): AuthResult {
     if (error instanceof Error && error.name === 'APIError') {
       throw error;
     }
+    if (error instanceof jwt.JsonWebTokenError) {
+      throw createAuthenticationError('Invalid token');
+    }
     throw createAuthenticationError('Token validation failed');
   }
+}
+
+// Helper function to get user permissions based on role
+function getUserPermissions(role: UserRole): string[] {
+  const permissions: Record<UserRole, string[]> = {
+    'ceo': ['read:all-calls', 'read:all-metrics', 'read:all-users'],
+    'admin': ['read:all-calls', 'write:all-calls', 'read:all-metrics', 'read:all-users', 'write:all-users'],
+    'sales': ['read:own-calls', 'write:own-calls', 'read:own-metrics']
+  };
+  
+  return permissions[role] || permissions['sales'];
 }
 
 // Extract token from request headers
