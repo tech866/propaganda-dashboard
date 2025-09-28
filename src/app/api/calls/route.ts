@@ -9,16 +9,35 @@ import {
   withErrorHandling 
 } from '@/middleware/errors';
 import { CallService, CreateCallData } from '@/lib/services/callService';
+import { validateCreateCall, validateCallFilter } from '@/lib/validation';
 
 // GET /api/calls - Get all calls (with optional filtering)
 const getCalls = withErrorHandling(async (request: NextRequest, user: User) => {
   const { searchParams } = new URL(request.url);
-  const requestedClientId = searchParams.get('clientId');
-  const userId = searchParams.get('userId');
-  const dateFrom = searchParams.get('dateFrom');
-  const dateTo = searchParams.get('dateTo');
-  const limit = parseInt(searchParams.get('limit') || '100');
-  const offset = parseInt(searchParams.get('offset') || '0');
+  
+  // Prepare filter data for validation
+  const filterData = {
+    clientId: searchParams.get('clientId') || undefined,
+    userId: searchParams.get('userId') || undefined,
+    dateFrom: searchParams.get('dateFrom') ? new Date(searchParams.get('dateFrom')!) : undefined,
+    dateTo: searchParams.get('dateTo') ? new Date(searchParams.get('dateTo')!) : undefined,
+    limit: searchParams.get('limit') ? parseInt(searchParams.get('limit')!) : undefined,
+    offset: searchParams.get('offset') ? parseInt(searchParams.get('offset')!) : undefined,
+  };
+
+  // Validate filter parameters
+  const filterValidation = await validateCallFilter(filterData);
+  if (!filterValidation.isValid) {
+    throw createValidationError('Invalid filter parameters', filterValidation.errors);
+  }
+
+  const validatedFilters = filterValidation.data!;
+  const requestedClientId = validatedFilters.clientId;
+  const userId = validatedFilters.userId;
+  const dateFrom = validatedFilters.dateFrom;
+  const dateTo = validatedFilters.dateTo;
+  const limit = validatedFilters.limit || 100;
+  const offset = validatedFilters.offset || 0;
 
   // Validate client access
   if (requestedClientId && !canAccessClient(user, requestedClientId)) {
@@ -50,35 +69,34 @@ const getCalls = withErrorHandling(async (request: NextRequest, user: User) => {
 const createCall = withErrorHandling(async (request: NextRequest, user: User) => {
   const body = await request.json();
   
-  // Validate required fields
-  const requiredFields = ['client_id', 'prospect_name', 'call_type', 'status'];
-  const validation = validateRequiredFields(body, requiredFields);
+  // Validate request body using Yup schema
+  const validation = await validateCreateCall(body);
   
   if (!validation.isValid) {
-    throw createValidationError('Missing required fields', {
-      missingFields: validation.missingFields
-    });
+    throw createValidationError('Validation failed', validation.errors);
   }
 
+  const validatedData = validation.data!;
+
   // Validate client access
-  if (!canAccessClient(user, body.client_id)) {
+  if (!canAccessClient(user, validatedData.client_id)) {
     throw createAuthorizationError('Access denied to create call for this client');
   }
 
-  // Create call data object
+  // Create call data object with validated data
   const callData: CreateCallData = {
-    client_id: body.client_id,
-    prospect_name: body.prospect_name,
-    prospect_email: body.prospect_email || undefined,
-    prospect_phone: body.prospect_phone || undefined,
-    call_type: body.call_type,
-    status: body.status,
-    outcome: body.outcome || 'tbd',
-    loss_reason_id: body.loss_reason_id || undefined,
-    notes: body.notes || undefined,
-    call_duration: body.call_duration || undefined,
-    scheduled_at: body.scheduled_at || undefined,
-    completed_at: body.completed_at || undefined,
+    client_id: validatedData.client_id,
+    prospect_name: validatedData.prospect_name,
+    prospect_email: validatedData.prospect_email,
+    prospect_phone: validatedData.prospect_phone,
+    call_type: validatedData.call_type,
+    status: validatedData.status,
+    outcome: validatedData.outcome || 'tbd',
+    loss_reason_id: validatedData.loss_reason_id,
+    notes: validatedData.notes,
+    call_duration: validatedData.call_duration,
+    scheduled_at: validatedData.scheduled_at,
+    completed_at: validatedData.completed_at,
   };
 
   // Create call in database

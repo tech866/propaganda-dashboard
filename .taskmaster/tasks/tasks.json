@@ -461,7 +461,64 @@
           6
         ],
         "status": "pending",
-        "subtasks": []
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Define Validation Schema",
+            "description": "Create a validation schema using Yup for all forms as per the PRD specifications.",
+            "dependencies": [],
+            "details": "Outline the required fields, data types, and business rules for each form in the validation schema.",
+            "status": "done",
+            "testStrategy": "Verify the schema against sample data to ensure it enforces the correct validation rules."
+          },
+          {
+            "id": 2,
+            "title": "Implement Client-Side Validation",
+            "description": "Integrate the Yup validation schema into the client-side forms to enforce validation rules.",
+            "dependencies": [
+              "13.1"
+            ],
+            "details": "Ensure that all forms display appropriate error messages and prevent submission when validation fails.",
+            "status": "pending",
+            "testStrategy": "Test each form by entering invalid data and confirming that error messages are displayed correctly."
+          },
+          {
+            "id": 3,
+            "title": "Implement Server-Side Validation",
+            "description": "Set up server-side validation to enforce the same rules as the client-side validation.",
+            "dependencies": [
+              "13.1"
+            ],
+            "details": "Use the Yup schema to validate incoming data on the server before processing it.",
+            "status": "done",
+            "testStrategy": "Send invalid data to the server and ensure that it responds with the correct error messages."
+          },
+          {
+            "id": 4,
+            "title": "Error Handling and User Feedback",
+            "description": "Implement error handling mechanisms to provide user feedback for validation errors.",
+            "dependencies": [
+              "13.2",
+              "13.3"
+            ],
+            "details": "Ensure that users receive clear feedback on what went wrong during form submission.",
+            "status": "done",
+            "testStrategy": "Test the user feedback mechanism by submitting forms with various validation errors."
+          },
+          {
+            "id": 5,
+            "title": "Comprehensive Testing of Validation Rules",
+            "description": "Conduct thorough testing of all forms to ensure validation rules are enforced correctly.",
+            "dependencies": [
+              "13.2",
+              "13.3",
+              "13.4"
+            ],
+            "details": "Create test cases for all possible validation scenarios and ensure they pass.",
+            "status": "pending",
+            "testStrategy": "Run automated tests to validate that all forms adhere to the defined validation rules."
+          }
+        ]
       },
       {
         "id": 14,
@@ -499,7 +556,7 @@
     ],
     "metadata": {
       "created": "2025-09-28T00:23:29.094Z",
-      "updated": "2025-09-28T09:09:20.948Z",
+      "updated": "2025-09-28T09:44:49.212Z",
       "description": "Tasks for master context"
     }
   }

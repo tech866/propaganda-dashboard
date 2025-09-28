@@ -1,13 +1,31 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { withAuth, User } from '@/middleware/auth';
+import { createValidationError, withErrorHandling } from '@/middleware/errors';
+import { validateMetricsFilter } from '@/lib/validation';
 
 // GET /api/metrics - Get performance metrics
-export async function GET(request: NextRequest) {
-  try {
-    const { searchParams } = new URL(request.url);
-    const clientId = searchParams.get('clientId');
-    const userId = searchParams.get('userId');
-    const dateFrom = searchParams.get('dateFrom');
-    const dateTo = searchParams.get('dateTo');
+const getMetrics = withErrorHandling(async (request: NextRequest, user: User) => {
+  const { searchParams } = new URL(request.url);
+  
+  // Prepare filter data for validation
+  const filterData = {
+    clientId: searchParams.get('clientId') || undefined,
+    userId: searchParams.get('userId') || undefined,
+    dateFrom: searchParams.get('dateFrom') ? new Date(searchParams.get('dateFrom')!) : undefined,
+    dateTo: searchParams.get('dateTo') ? new Date(searchParams.get('dateTo')!) : undefined,
+  };
+
+  // Validate filter parameters
+  const filterValidation = await validateMetricsFilter(filterData);
+  if (!filterValidation.isValid) {
+    throw createValidationError('Invalid filter parameters', filterValidation.errors);
+  }
+
+  const validatedFilters = filterValidation.data!;
+  const clientId = validatedFilters.clientId;
+  const userId = validatedFilters.userId;
+  const dateFrom = validatedFilters.dateFrom;
+  const dateTo = validatedFilters.dateTo;
 
     // TODO: Implement actual metrics calculation from database
     // For now, return mock data
@@ -41,21 +59,14 @@ export async function GET(request: NextRequest) {
       filters: { clientId, userId }
     };
 
-    return NextResponse.json(
-      {
-        success: true,
-        data: mockMetrics
-      },
-      { status: 200 }
-    );
-  } catch (error) {
-    return NextResponse.json(
-      {
-        success: false,
-        message: 'Failed to fetch metrics',
-        error: error instanceof Error ? error.message : 'Unknown error'
-      },
-      { status: 500 }
-    );
-  }
-}
+  return NextResponse.json(
+    {
+      success: true,
+      data: mockMetrics
+    },
+    { status: 200 }
+  );
+});
+
+// Export the protected handler
+export const GET = withAuth(getMetrics);
