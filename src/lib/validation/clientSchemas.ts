@@ -6,13 +6,13 @@ const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[
 // Login Schema
 export const loginSchema = yup.object().shape({
   email: yup.string().email('Invalid email format').required('Email is required'),
-  password: yup.string().min(6, 'Password must be at least 6 characters').required('Password is required'),
+  password: yup.string().min(8, 'Password must be at least 8 characters').required('Password is required'),
 });
 
 // Register Schema
 export const registerSchema = yup.object().shape({
   email: yup.string().email('Invalid email format').required('Email is required'),
-  password: yup.string().min(6, 'Password must be at least 6 characters').required('Password is required'),
+  password: yup.string().min(8, 'Password must be at least 8 characters').required('Password is required'),
   name: yup.string().min(2, 'Name must be at least 2 characters').required('Name is required'),
   clientId: yup.string().matches(uuidRegex, 'Client ID must be a valid UUID').required('Client ID is required'),
 });
@@ -51,7 +51,7 @@ export const updateCallSchema = yup.object().shape({
 // Create User Schema (for admin panel)
 export const createUserSchema = yup.object().shape({
   email: yup.string().email('Invalid email format').required('Email is required'),
-  password: yup.string().min(6, 'Password must be at least 6 characters').required('Password is required'),
+  password: yup.string().min(8, 'Password must be at least 8 characters').required('Password is required'),
   name: yup.string().min(2, 'Name must be at least 2 characters').required('Name is required'),
   role: yup.string().oneOf(['sales', 'admin', 'ceo'], 'Invalid role. Must be one of: sales, admin, ceo').required('Role is required'),
   clientId: yup.string().matches(uuidRegex, 'Client ID must be a valid UUID').required('Client ID is required'),
