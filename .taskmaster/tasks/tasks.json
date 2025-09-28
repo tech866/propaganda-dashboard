@@ -313,8 +313,62 @@
           4,
           5
         ],
-        "status": "pending",
-        "subtasks": []
+        "status": "done",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Set Up Database Connection",
+            "description": "Establish a connection to the PostgreSQL database for the API.",
+            "dependencies": [],
+            "details": "Configure the database connection settings in the application, ensuring that the connection is secure and efficient.",
+            "status": "done",
+            "testStrategy": "Verify the database connection by running a simple query to check connectivity."
+          },
+          {
+            "id": 2,
+            "title": "Implement CRUD Operations",
+            "description": "Develop the API endpoints for creating, reading, updating, and deleting call logs.",
+            "dependencies": [
+              "6.1"
+            ],
+            "details": "Create the necessary API routes and implement the logic for each CRUD operation, ensuring they follow RESTful principles.",
+            "status": "done",
+            "testStrategy": "Test each CRUD operation using Postman to ensure they function correctly."
+          },
+          {
+            "id": 3,
+            "title": "Add Validation Rules",
+            "description": "Implement validation rules for the API endpoints to ensure data integrity.",
+            "dependencies": [
+              "6.2"
+            ],
+            "details": "Define and enforce validation rules for required fields and ownership checks in the API requests.",
+            "status": "done",
+            "testStrategy": "Test the API endpoints with both valid and invalid data to ensure validation works as expected."
+          },
+          {
+            "id": 4,
+            "title": "Implement Middleware for Authorization",
+            "description": "Create middleware to check user authorization for accessing the API endpoints.",
+            "dependencies": [
+              "6.3"
+            ],
+            "details": "Develop middleware that verifies user permissions before allowing access to the CRUD operations.",
+            "status": "done",
+            "testStrategy": "Test the middleware by attempting to access endpoints with both authorized and unauthorized users."
+          },
+          {
+            "id": 5,
+            "title": "Conduct Comprehensive Testing",
+            "description": "Perform thorough testing of the API to ensure all functionalities work as intended.",
+            "dependencies": [
+              "6.4"
+            ],
+            "details": "Use Postman to test all CRUD operations, validation, and authorization checks, documenting any issues found.",
+            "status": "done",
+            "testStrategy": "Create a test report summarizing the results of the API tests and any necessary fixes."
+          }
+        ]
       },
       {
         "id": 7,
@@ -445,7 +499,7 @@
     ],
     "metadata": {
       "created": "2025-09-28T00:23:29.094Z",
-      "updated": "2025-09-28T08:50:59.775Z",
+      "updated": "2025-09-28T09:09:20.948Z",
       "description": "Tasks for master context"
     }
   }
