@@ -1,0 +1,11 @@
+# Task ID: 7
+# Title: Implement Performance Metrics Calculations
+# Status: pending
+# Dependencies: 6
+# Priority: medium
+# Description: Create backend logic to calculate Show Rate and Close Rate based on call data.
+# Details:
+Develop functions to calculate Show Rate and Close Rate from the Calls table. Ensure these calculations are optimized for performance, especially with large datasets.
+
+# Test Strategy:
+Create unit tests for the calculation functions. Validate that metrics are calculated correctly for various scenarios.

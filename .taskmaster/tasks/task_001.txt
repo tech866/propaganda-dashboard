@@ -1,0 +1,43 @@
+# Task ID: 1
+# Title: Setup Project Repository
+# Status: done
+# Dependencies: None
+# Priority: medium
+# Description: Initialize a new Git repository for the project and set up the basic directory structure for both frontend and backend components.
+# Details:
+Create a Git repository on GitHub or GitLab. Initialize the project with a README file. Set up directories for frontend (Next.js) and backend (Next.js API routes). Include a .gitignore file to exclude node_modules and environment files.
+
+# Test Strategy:
+Verify repository is created and accessible. Check directory structure for frontend and backend.
+
+# Subtasks:
+## 1. Create Git Repository [done]
+### Dependencies: None
+### Description: Create a new Git repository on GitHub or GitLab for the project.
+### Details:
+Ensure the repository is initialized with a README file.
+
+## 2. Set Up Directory Structure [done]
+### Dependencies: None
+### Description: Create the basic directory structure for frontend and backend components.
+### Details:
+Set up directories for frontend (Next.js) and backend (Next.js API routes).
+
+## 3. Add .gitignore File [done]
+### Dependencies: None
+### Description: Include a .gitignore file to exclude unnecessary files from the repository.
+### Details:
+Ensure node_modules and environment files are excluded in the .gitignore.
+
+## 4. Initialize Frontend with Next.js [done]
+### Dependencies: None
+### Description: Set up the frontend application using Next.js with TypeScript and Tailwind CSS.
+### Details:
+Run 'npx create-next-app@latest --typescript' and install Tailwind CSS.
+
+## 5. Configure Tailwind CSS [done]
+### Dependencies: None
+### Description: Configure Tailwind CSS in the Next.js project.
+### Details:
+Create a tailwind.config.js file and include it in the global CSS file.
+

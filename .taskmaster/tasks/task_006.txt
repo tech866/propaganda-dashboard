@@ -1,0 +1,43 @@
+# Task ID: 6
+# Title: Create Call Logging API
+# Status: done
+# Dependencies: 4, 5
+# Priority: high
+# Description: Develop API endpoints for creating, reading, updating, and deleting call logs with proper validation.
+# Details:
+Implement CRUD operations for Calls in the API routes. Ensure validation rules are enforced, such as required fields and ownership rules. Use middleware for authorization checks.
+
+# Test Strategy:
+Test all CRUD operations using Postman. Validate that only authorized users can perform actions on calls.
+
+# Subtasks:
+## 1. Set Up Database Connection [done]
+### Dependencies: None
+### Description: Establish a connection to the PostgreSQL database for the API.
+### Details:
+Configure the database connection settings in the application, ensuring that the connection is secure and efficient.
+
+## 2. Implement CRUD Operations [done]
+### Dependencies: 6.1
+### Description: Develop the API endpoints for creating, reading, updating, and deleting call logs.
+### Details:
+Create the necessary API routes and implement the logic for each CRUD operation, ensuring they follow RESTful principles.
+
+## 3. Add Validation Rules [done]
+### Dependencies: 6.2
+### Description: Implement validation rules for the API endpoints to ensure data integrity.
+### Details:
+Define and enforce validation rules for required fields and ownership checks in the API requests.
+
+## 4. Implement Middleware for Authorization [done]
+### Dependencies: 6.3
+### Description: Create middleware to check user authorization for accessing the API endpoints.
+### Details:
+Develop middleware that verifies user permissions before allowing access to the CRUD operations.
+
+## 5. Conduct Comprehensive Testing [done]
+### Dependencies: 6.4
+### Description: Perform thorough testing of the API to ensure all functionalities work as intended.
+### Details:
+Use Postman to test all CRUD operations, validation, and authorization checks, documenting any issues found.
+

@@ -479,7 +479,7 @@
               "13.1"
             ],
             "details": "Ensure that all forms display appropriate error messages and prevent submission when validation fails.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Test each form by entering invalid data and confirming that error messages are displayed correctly."
           },
           {
@@ -517,6 +517,51 @@
             "details": "Create test cases for all possible validation scenarios and ensure they pass.",
             "status": "pending",
             "testStrategy": "Run automated tests to validate that all forms adhere to the defined validation rules."
+          },
+          {
+            "id": 6,
+            "title": "Create Client-Side Validation Utilities",
+            "description": "Create reusable validation utilities and hooks for client-side form validation using Yup schemas.",
+            "details": "Build validation utilities that can be reused across all forms, including custom hooks for form validation, error state management, and integration with Yup schemas.",
+            "status": "done",
+            "dependencies": [],
+            "parentTaskId": 13
+          },
+          {
+            "id": 7,
+            "title": "Implement Login Form Validation",
+            "description": "Add client-side validation to the login form with real-time feedback and error display.",
+            "details": "Integrate Yup validation schema into the existing login form, implement real-time validation feedback, and ensure proper error message display.",
+            "status": "done",
+            "dependencies": [],
+            "parentTaskId": 13
+          },
+          {
+            "id": 8,
+            "title": "Implement Registration Form Validation",
+            "description": "Add client-side validation to the registration form with comprehensive field validation.",
+            "details": "Create a registration form with client-side validation for email, password, name, and clientId fields using Yup schemas and real-time feedback.",
+            "status": "done",
+            "dependencies": [],
+            "parentTaskId": 13
+          },
+          {
+            "id": 9,
+            "title": "Implement Call Logging Form Validation",
+            "description": "Create a call logging form with comprehensive client-side validation for all call fields.",
+            "details": "Build a call logging form with validation for prospect information, call type, status, outcome, and other call-related fields using Yup schemas.",
+            "status": "done",
+            "dependencies": [],
+            "parentTaskId": 13
+          },
+          {
+            "id": 10,
+            "title": "Implement User Management Form Validation",
+            "description": "Create user management forms with client-side validation for admin user creation and editing.",
+            "details": "Build forms for creating and editing users with validation for email, password, name, role, and clientId fields, including role-based access controls.",
+            "status": "done",
+            "dependencies": [],
+            "parentTaskId": 13
           }
         ]
       },
@@ -556,7 +601,7 @@
     ],
     "metadata": {
       "created": "2025-09-28T00:23:29.094Z",
-      "updated": "2025-09-28T09:44:49.212Z",
+      "updated": "2025-09-28T09:58:05.107Z",
       "description": "Tasks for master context"
     }
   }

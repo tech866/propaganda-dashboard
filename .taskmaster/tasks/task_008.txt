@@ -1,0 +1,11 @@
+# Task ID: 8
+# Title: Develop Dashboard UI Components
+# Status: pending
+# Dependencies: 2, 7
+# Priority: medium
+# Description: Build the frontend components for the dashboard, including metrics display and call log table.
+# Details:
+Use React components to create the dashboard layout. Implement sections for Hero Metrics (Show Rate, Close Rate), Loss Reasons Chart, and Call Log Table. Style components using Tailwind CSS.
+
+# Test Strategy:
+Render the dashboard in the browser and verify that all components display correctly with sample data.

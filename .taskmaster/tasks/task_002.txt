@@ -1,0 +1,43 @@
+# Task ID: 2
+# Title: Initialize Frontend with Next.js
+# Status: done
+# Dependencies: 1
+# Priority: high
+# Description: Set up the frontend application using Next.js with TypeScript and Tailwind CSS.
+# Details:
+Run 'npx create-next-app@latest --typescript' to create a new Next.js app. Install Tailwind CSS by following the official documentation. Configure Tailwind in the project by creating a tailwind.config.js file and including it in the global CSS file.
+
+# Test Strategy:
+Run the development server and ensure the default Next.js page loads with Tailwind CSS styles applied.
+
+# Subtasks:
+## 1. Install Tailwind CSS [done]
+### Dependencies: None
+### Description: Follow the official Tailwind CSS documentation to install Tailwind CSS in the Next.js project.
+### Details:
+Run the necessary npm commands to install Tailwind CSS and its dependencies.
+
+## 2. Configure Tailwind CSS [done]
+### Dependencies: None
+### Description: Create a tailwind.config.js file and configure it for the Next.js project.
+### Details:
+Set up the Tailwind configuration file and include it in the global CSS file.
+
+## 3. Create Global CSS File [done]
+### Dependencies: None
+### Description: Create a global CSS file to include Tailwind's base, components, and utilities.
+### Details:
+Import the Tailwind CSS directives in the global CSS file.
+
+## 4. Implement UI Components [done]
+### Dependencies: None
+### Description: Identify and implement any missing UI components required for the propaganda dashboard.
+### Details:
+Create React components for the dashboard layout and necessary sections.
+
+## 5. Optimize Project Configuration [done]
+### Dependencies: None
+### Description: Review and optimize the Next.js project configuration for performance and best practices.
+### Details:
+Adjust settings in next.config.js and ensure proper image optimization and code splitting.
+

@@ -1,0 +1,11 @@
+# Task ID: 12
+# Title: Create Admin Management Screens
+# Status: pending
+# Dependencies: 9
+# Priority: medium
+# Description: Develop admin screens for managing users and loss reasons, accessible only to Admin users.
+# Details:
+Build UI components for user management (CRUD operations) and loss reason configuration. Ensure these screens are only accessible to Admin users based on RBAC.
+
+# Test Strategy:
+Log in as an Admin user and verify that the management screens are accessible and functional.
