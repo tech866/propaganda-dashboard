@@ -53,8 +53,14 @@ async function getUsers(request: NextRequest, user: User) {
 const createUser = withErrorHandling(async (request: NextRequest, user: User) => {
   const body = await request.json();
   
+  // Add clientId from authenticated user
+  const bodyWithClientId = {
+    ...body,
+    clientId: user.clientId
+  };
+  
   // Validate request body using Yup schema
-  const validation = await validateCreateUser(body);
+  const validation = await validateCreateUser(bodyWithClientId);
   
   if (!validation.isValid) {
     throw createValidationError('Validation failed', validation.errors);
