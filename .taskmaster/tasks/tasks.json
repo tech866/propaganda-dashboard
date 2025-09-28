@@ -380,8 +380,62 @@
         "dependencies": [
           6
         ],
-        "status": "pending",
-        "subtasks": []
+        "status": "done",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Understand Business Logic for Metrics",
+            "description": "Gather and document the business rules for calculating Show Rate and Close Rate.",
+            "dependencies": [],
+            "details": "Consult with stakeholders to clarify how Show Rate and Close Rate are defined and calculated based on call data.\n<info added on 2025-09-28T10:33:40.282Z>\n## Business Logic Analysis Complete ✅\n\n### Key Findings:\n\n**Show Rate Calculation:**\n- Formula: (Completed Calls / Total Scheduled Calls) × 100\n- Numerator: Calls with `status = 'completed'`\n- Denominator: All calls regardless of status\n- Includes: completed, no-show, rescheduled calls in denominator\n- Excludes: None from denominator\n\n**Close Rate Calculation:**\n- Formula: (Won Calls / Completed Calls) × 100  \n- Numerator: Calls with `status = 'completed'` AND `outcome = 'won'`\n- Denominator: Calls with `status = 'completed'` (regardless of outcome)\n- Excludes: no-show and rescheduled calls from denominator\n- Handles: `tbd` outcomes (excluded from numerator, included in denominator)\n\n**Data Requirements:**\n- Primary table: `calls` with key fields: status, outcome, client_id, user_id, completed_at\n- Multi-tenant isolation: All queries must filter by `client_id`\n- Role-based access: Sales (own data), Admin (client data), CEO (all clients)\n\n**Loss Reasons Analysis:**\n- Top 5 loss reasons by count\n- Percentage calculation: (Calls with reason / Total lost calls) × 100\n- Categories: Price, Interest, Timing, Competition, Technical, Internal\n\n**Edge Cases Handled:**\n- Zero division: Return 0% instead of undefined\n- Missing data: Appropriate NULL handling\n- Invalid status: Exclude from calculations\n- Future dates: Don't include in calculations\n\n**Performance Requirements:**\n- Target: P95 < 300ms for up to 50k calls per client\n- Caching: 15min for real-time, 1hr for historical\n- Optimization: Database indexes and efficient queries\n\n### Documentation Created:\n- Comprehensive business logic document: `.taskmaster/docs/metrics-business-logic.md`\n- Includes formulas, examples, edge cases, and implementation notes\n- Defines API response format and testing considerations\n</info added on 2025-09-28T10:33:40.282Z>",
+            "status": "done",
+            "testStrategy": "Review documentation and confirm understanding with stakeholders."
+          },
+          {
+            "id": 2,
+            "title": "Create Database Queries for Metrics",
+            "description": "Develop optimized SQL queries to retrieve necessary data for Show Rate and Close Rate calculations.",
+            "dependencies": [
+              "7.1"
+            ],
+            "details": "Ensure queries are efficient and can handle large datasets without performance degradation.\n<info added on 2025-09-28T10:42:35.415Z>\n## Database Queries Implementation Complete ✅\n\n### Key Deliverables:\n\n**1. Comprehensive MetricsService Created:**\n- `src/lib/services/metricsService.ts` - Complete service layer with optimized SQL queries\n- Implements all business logic from Task 7.1 documentation\n- Handles multi-tenant data isolation and role-based access\n\n**2. Core Metrics Queries:**\n- **Show Rate Query:** `(Completed Calls / Total Calls) × 100`\n- **Close Rate Query:** `(Won Calls / Completed Calls) × 100`\n- **Loss Reasons Query:** Top 5 with percentages\n- **Performance Comparison:** User vs user metrics\n- **Trend Analysis:** Time-series data over configurable periods\n\n**3. Advanced Features:**\n- **Role-based filtering:** Sales (own data), Admin (client data), CEO (all data)\n- **Date range filtering:** Flexible date boundaries\n- **Performance optimization:** Efficient SQL with proper indexing considerations\n- **Edge case handling:** Zero division, NULL values, invalid data\n\n**4. API Integration:**\n- Updated `/api/metrics` to use real database queries\n- Added `/api/metrics/trend` for time-series data\n- Added `/api/metrics/performance` for user comparisons\n- Maintained backward compatibility with existing API structure\n\n**5. Query Performance:**\n- Single-query approach for basic metrics (reduces database round trips)\n- Optimized JOINs for loss reasons analysis\n- Proper parameterized queries to prevent SQL injection\n- Efficient aggregation with CASE statements\n\n**6. Data Structure:**\n- Comprehensive TypeScript interfaces for type safety\n- Consistent response format across all endpoints\n- Proper error handling and validation\n- Multi-tenant data isolation at query level\n\n### Technical Implementation:\n- **Database:** PostgreSQL with optimized queries\n- **Performance:** Target <300ms for up to 50k calls per client\n- **Security:** Role-based access control in queries\n- **Scalability:** Efficient aggregation and filtering\n- **Maintainability:** Clean service layer architecture\n\nAll queries tested against the existing database schema and ready for integration with the calculation functions in Task 7.3.\n</info added on 2025-09-28T10:42:35.415Z>",
+            "status": "done",
+            "testStrategy": "Run queries against a sample dataset and measure execution time."
+          },
+          {
+            "id": 3,
+            "title": "Implement Calculation Functions",
+            "description": "Write backend functions to calculate Show Rate and Close Rate using the retrieved data.",
+            "dependencies": [
+              "7.2"
+            ],
+            "details": "Include error handling to manage potential issues during calculations.",
+            "status": "done",
+            "testStrategy": "Create unit tests to validate calculations against known values."
+          },
+          {
+            "id": 4,
+            "title": "Create Metrics Service Layer",
+            "description": "Develop a service layer to encapsulate the metrics calculations and provide an API for access.",
+            "dependencies": [
+              "7.3"
+            ],
+            "details": "Ensure the service layer is modular and can be easily integrated with existing systems.",
+            "status": "done",
+            "testStrategy": "Test the service layer with various inputs to ensure correct outputs."
+          },
+          {
+            "id": 5,
+            "title": "Add Unit Tests for Metrics",
+            "description": "Implement comprehensive unit tests for the metrics calculation functions and service layer.",
+            "dependencies": [
+              "7.4"
+            ],
+            "details": "Ensure tests cover edge cases and validate the accuracy of the metrics.",
+            "status": "done",
+            "testStrategy": "Run all unit tests and confirm that they pass successfully."
+          }
+        ]
       },
       {
         "id": 8,
@@ -422,7 +476,62 @@
           6
         ],
         "status": "pending",
-        "subtasks": []
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Define Audit Log Structure",
+            "description": "Design the schema for the Audit Logs table to store necessary information.",
+            "dependencies": [],
+            "details": "Include fields for user identification, action type (create, update, delete), timestamp, and affected data.\n<info added on 2025-09-28T11:16:29.977Z>\n## Audit Log Structure Analysis Complete ✅\n\n### Current Database Schema Analysis:\n\n**Existing `audit_logs` Table Structure:**\n```sql\nCREATE TABLE audit_logs (\n    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),\n    client_id UUID REFERENCES clients(id) ON DELETE CASCADE,\n    user_id UUID REFERENCES users(id) ON DELETE SET NULL,\n    table_name VARCHAR(100) NOT NULL,\n    record_id UUID NOT NULL,\n    action VARCHAR(20) NOT NULL CHECK (action IN ('INSERT', 'UPDATE', 'DELETE', 'SELECT')),\n    old_values JSONB,\n    new_values JSONB,\n    ip_address INET,\n    user_agent TEXT,\n    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP\n);\n```\n\n### Schema Assessment:\n\n**✅ Strengths:**\n- Multi-tenant isolation with `client_id`\n- User identification with `user_id`\n- Comprehensive action tracking (INSERT, UPDATE, DELETE, SELECT)\n- JSONB storage for flexible old/new values\n- Network information (IP address, user agent)\n- Proper foreign key relationships\n\n**🔧 Enhancements Needed:**\n1. **Add session tracking** - Track user sessions for better audit trails\n2. **Add request context** - Track API endpoints and request methods\n3. **Add error logging** - Track failed operations\n4. **Add performance metrics** - Track operation duration\n5. **Add additional metadata** - Track more context about operations\n\n### Enhanced Schema Design:\n\n**Additional Fields to Add:**\n- `session_id` - Track user sessions\n- `endpoint` - API endpoint accessed\n- `http_method` - HTTP method used\n- `status_code` - HTTP response status\n- `operation_duration_ms` - Time taken for operation\n- `error_message` - Error details if operation failed\n- `metadata` - Additional context as JSONB\n\n### Implementation Plan:\n1. Create TypeScript interfaces for audit logging\n2. Design audit logging service layer\n3. Create audit logging middleware\n4. Implement audit logging in API routes\n5. Test audit logging functionality\n\nThe existing schema is solid and provides a good foundation. We'll enhance it with additional fields for comprehensive audit logging.\n</info added on 2025-09-28T11:16:29.977Z>\n<info added on 2025-09-28T13:58:28.368Z>\n## Middleware Implementation for Audit Logging\n\n### Core Middleware Components:\n\n**1. Request Context Middleware:**\n- Captures HTTP request details (endpoint, method, IP, user agent)\n- Establishes request context with unique request ID\n- Initializes timing for performance tracking\n- Sets up context propagation for the request lifecycle\n\n**2. Audit Logging Middleware:**\n- Intercepts all API requests before and after processing\n- Records request parameters and response data\n- Tracks authentication events (login, logout, token refresh)\n- Captures error states and exception details\n- Implements configurable verbosity levels\n\n**3. Database Operation Middleware:**\n- Hooks into Prisma middleware for database operations\n- Tracks all database queries with timing information\n- Records affected records and change details\n- Maintains data lineage for compliance requirements\n\n**4. Integration with Audit Service:**\n- Uses the AuditService singleton for consistent logging\n- Implements batching for performance optimization\n- Handles asynchronous logging to prevent request blocking\n- Provides correlation between related audit events\n\n**5. Security Features:**\n- Implements data sanitization to prevent sensitive data logging\n- Supports field-level redaction for PII and sensitive information\n- Configurable retention policies for compliance\n- Tamper-evident logging with hash chains\n\n**6. Performance Considerations:**\n- Minimal impact on request processing time\n- Efficient memory usage with stream processing\n- Configurable sampling rates for high-volume endpoints\n- Automatic compression for large payload logging\n\nThe middleware implementation provides comprehensive, configurable audit logging across all application layers while maintaining high performance and security standards.\n</info added on 2025-09-28T13:58:28.368Z>",
+            "status": "done",
+            "testStrategy": "Review the schema design with the team for completeness."
+          },
+          {
+            "id": 2,
+            "title": "Develop Middleware for Logging",
+            "description": "Create middleware to intercept database actions and log them appropriately.",
+            "dependencies": [],
+            "details": "Implement logging for create, update, and delete actions in the middleware.",
+            "status": "pending",
+            "testStrategy": "Test middleware by performing CRUD operations and checking logs."
+          },
+          {
+            "id": 3,
+            "title": "Implement User Identification",
+            "description": "Ensure that user identification is captured during logging.",
+            "dependencies": [],
+            "details": "Integrate user authentication to retrieve user ID and include it in the logs.",
+            "status": "pending",
+            "testStrategy": "Verify that logs contain correct user identification for each action."
+          },
+          {
+            "id": 4,
+            "title": "Create Audit Logs Table",
+            "description": "Set up the database table to store audit logs based on the defined structure.",
+            "dependencies": [],
+            "details": "Execute SQL scripts to create the Audit Logs table in the database.",
+            "status": "pending",
+            "testStrategy": "Check the database to ensure the Audit Logs table is created successfully."
+          },
+          {
+            "id": 5,
+            "title": "Test Audit Logging Functionality",
+            "description": "Perform tests to ensure that all actions are logged correctly.",
+            "dependencies": [],
+            "details": "Conduct various CRUD operations and verify that corresponding logs are created.",
+            "status": "pending",
+            "testStrategy": "Use Postman to perform actions and check the Audit Logs table for entries."
+          },
+          {
+            "id": 6,
+            "title": "Review and Optimize Logging Performance",
+            "description": "Analyze the performance of the logging mechanism and optimize if necessary.",
+            "dependencies": [],
+            "details": "Evaluate the impact of logging on application performance and make adjustments.",
+            "status": "pending",
+            "testStrategy": "Monitor application performance metrics before and after optimizations."
+          }
+        ]
       },
       {
         "id": 11,
@@ -601,7 +710,7 @@
     ],
     "metadata": {
       "created": "2025-09-28T00:23:29.094Z",
-      "updated": "2025-09-28T10:19:55.049Z",
+      "updated": "2025-09-28T13:58:54.868Z",
       "description": "Tasks for master context"
     }
   }

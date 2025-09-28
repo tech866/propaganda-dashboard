@@ -60,7 +60,7 @@ describe('Validation Schemas', () => {
     it('should validate correct registration data', async () => {
       const validData = {
         email: 'newuser@example.com',
-        password: 'password123',
+        password: 'Password123',
         name: 'John Doe',
         clientId: '550e8400-e29b-41d4-a716-446655440001'
       };
@@ -164,7 +164,7 @@ describe('Validation Schemas', () => {
 
       const result = await validateCreateCall(invalidData);
       expect(result.isValid).toBe(false);
-      expect(result.errors?.call_duration).toBe('Call duration cannot be negative');
+      expect(result.errors?.call_duration).toBe('Call duration must be positive');
     });
   });
 
@@ -215,7 +215,7 @@ describe('Validation Schemas', () => {
 
       const result = await validateCreateUser(invalidData);
       expect(result.isValid).toBe(false);
-      expect(result.errors?.role).toBe('Invalid role. Must be one of: sales, admin, ceo');
+      expect(result.errors?.role).toBe('Role must be ceo, admin, or sales');
     });
   });
 
@@ -252,7 +252,7 @@ describe('Validation Schemas', () => {
 
       const result = await validateCallFilter(invalidData);
       expect(result.isValid).toBe(false);
-      expect(result.errors?.offset).toBe('Offset cannot be negative');
+      expect(result.errors?.offset).toBe('Offset must be non-negative');
     });
   });
 
