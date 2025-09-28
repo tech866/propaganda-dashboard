@@ -1,53 +1,62 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { withRole, User } from '@/middleware/auth';
+import { withAuth, User } from '@/middleware/auth';
 import { createValidationError, withErrorHandling } from '@/middleware/errors';
 import { validateCreateUser } from '@/lib/validation';
+import { getClient } from '@/lib/database';
 
-// GET /api/users - Get all users (admin only)
-async function getUsers(request: NextRequest, user: User) {
+// GET /api/users - Get all users (admin/ceo only)
+const getUsers = withErrorHandling(async (request: NextRequest, user: User) => {
+  const client = await getClient();
+  
   try {
-    // TODO: Implement database query
-    // For now, return mock data filtered by user's client access
-    const mockUsers = [
-      {
-        id: 'user-1',
-        email: 'john@example.com',
-        name: 'John Doe',
-        role: 'sales',
-        clientId: 'client-1',
-        isActive: true,
-        createdAt: new Date().toISOString()
-      },
-      {
-        id: 'user-2',
-        email: 'admin@example.com',
-        name: 'Admin User',
-        role: 'admin',
-        clientId: 'client-1',
-        isActive: true,
-        createdAt: new Date().toISOString()
-      }
-    ].filter(u => u.clientId === user.clientId || user.role === 'ceo');
+    // Only admin and CEO can access user data
+    if (user.role === 'sales') {
+      return NextResponse.json(
+        {
+          success: false,
+          message: 'Access denied'
+        },
+        { status: 403 }
+      );
+    }
+
+    let query = `
+      SELECT 
+        u.id,
+        u.email,
+        u.name,
+        u.role,
+        u.client_id as "clientId",
+        u.is_active as "isActive",
+        u.created_at as "createdAt"
+      FROM users u
+      JOIN clients c ON u.client_id = c.id
+    `;
+    
+    const queryParams: string[] = [];
+    
+    // Admin can only see users from their client, CEO can see all
+    if (user.role === 'admin') {
+      query += ' WHERE u.client_id = $1';
+      queryParams.push(user.clientId);
+    }
+    
+    query += ' ORDER BY u.name ASC';
+    
+    const result = await client.query(query, queryParams);
 
     return NextResponse.json(
       {
         success: true,
-        data: mockUsers,
+        data: result.rows,
         user: { id: user.id, role: user.role, clientId: user.clientId }
       },
       { status: 200 }
     );
-  } catch (error) {
-    return NextResponse.json(
-      {
-        success: false,
-        message: 'Failed to fetch users',
-        error: error instanceof Error ? error.message : 'Unknown error'
-      },
-      { status: 500 }
-    );
+  } finally {
+    client.release();
   }
-}
+});
 
 // POST /api/users - Create a new user (admin only)
 const createUser = withErrorHandling(async (request: NextRequest, user: User) => {
@@ -92,6 +101,6 @@ const createUser = withErrorHandling(async (request: NextRequest, user: User) =>
   );
 });
 
-// Export the protected handlers (admin role required)
-export const GET = withRole('admin', getUsers);
-export const POST = withRole('admin', createUser);
+// Export the protected handlers
+export const GET = withAuth(getUsers);
+export const POST = withAuth(createUser);

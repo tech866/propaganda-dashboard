@@ -27,8 +27,8 @@ export function extractAuditContext(request: NextRequest, user?: User): AuditCon
   const httpMethod = request.method as any;
 
   return {
-    clientId: user?.clientId || 'unknown',
-    userId: user?.id,
+    clientId: user?.clientId || null,
+    userId: user?.id || null,
     sessionId: request.headers.get('x-session-id') || undefined,
     ipAddress,
     userAgent,

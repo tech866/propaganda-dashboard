@@ -34,11 +34,11 @@ export async function middleware(request: NextRequest) {
 
     if (token) {
       user = {
-        id: token.sub || 'unknown',
+        id: token.sub || null,
         email: token.email || 'unknown',
         name: token.name || 'unknown',
         role: (token as any).role || 'sales',
-        clientId: (token as any).clientId || 'unknown',
+        clientId: (token as any).clientId || null,
       };
     }
   } catch (error) {

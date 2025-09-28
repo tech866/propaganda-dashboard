@@ -2,11 +2,12 @@
 
 import { useSession, signOut } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import HeroMetrics from '@/components/dashboard/HeroMetrics';
 import LossReasonsChart from '@/components/dashboard/LossReasonsChart';
 import CallLogTable from '@/components/dashboard/CallLogTable';
+import DashboardFilters, { FilterState } from '@/components/dashboard/DashboardFilters';
 import DashboardNavigation from '@/components/navigation/DashboardNavigation';
 import { useRole, RoleGuard, PermissionGuard } from '@/contexts/RoleContext';
 
@@ -14,12 +15,25 @@ export default function Dashboard() {
   const { data: session, status } = useSession();
   const router = useRouter();
   const { user, hasAnyRole, canViewMetrics, canManageUsers, canViewAuditLogs } = useRole();
+  const [filters, setFilters] = useState<FilterState>({
+    dateFrom: '',
+    dateTo: '',
+    clientId: '',
+    userId: '',
+    callType: '',
+    status: '',
+    outcome: ''
+  });
 
   useEffect(() => {
     if (status === 'unauthenticated') {
       router.push('/auth/signin');
     }
   }, [status, router]);
+
+  const handleFiltersChange = (newFilters: FilterState) => {
+    setFilters(newFilters);
+  };
 
   if (status === 'loading') {
     return (
@@ -66,9 +80,16 @@ export default function Dashboard() {
 
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Dashboard Filters */}
+        <DashboardFilters 
+          onFiltersChange={handleFiltersChange}
+          className="mb-8"
+          showAdvanced={hasAnyRole(['admin', 'ceo'])}
+        />
+
         {/* Hero Metrics - Only show if user can view metrics */}
         <PermissionGuard permission="view_own_metrics">
-          <HeroMetrics className="mb-8" />
+          <HeroMetrics className="mb-8" filters={filters} />
         </PermissionGuard>
 
         {/* Main Dashboard Content */}
@@ -143,7 +164,7 @@ export default function Dashboard() {
 
         {/* Call Log Table - Only show if user can view calls */}
         <PermissionGuard permission="view_own_calls">
-          <CallLogTable className="mt-8" />
+          <CallLogTable className="mt-8" filters={filters} />
         </PermissionGuard>
       </main>
     </div>

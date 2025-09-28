@@ -553,7 +553,7 @@
           5,
           8
         ],
-        "status": "in-progress",
+        "status": "done",
         "subtasks": [
           {
             "id": 1,
@@ -607,7 +607,7 @@
               "9.4"
             ],
             "details": "Create test cases for each user role to ensure the UI behaves as expected regarding access and visibility.",
-            "status": "in-progress",
+            "status": "done",
             "testStrategy": "Log in as each user role and validate that the UI displays the correct components and data."
           }
         ]
@@ -857,7 +857,7 @@
     ],
     "metadata": {
       "created": "2025-09-28T00:23:29.094Z",
-      "updated": "2025-09-28T19:05:19.070Z",
+      "updated": "2025-09-28T20:38:20.519Z",
       "description": "Tasks for master context"
     }
   }

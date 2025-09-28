@@ -19,9 +19,15 @@ interface MetricsData {
 
 interface HeroMetricsProps {
   className?: string;
+  filters?: {
+    dateFrom?: string;
+    dateTo?: string;
+    clientId?: string;
+    userId?: string;
+  };
 }
 
-export default function HeroMetrics({ className = '' }: HeroMetricsProps) {
+export default function HeroMetrics({ className = '', filters }: HeroMetricsProps) {
   const [metrics, setMetrics] = useState<MetricsData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -32,7 +38,17 @@ export default function HeroMetrics({ className = '' }: HeroMetricsProps) {
         setLoading(true);
         setError(null);
         
-        const response = await fetch('/api/metrics');
+        // Build query parameters from filters
+        const params = new URLSearchParams();
+        if (filters?.dateFrom) params.append('dateFrom', filters.dateFrom);
+        if (filters?.dateTo) params.append('dateTo', filters.dateTo);
+        if (filters?.clientId) params.append('clientId', filters.clientId);
+        if (filters?.userId) params.append('userId', filters.userId);
+        
+        const queryString = params.toString();
+        const url = queryString ? `/api/metrics?${queryString}` : '/api/metrics';
+        
+        const response = await fetch(url);
         if (!response.ok) {
           throw new Error(`Failed to fetch metrics: ${response.status}`);
         }
@@ -48,7 +64,7 @@ export default function HeroMetrics({ className = '' }: HeroMetricsProps) {
     };
 
     fetchMetrics();
-  }, []);
+  }, [filters]);
 
   if (loading) {
     return (

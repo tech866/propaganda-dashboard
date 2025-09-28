@@ -121,8 +121,8 @@ export class UserIdentificationService {
     const httpMethod = request.method as any;
 
     return {
-      clientId: user?.clientId || 'unknown',
-      userId: user?.id,
+      clientId: user?.clientId || null,
+      userId: user?.id || null,
       sessionId: user?.sessionId || this.generateSessionId(),
       ipAddress,
       userAgent,

@@ -5,6 +5,15 @@ import { Call } from '@/lib/services/callService';
 
 interface CallLogTableProps {
   className?: string;
+  filters?: {
+    dateFrom?: string;
+    dateTo?: string;
+    clientId?: string;
+    userId?: string;
+    callType?: string;
+    status?: string;
+    outcome?: string;
+  };
 }
 
 interface CallLogTableState {
@@ -18,7 +27,7 @@ interface CallLogTableState {
   searchTerm: string;
 }
 
-const CallLogTable: React.FC<CallLogTableProps> = ({ className = '' }) => {
+const CallLogTable: React.FC<CallLogTableProps> = ({ className = '', filters }) => {
   const [state, setState] = useState<CallLogTableState>({
     calls: [],
     loading: true,
@@ -36,14 +45,35 @@ const CallLogTable: React.FC<CallLogTableProps> = ({ className = '' }) => {
       try {
         setState(prev => ({ ...prev, loading: true, error: null }));
         
-        const response = await fetch('/api/calls?limit=100');
+        // Build query parameters from filters
+        const params = new URLSearchParams();
+        params.append('limit', '100');
+        if (filters?.dateFrom) params.append('dateFrom', filters.dateFrom);
+        if (filters?.dateTo) params.append('dateTo', filters.dateTo);
+        if (filters?.clientId) params.append('clientId', filters.clientId);
+        if (filters?.userId) params.append('userId', filters.userId);
+        
+        const response = await fetch(`/api/calls?${params.toString()}`);
         if (!response.ok) {
           throw new Error(`Failed to fetch calls: ${response.statusText}`);
         }
         
         const result = await response.json();
         if (result.success) {
-          setState(prev => ({ ...prev, calls: result.data, loading: false }));
+          let filteredCalls = result.data;
+          
+          // Apply client-side filters for callType, status, outcome
+          if (filters?.callType) {
+            filteredCalls = filteredCalls.filter((call: Call) => call.call_type === filters.callType);
+          }
+          if (filters?.status) {
+            filteredCalls = filteredCalls.filter((call: Call) => call.status === filters.status);
+          }
+          if (filters?.outcome) {
+            filteredCalls = filteredCalls.filter((call: Call) => call.outcome === filters.outcome);
+          }
+          
+          setState(prev => ({ ...prev, calls: filteredCalls, loading: false }));
         } else {
           throw new Error(result.message || 'Failed to fetch calls');
         }
@@ -58,7 +88,7 @@ const CallLogTable: React.FC<CallLogTableProps> = ({ className = '' }) => {
     };
 
     fetchCalls();
-  }, []);
+  }, [filters]);
 
   // Sort calls based on current sort field and direction
   const sortedCalls = React.useMemo(() => {

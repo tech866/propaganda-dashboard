@@ -101,7 +101,7 @@ export class AuditService {
         clientId: context.clientId,
         userId: context.userId,
         tableName: 'users',
-        recordId: context.userId || 'unknown',
+        recordId: context.userId || null,
         action: 'SELECT',
         endpoint: context.endpoint,
         httpMethod: context.httpMethod,
@@ -166,7 +166,7 @@ export class AuditService {
         clientId: context.clientId,
         userId: context.userId,
         tableName: tableName || 'system',
-        recordId: recordId || 'unknown',
+        recordId: recordId || null,
         action: 'SELECT', // Default action for errors
         endpoint: context.endpoint,
         httpMethod: context.httpMethod,
