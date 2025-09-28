@@ -8,6 +8,7 @@ import {
   validateRequiredFields,
   withErrorHandling 
 } from '@/middleware/errors';
+import { CallService, CreateCallData } from '@/lib/services/callService';
 
 // GET /api/calls - Get all calls (with optional filtering)
 const getCalls = withErrorHandling(async (request: NextRequest, user: User) => {
@@ -16,40 +17,29 @@ const getCalls = withErrorHandling(async (request: NextRequest, user: User) => {
   const userId = searchParams.get('userId');
   const dateFrom = searchParams.get('dateFrom');
   const dateTo = searchParams.get('dateTo');
+  const limit = parseInt(searchParams.get('limit') || '100');
+  const offset = parseInt(searchParams.get('offset') || '0');
 
   // Validate client access
   if (requestedClientId && !canAccessClient(user, requestedClientId)) {
     throw createAuthorizationError('Access denied to client data');
   }
 
-  // Get accessible client IDs for the user
-  const accessibleClientIds = getAccessibleClientIds(user);
-  
-  // TODO: Implement database query with filters
-  // For now, return mock data filtered by user permissions
-  const mockCalls = [
-    {
-      id: '1',
-      clientId: 'client-1',
-      prospect: 'John Doe',
-      owner: user.role === 'sales' ? user.id : 'user-1',
-      timestamp: new Date().toISOString(),
-      callType: 'outbound',
-      status: 'completed',
-      outcome: 'won',
-      lossReason: null,
-      notes: 'Great conversation, closed the deal'
-    }
-  ].filter(call => 
-    accessibleClientIds.includes(call.clientId) &&
-    (user.role === 'ceo' || user.role === 'admin' || call.owner === user.id)
-  );
+  // Get calls from database
+  const calls = await CallService.getCalls(user, {
+    clientId: requestedClientId || undefined,
+    userId: userId || undefined,
+    dateFrom: dateFrom || undefined,
+    dateTo: dateTo || undefined,
+    limit,
+    offset,
+  });
 
   return NextResponse.json(
     {
       success: true,
-      data: mockCalls,
-      filters: { clientId: requestedClientId, userId, dateFrom, dateTo },
+      data: calls,
+      filters: { clientId: requestedClientId, userId, dateFrom, dateTo, limit, offset },
       user: { id: user.id, role: user.role, clientId: user.clientId }
     },
     { status: 200 }
@@ -61,7 +51,7 @@ const createCall = withErrorHandling(async (request: NextRequest, user: User) =>
   const body = await request.json();
   
   // Validate required fields
-  const requiredFields = ['clientId', 'prospect', 'callType', 'status'];
+  const requiredFields = ['client_id', 'prospect_name', 'call_type', 'status'];
   const validation = validateRequiredFields(body, requiredFields);
   
   if (!validation.isValid) {
@@ -71,18 +61,28 @@ const createCall = withErrorHandling(async (request: NextRequest, user: User) =>
   }
 
   // Validate client access
-  if (!canAccessClient(user, body.clientId)) {
+  if (!canAccessClient(user, body.client_id)) {
     throw createAuthorizationError('Access denied to create call for this client');
   }
 
-  // TODO: Implement database insert
-  // For now, return mock response
-  const newCall = {
-    id: Date.now().toString(),
-    ...body,
-    timestamp: new Date().toISOString(),
-    owner: user.id // Set owner to current user
+  // Create call data object
+  const callData: CreateCallData = {
+    client_id: body.client_id,
+    prospect_name: body.prospect_name,
+    prospect_email: body.prospect_email || undefined,
+    prospect_phone: body.prospect_phone || undefined,
+    call_type: body.call_type,
+    status: body.status,
+    outcome: body.outcome || 'tbd',
+    loss_reason_id: body.loss_reason_id || undefined,
+    notes: body.notes || undefined,
+    call_duration: body.call_duration || undefined,
+    scheduled_at: body.scheduled_at || undefined,
+    completed_at: body.completed_at || undefined,
   };
+
+  // Create call in database
+  const newCall = await CallService.createCall(callData, user);
 
   return NextResponse.json(
     {
