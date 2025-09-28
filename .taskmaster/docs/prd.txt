@@ -1,0 +1,204 @@
+# Agency Client Tracking Database & Dashboard - Product Requirements Document
+
+## Project Overview
+Deliver a lean MVP for a multi-tenant agency dashboard focused on call logging and high-level performance metrics (Show Rate, Close Rate). Scope to essentials that validate workflows and RBAC; defer advanced integrations/reporting to later phases.
+
+## Business Objectives
+- Validate multi-tenant agency workflow efficiency
+- Implement role-based access control (RBAC) for different user types
+- Provide real-time performance metrics for sales teams
+- Enable strategic oversight for management
+- Create scalable foundation for future feature expansion
+
+## User Roles & Access Levels
+
+### 1. CEO Access
+**Primary Function:** Strategic oversight and reporting
+- **Permissions:** Read-only access to all client data
+- **Dashboard Needs:** Agency rollup + per-client overview (Show Rate, Close Rate, Loss Reasons)
+- **Key Features:** Executive dashboard, client performance comparison, loss reason analysis
+
+### 2. Admin Access
+**Primary Function:** Client management and oversight
+- **Permissions:** Full CRUD within assigned client(s); manage users, tags, loss reasons
+- **Dashboard Needs:** Same as CEO + administrative management tools
+- **Key Features:** User management, loss reason configuration, client data management
+
+### 3. Sales Team Access (Closer/Rep)
+**Primary Function:** Call logging and personal performance tracking
+- **Permissions:** Create/edit their own call logs; view their own metrics only
+- **Dashboard Needs:** My Performance (Show Rate, Close Rate), My Calls
+- **Key Features:** Call logging interface, personal metrics dashboard, call history
+
+## Core Data Tracking Requirements
+
+### Performance Metrics
+- **Show Rate:** Shows / Booked calls
+- **Close Rate:** Wins / (Shows or Qualified calls)
+- **Deal Loss Reasons:** Categorized reasons for unsuccessful conversions
+
+### Data Entities
+- **Clients:** Multi-tenant client organizations
+- **Users:** Sales reps, admins, CEOs with role-based permissions
+- **Calls:** Individual call records with outcomes and metadata
+- **Loss Reasons:** Categorized reasons for failed conversions
+- **Audit Logs:** Track all data changes and access events
+
+## Technical Architecture Requirements
+
+### Database Structure
+- Multi-tenant architecture supporting agency-level and client-level data segregation
+- Account switching functionality allowing seamless toggling between client sub-accounts
+- Role-based access control with granular permissions per user type
+- Audit logging for all data changes and access events
+
+### Dashboard Features
+- **Hero Metrics Section:** Prominent display of Show Rate and Close Rate
+- **Loss Reasons Chart:** Top 5 categories with visual representation
+- **Call Log Table:** Recent call history with filtering capabilities
+- **Filters:** Date range, client, and sales user (Admin/CEO only)
+
+### API Capabilities
+- **Calls CRUD:** Create, read, update, delete calls with proper authorization
+- **Metrics Endpoints:** Overview by client/date, personal metrics for sales users
+- **Loss Reason Management:** Admin-only endpoints for configuration
+- **User Management:** Role-based user administration
+
+## Specific Functional Requirements
+
+### Call Logging System
+**Create call with:**
+- Client selection
+- Prospect information
+- Owner (auto-assigned to current user)
+- Timestamp (defaults to now)
+- Call type (inbound/outbound)
+- Status (completed/no-show/rescheduled)
+- Outcome (won/lost/tbd)
+- Loss reason (select from configured options)
+- Notes (optional)
+
+**Validation Rules:**
+- Required fields validation
+- Sensible defaults (owner = current user, timestamp = now)
+- Call ownership rules enforcement
+
+**Edit/Delete Permissions:**
+- Sales users: Own calls only
+- Admin users: All calls within assigned clients
+- CEO: Read-only access
+
+### Reporting & Analytics
+**MVP Dashboard Components:**
+- Show Rate calculation and display
+- Close Rate calculation and display
+- Loss Reasons breakdown and visualization
+- Call volume trends
+
+**Filtering Capabilities:**
+- Date range selection
+- Client filtering (Admin/CEO only)
+- Sales user filtering (Admin/CEO only)
+- Real-time filter application
+
+**Audit Logs:**
+- Track create/update/delete actions
+- User identification and timestamp
+- Data change details
+- Access event logging
+
+### Data Entry & Validation
+**Form-based Input:**
+- Streamlined call logging modal
+- Intuitive user interface
+- Mobile-responsive design
+
+**Data Validation Rules:**
+- Required fields enforcement
+- Call ownership rules
+- Data type validation
+- Business rule validation
+
+## Technical Specifications
+
+### Frontend Requirements
+- **Framework:** Next.js with TypeScript
+- **Styling:** Tailwind CSS with shadcn/ui components
+- **Theme:** Dark theme aligned to Propaganda Inc. branding
+- **Responsiveness:** Mobile-friendly responsive design
+- **Navigation:** Client switcher in top bar
+- **Access Control:** Role-based menu and feature visibility
+
+### Backend Requirements
+- **Architecture:** RESTful API with Next.js API routes
+- **Database:** PostgreSQL with multi-tenant schema design
+- **Authentication:** JWT-based authentication system with MFA readiness
+- **Logging:** Comprehensive audit logging for all write actions
+- **Performance:** Optimized queries for metrics calculations
+
+### Security & Compliance
+- **Data Encryption:** In transit and at rest
+- **Access Control:** Strict scoping by clientId at API and DB levels
+- **Backup Strategy:** Daily backups and recovery plan
+- **Rate Limiting:** API endpoint protection
+- **Data Privacy:** Role-based data access restrictions
+
+## Out of Scope (MVP)
+- Prospect pipeline management
+- Task scheduling or reminders
+- Ad/CRM/Payment integrations
+- P&L, AOV, revenue metrics
+- Automated reporting (CSV optional if trivial)
+- Advanced analytics and forecasting
+- Third-party integrations
+- Mobile native applications
+
+## Success Metrics
+- Sales users can only view/edit their own calls and metrics
+- CEO/Admin can switch clients and view aggregated metrics
+- Dashboard correctly computes Show Rate and Close Rate for any date range
+- All write actions recorded in audit logs
+- P95 < 300ms for metric endpoints on up to 50k calls/client
+- 99.9% uptime for core functionality
+- User authentication and authorization working correctly
+- Multi-tenant data isolation maintained
+
+## Deliverables Expected
+1. **Deployed web application** with authentication and RBAC
+2. **Calls CRUD functionality** with proper validation
+3. **Metrics dashboard** with real-time calculations
+4. **Minimal database schema** with seed/demo data
+5. **Admin screens** for Loss Reasons & user management
+6. **Comprehensive README** with setup, environment variables, and backup/restore procedures
+7. **API documentation** for all endpoints
+8. **User guide** for each role type
+
+## Timeline Considerations
+- **Week 1:** Auth/RBAC, database schema, client switcher, Log Call modal
+- **Week 2:** Calls list/history, metrics calculations + dashboard
+- **Week 3:** Admin features (loss reasons, users), audit logs, UI polish
+- **Week 4:** QA testing, seed/demo data, documentation, deployment
+
+## Nice-to-Have Features (Future Phases)
+- CSV export of calls/metrics for selected ranges
+- Simple "My Goals" with target Show/Close rates and progress indicator
+- Saved filters per user
+- Advanced reporting and analytics
+- Mobile app development
+- Third-party integrations
+- Automated notifications and alerts
+
+## Technical Stack
+- **Frontend:** Next.js 15, TypeScript, Tailwind CSS, shadcn/ui
+- **Backend:** Next.js API routes, PostgreSQL
+- **Authentication:** NextAuth.js or similar
+- **Deployment:** Vercel or similar platform
+- **Database:** PostgreSQL with connection pooling
+- **Monitoring:** Basic error tracking and performance monitoring
+
+## Risk Mitigation
+- **Data Security:** Implement proper encryption and access controls
+- **Performance:** Optimize database queries and implement caching
+- **Scalability:** Design for multi-tenant growth
+- **User Adoption:** Focus on intuitive UX and clear value proposition
+- **Technical Debt:** Maintain clean code architecture for future expansion

@@ -1,0 +1,214 @@
+{
+  "master": {
+    "tasks": [
+      {
+        "id": 1,
+        "title": "Setup Project Repository",
+        "description": "Initialize a new Git repository for the project and set up the basic directory structure for both frontend and backend components.",
+        "details": "Create a Git repository on GitHub or GitLab. Initialize the project with a README file. Set up directories for frontend (Next.js) and backend (Next.js API routes). Include a .gitignore file to exclude node_modules and environment files.",
+        "testStrategy": "Verify repository is created and accessible. Check directory structure for frontend and backend.",
+        "priority": "medium",
+        "dependencies": [],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 2,
+        "title": "Initialize Frontend with Next.js",
+        "description": "Set up the frontend application using Next.js with TypeScript and Tailwind CSS.",
+        "details": "Run 'npx create-next-app@latest --typescript' to create a new Next.js app. Install Tailwind CSS by following the official documentation. Configure Tailwind in the project by creating a tailwind.config.js file and including it in the global CSS file.",
+        "testStrategy": "Run the development server and ensure the default Next.js page loads with Tailwind CSS styles applied.",
+        "priority": "high",
+        "dependencies": [
+          1
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 3,
+        "title": "Setup Backend with Next.js API Routes",
+        "description": "Create the backend structure using Next.js API routes for handling server-side logic.",
+        "details": "Create an 'api' directory under the 'pages' directory in the Next.js project. Set up basic API route files for handling calls CRUD operations. Ensure the API structure follows RESTful principles.",
+        "testStrategy": "Test API routes using Postman or similar tool to ensure they respond correctly.",
+        "priority": "high",
+        "dependencies": [
+          1
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 4,
+        "title": "Implement Database Schema in PostgreSQL",
+        "description": "Design and implement the PostgreSQL database schema to support multi-tenant architecture.",
+        "details": "Create a PostgreSQL database and define tables for Clients, Users, Calls, Loss Reasons, and Audit Logs. Use a multi-tenant schema design to ensure data segregation. Include necessary fields as per PRD requirements.",
+        "testStrategy": "Run SQL queries to verify table creation and structure. Ensure relationships between tables are correctly established.",
+        "priority": "high",
+        "dependencies": [
+          1
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 5,
+        "title": "Setup Authentication with JWT",
+        "description": "Implement JWT-based authentication for user login and role-based access control.",
+        "details": "Use NextAuth.js for authentication. Configure JWT settings and define user roles (CEO, Admin, Sales Team). Implement login and registration endpoints in the API routes.",
+        "testStrategy": "Test user registration and login functionality. Verify JWT tokens are issued and can be used for authenticated requests.",
+        "priority": "high",
+        "dependencies": [
+          3
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 6,
+        "title": "Create Call Logging API",
+        "description": "Develop API endpoints for creating, reading, updating, and deleting call logs with proper validation.",
+        "details": "Implement CRUD operations for Calls in the API routes. Ensure validation rules are enforced, such as required fields and ownership rules. Use middleware for authorization checks.",
+        "testStrategy": "Test all CRUD operations using Postman. Validate that only authorized users can perform actions on calls.",
+        "priority": "high",
+        "dependencies": [
+          4,
+          5
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 7,
+        "title": "Implement Performance Metrics Calculations",
+        "description": "Create backend logic to calculate Show Rate and Close Rate based on call data.",
+        "details": "Develop functions to calculate Show Rate and Close Rate from the Calls table. Ensure these calculations are optimized for performance, especially with large datasets.",
+        "testStrategy": "Create unit tests for the calculation functions. Validate that metrics are calculated correctly for various scenarios.",
+        "priority": "medium",
+        "dependencies": [
+          6
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 8,
+        "title": "Develop Dashboard UI Components",
+        "description": "Build the frontend components for the dashboard, including metrics display and call log table.",
+        "details": "Use React components to create the dashboard layout. Implement sections for Hero Metrics (Show Rate, Close Rate), Loss Reasons Chart, and Call Log Table. Style components using Tailwind CSS.",
+        "testStrategy": "Render the dashboard in the browser and verify that all components display correctly with sample data.",
+        "priority": "medium",
+        "dependencies": [
+          2,
+          7
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 9,
+        "title": "Implement Role-Based Access Control in UI",
+        "description": "Ensure that the frontend UI respects user roles and permissions for displaying features and data.",
+        "details": "Use context or state management to manage user roles in the frontend. Conditionally render components based on user permissions (e.g., Admin features only for Admin users).",
+        "testStrategy": "Log in as different user roles and verify that the UI displays the correct components and data based on permissions.",
+        "priority": "high",
+        "dependencies": [
+          5,
+          8
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 10,
+        "title": "Create Audit Logging Mechanism",
+        "description": "Implement audit logging for all data changes and access events in the application.",
+        "details": "Develop middleware for logging create, update, and delete actions in the database. Store logs in the Audit Logs table with user identification and timestamps.",
+        "testStrategy": "Perform various CRUD operations and verify that corresponding logs are created in the Audit Logs table.",
+        "priority": "medium",
+        "dependencies": [
+          6
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 11,
+        "title": "Implement Filtering Capabilities for Dashboard",
+        "description": "Add filtering options for the dashboard to allow users to filter data by date range, client, and sales user.",
+        "details": "Develop filtering components in the dashboard UI. Implement API endpoints to handle filter requests and return filtered data based on user selections.",
+        "testStrategy": "Test filtering functionality by applying different filters and verifying that the displayed data updates accordingly.",
+        "priority": "medium",
+        "dependencies": [
+          8
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 12,
+        "title": "Create Admin Management Screens",
+        "description": "Develop admin screens for managing users and loss reasons, accessible only to Admin users.",
+        "details": "Build UI components for user management (CRUD operations) and loss reason configuration. Ensure these screens are only accessible to Admin users based on RBAC.",
+        "testStrategy": "Log in as an Admin user and verify that the management screens are accessible and functional.",
+        "priority": "medium",
+        "dependencies": [
+          9
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 13,
+        "title": "Implement Data Validation Rules",
+        "description": "Ensure that all forms and data entries enforce validation rules as specified in the PRD.",
+        "details": "Implement client-side and server-side validation for all forms, including required fields, data types, and business rules. Use libraries like Yup for schema validation.",
+        "testStrategy": "Test all forms to ensure validation rules are enforced and appropriate error messages are displayed.",
+        "priority": "high",
+        "dependencies": [
+          6
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 14,
+        "title": "Create Comprehensive README and Documentation",
+        "description": "Document the project setup, environment variables, and API endpoints in a comprehensive README file.",
+        "details": "Write a README file that includes project overview, setup instructions, environment variables, and API documentation. Ensure clarity and completeness for future developers.",
+        "testStrategy": "Review the README for completeness and clarity. Ensure that it provides all necessary information for setup and usage.",
+        "priority": "medium",
+        "dependencies": [
+          1,
+          3,
+          5,
+          6,
+          8
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 15,
+        "title": "Conduct QA Testing and Deployment",
+        "description": "Perform thorough QA testing of the application and deploy to a hosting platform.",
+        "details": "Conduct functional and performance testing across all features. Deploy the application to Vercel or a similar platform, ensuring all environment variables are correctly configured.",
+        "testStrategy": "Perform end-to-end testing of the deployed application. Verify that all features work as expected in the production environment.",
+        "priority": "high",
+        "dependencies": [
+          10,
+          11,
+          12,
+          13
+        ],
+        "status": "pending",
+        "subtasks": []
+      }
+    ],
+    "metadata": {
+      "created": "2025-09-28T00:23:29.094Z",
+      "updated": "2025-09-28T00:23:29.094Z",
+      "description": "Tasks for master context"
+    }
+  }
+}
