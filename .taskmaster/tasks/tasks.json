@@ -253,8 +253,54 @@
         "dependencies": [
           3
         ],
-        "status": "pending",
-        "subtasks": []
+        "status": "done",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Configure NextAuth.js",
+            "description": "Set up NextAuth.js for handling authentication and session management.",
+            "dependencies": [],
+            "details": "Install NextAuth.js and configure it to use JWT for authentication. Define the necessary providers and callbacks.",
+            "status": "done",
+            "testStrategy": "Verify that users can log in and that sessions are maintained correctly."
+          },
+          {
+            "id": 2,
+            "title": "Define User Roles",
+            "description": "Establish user roles for the application including CEO, Admin, and Sales Team.",
+            "dependencies": [],
+            "details": "Create a role management system that assigns roles to users during registration and login.",
+            "status": "done",
+            "testStrategy": "Test role assignment during user registration and ensure roles are correctly recognized in the application."
+          },
+          {
+            "id": 3,
+            "title": "Implement Login Endpoint",
+            "description": "Create an API endpoint for user login that issues JWT tokens.",
+            "dependencies": [],
+            "details": "Develop the login API route that authenticates users and returns a JWT token upon successful login.",
+            "status": "done",
+            "testStrategy": "Test the login endpoint to ensure it returns a valid JWT token for authenticated users."
+          },
+          {
+            "id": 4,
+            "title": "Implement Registration Endpoint",
+            "description": "Create an API endpoint for user registration that includes role assignment.",
+            "dependencies": [],
+            "details": "Develop the registration API route that allows new users to sign up and assigns them a default role.",
+            "status": "done",
+            "testStrategy": "Test the registration endpoint to ensure new users can register and receive the correct role."
+          },
+          {
+            "id": 5,
+            "title": "Integrate JWT Middleware",
+            "description": "Implement middleware to validate JWT tokens for protected routes.",
+            "dependencies": [],
+            "details": "Create middleware that checks for a valid JWT token in the request headers and grants access to protected resources.",
+            "status": "done",
+            "testStrategy": "Test protected routes to ensure they are accessible only with a valid JWT token."
+          }
+        ]
       },
       {
         "id": 6,
@@ -399,7 +445,7 @@
     ],
     "metadata": {
       "created": "2025-09-28T00:23:29.094Z",
-      "updated": "2025-09-28T08:40:53.455Z",
+      "updated": "2025-09-28T08:50:59.775Z",
       "description": "Tasks for master context"
     }
   }
