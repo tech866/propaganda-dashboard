@@ -7,28 +7,28 @@ import { User, UserRole } from '@/middleware/auth';
 // Mock user data (in a real app, this would come from a database)
 const mockUsers = [
   { 
-    id: 'user-1', 
+    id: '650e8400-e29b-41d4-a716-446655440003', 
     email: 'test@example.com', 
     password: 'password123', 
     name: 'John Doe', 
     role: 'sales' as UserRole, 
-    clientId: 'client-1' 
+    clientId: '550e8400-e29b-41d4-a716-446655440001' 
   },
   { 
-    id: 'user-admin-1', 
+    id: '650e8400-e29b-41d4-a716-446655440002', 
     email: 'admin@example.com', 
     password: 'adminpassword', 
     name: 'Admin User', 
     role: 'admin' as UserRole, 
-    clientId: 'client-1' 
+    clientId: '550e8400-e29b-41d4-a716-446655440001' 
   },
   { 
-    id: 'user-ceo-1', 
+    id: '650e8400-e29b-41d4-a716-446655440001', 
     email: 'ceo@example.com', 
     password: 'ceopassword', 
     name: 'CEO User', 
     role: 'ceo' as UserRole, 
-    clientId: 'client-agency' 
+    clientId: '550e8400-e29b-41d4-a716-446655440001' 
   },
 ];
 

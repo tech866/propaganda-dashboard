@@ -4,12 +4,17 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { auditService } from '@/lib/services/auditService';
-import { AuditContext, AuditLevel, AuditCategory } from '@/lib/types/audit';
+import { AuditService } from '@/lib/services/auditService';
+import { AuditContext, AuditLevel, AuditCategory, AuditLogCreate } from '@/lib/types/audit';
 import { User } from '@/middleware/auth';
+import { PoolClient } from 'pg';
+import { userIdentificationService, EnhancedUser } from '@/lib/services/userIdentification';
+
+// Get audit service instance
+const auditService = AuditService.getInstance();
 
 /**
- * Extract audit context from request and user
+ * Extract audit context from request and user (legacy function)
  */
 export function extractAuditContext(request: NextRequest, user?: User): AuditContext {
   const ipAddress = request.ip || 
@@ -38,7 +43,21 @@ export function extractAuditContext(request: NextRequest, user?: User): AuditCon
 }
 
 /**
- * Audit middleware wrapper for API routes
+ * Extract enhanced audit context with comprehensive user identification
+ */
+export async function extractEnhancedAuditContext(request: NextRequest, user?: User | EnhancedUser): Promise<AuditContext> {
+  // If user is already enhanced, use it directly
+  if (user && 'sessionId' in user) {
+    return await userIdentificationService.createAuditContext(request, user as EnhancedUser);
+  }
+
+  // Otherwise, extract user from request
+  const enhancedUser = await userIdentificationService.extractUserFromRequest(request);
+  return await userIdentificationService.createAuditContext(request, enhancedUser);
+}
+
+/**
+ * Audit middleware wrapper for API routes (legacy version)
  */
 export function withAudit<T extends any[]>(
   handler: (request: NextRequest, user: User, ...args: T) => Promise<NextResponse>
@@ -54,31 +73,132 @@ export function withAudit<T extends any[]>(
       response = await handler(request, user, ...args);
       
       // Log successful operation
-      await auditService.logDataAccess(
-        context,
-        'api_requests',
-        'request',
-        'SELECT',
-        undefined,
-        {
+      const auditLog: AuditLogCreate = {
+        clientId: context.clientId,
+        userId: context.userId,
+        tableName: 'api_requests',
+        recordId: 'request',
+        action: 'SELECT',
+        ipAddress: context.ipAddress,
+        userAgent: context.userAgent,
+        sessionId: context.sessionId,
+        endpoint: context.endpoint,
+        httpMethod: context.httpMethod,
+        statusCode: response.status,
+        operationDurationMs: Date.now() - startTime,
+        metadata: {
+          ...context.metadata,
           statusCode: response.status,
           endpoint: context.endpoint,
           method: context.httpMethod
-        },
-        Date.now() - startTime
-      );
+        }
+      };
+
+      await auditService.log(auditLog);
 
     } catch (err) {
       error = err as Error;
       
       // Log error
-      await auditService.logError(
-        context,
-        error,
-        'api_requests',
-        'request',
-        context.httpMethod
-      );
+      const errorLog: AuditLogCreate = {
+        clientId: context.clientId,
+        userId: context.userId,
+        tableName: 'api_requests',
+        recordId: 'request',
+        action: 'SELECT',
+        ipAddress: context.ipAddress,
+        userAgent: context.userAgent,
+        sessionId: context.sessionId,
+        endpoint: context.endpoint,
+        httpMethod: context.httpMethod,
+        statusCode: 500,
+        operationDurationMs: Date.now() - startTime,
+        errorMessage: error.message,
+        metadata: {
+          ...context.metadata,
+          error: error.message,
+          stack: error.stack
+        }
+      };
+
+      await auditService.log(errorLog);
+
+      // Re-throw the error
+      throw error;
+    }
+
+    return response;
+  };
+}
+
+/**
+ * Enhanced audit middleware wrapper with comprehensive user identification
+ */
+export function withEnhancedAudit<T extends any[]>(
+  handler: (request: NextRequest, user: User, ...args: T) => Promise<NextResponse>
+) {
+  return async (request: NextRequest, user: User, ...args: T): Promise<NextResponse> => {
+    const startTime = Date.now();
+    const context = await extractEnhancedAuditContext(request, user);
+    let response: NextResponse;
+    let error: Error | null = null;
+
+    try {
+      // Execute the original handler
+      response = await handler(request, user, ...args);
+      
+      // Log successful operation with enhanced context
+      const auditLog: AuditLogCreate = {
+        clientId: context.clientId,
+        userId: context.userId,
+        tableName: 'api_requests',
+        recordId: 'request',
+        action: 'SELECT',
+        ipAddress: context.ipAddress,
+        userAgent: context.userAgent,
+        sessionId: context.sessionId,
+        endpoint: context.endpoint,
+        httpMethod: context.httpMethod,
+        statusCode: response.status,
+        operationDurationMs: Date.now() - startTime,
+        metadata: {
+          ...context.metadata,
+          statusCode: response.status,
+          endpoint: context.endpoint,
+          method: context.httpMethod,
+          enhanced: true
+        }
+      };
+
+      await auditService.log(auditLog);
+
+    } catch (err) {
+      error = err as Error;
+      
+      // Log error with enhanced context
+      const errorLog: AuditLogCreate = {
+        clientId: context.clientId,
+        userId: context.userId,
+        tableName: 'api_requests',
+        recordId: 'request',
+        action: 'SELECT',
+        ipAddress: context.ipAddress,
+        userAgent: context.userAgent,
+        sessionId: context.sessionId,
+        endpoint: context.endpoint,
+        httpMethod: context.httpMethod,
+        statusCode: 500,
+        operationDurationMs: Date.now() - startTime,
+        errorMessage: error.message,
+        metadata: {
+          ...context.metadata,
+          error: error.message,
+          stack: error.stack,
+          enhanced: true
+        }
+      };
+
+      await auditService.log(errorLog);
 
       // Re-throw the error
       throw error;
@@ -101,15 +221,30 @@ export async function auditDatabaseOperation(
   duration?: number
 ): Promise<void> {
   try {
-    await auditService.logDataAccess(
-      context,
+    const auditLog: AuditLogCreate = {
+      clientId: context.clientId,
+      userId: context.userId,
       tableName,
       recordId,
       action,
       oldValues,
       newValues,
-      duration
-    );
+      ipAddress: context.ipAddress,
+      userAgent: context.userAgent,
+      sessionId: context.sessionId,
+      endpoint: context.endpoint,
+      httpMethod: context.httpMethod,
+      operationDurationMs: duration,
+      metadata: {
+        ...context.metadata,
+        operation: 'database',
+        tableName,
+        recordId,
+        action
+      }
+    };
+
+    await auditService.log(auditLog);
   } catch (error) {
     // Don't let audit logging errors break the main operation
     console.error('Failed to log audit event:', error);
@@ -126,7 +261,27 @@ export async function auditAuthEvent(
   details?: Record<string, any>
 ): Promise<void> {
   try {
-    await auditService.logAuth(context, action, success, details);
+    const auditLog: AuditLogCreate = {
+      clientId: context.clientId,
+      userId: context.userId,
+      tableName: 'auth_events',
+      recordId: action,
+      action: 'INSERT',
+      ipAddress: context.ipAddress,
+      userAgent: context.userAgent,
+      sessionId: context.sessionId,
+      endpoint: context.endpoint,
+      httpMethod: context.httpMethod,
+      statusCode: success ? 200 : 401,
+      metadata: {
+        ...context.metadata,
+        authAction: action,
+        success,
+        ...details
+      }
+    };
+
+    await auditService.log(auditLog);
   } catch (error) {
     console.error('Failed to log auth event:', error);
   }
@@ -144,34 +299,29 @@ export async function auditApiAccess(
   errorMessage?: string
 ): Promise<void> {
   try {
-    const auditContext = {
-      ...context,
+    const auditLog: AuditLogCreate = {
+      clientId: context.clientId,
+      userId: context.userId,
+      tableName: 'api_requests',
+      recordId: endpoint,
+      action: 'SELECT',
+      ipAddress: context.ipAddress,
+      userAgent: context.userAgent,
+      sessionId: context.sessionId,
       endpoint,
-      httpMethod: method as any
+      httpMethod: method as any,
+      statusCode,
+      operationDurationMs: duration,
+      errorMessage,
+      metadata: {
+        ...context.metadata,
+        method,
+        endpoint,
+        duration
+      }
     };
 
-    if (errorMessage) {
-      await auditService.logError(
-        auditContext,
-        new Error(errorMessage),
-        'api_requests',
-        endpoint
-      );
-    } else {
-      await auditService.logDataAccess(
-        auditContext,
-        'api_requests',
-        endpoint,
-        'SELECT',
-        undefined,
-        {
-          statusCode,
-          method,
-          endpoint
-        },
-        duration
-      );
-    }
+    await auditService.log(auditLog);
   } catch (error) {
     console.error('Failed to log API access:', error);
   }
@@ -190,15 +340,32 @@ export async function auditDataChange(
   duration?: number
 ): Promise<void> {
   try {
-    await auditService.logDataAccess(
-      context,
+    const auditLog: AuditLogCreate = {
+      clientId: context.clientId,
+      userId: context.userId,
       tableName,
       recordId,
       action,
       oldValues,
       newValues,
-      duration
-    );
+      ipAddress: context.ipAddress,
+      userAgent: context.userAgent,
+      sessionId: context.sessionId,
+      endpoint: context.endpoint,
+      httpMethod: context.httpMethod,
+      operationDurationMs: duration,
+      metadata: {
+        ...context.metadata,
+        operation: 'data_change',
+        tableName,
+        recordId,
+        action,
+        hasOldValues: !!oldValues,
+        hasNewValues: !!newValues
+      }
+    };
+
+    await auditService.log(auditLog);
   } catch (error) {
     console.error('Failed to log data change:', error);
   }
@@ -213,29 +380,29 @@ export async function auditSecurityEvent(
   details?: Record<string, any>
 ): Promise<void> {
   try {
-    await auditService.logEnhanced(
-      {
-        clientId: context.clientId,
-        userId: context.userId,
-        tableName: 'security_events',
-        recordId: 'security',
-        action: 'SELECT',
-        endpoint: context.endpoint,
-        httpMethod: context.httpMethod,
-        ipAddress: context.ipAddress,
-        userAgent: context.userAgent,
-        sessionId: context.sessionId,
-        statusCode: 403,
-        metadata: {
-          securityEvent: event,
-          ...details,
-          ...context.metadata
-        }
-      },
-      AuditLevel.WARN,
-      AuditCategory.SECURITY,
-      ['security', event]
-    );
+    const auditLog: AuditLogCreate = {
+      clientId: context.clientId,
+      userId: context.userId,
+      tableName: 'security_events',
+      recordId: 'security',
+      action: 'SELECT',
+      ipAddress: context.ipAddress,
+      userAgent: context.userAgent,
+      sessionId: context.sessionId,
+      endpoint: context.endpoint,
+      httpMethod: context.httpMethod,
+      statusCode: 403,
+      metadata: {
+        ...context.metadata,
+        securityEvent: event,
+        level: AuditLevel.WARN,
+        category: AuditCategory.SECURITY,
+        tags: ['security', event],
+        ...details
+      }
+    };
+
+    await auditService.log(auditLog);
   } catch (error) {
     console.error('Failed to log security event:', error);
   }
@@ -251,30 +418,30 @@ export async function auditPerformanceEvent(
   details?: Record<string, any>
 ): Promise<void> {
   try {
-    await auditService.logEnhanced(
-      {
-        clientId: context.clientId,
-        userId: context.userId,
-        tableName: 'performance_events',
-        recordId: operation,
-        action: 'SELECT',
-        endpoint: context.endpoint,
-        httpMethod: context.httpMethod,
-        ipAddress: context.ipAddress,
-        userAgent: context.userAgent,
-        sessionId: context.sessionId,
-        operationDurationMs: duration,
-        metadata: {
-          operation,
-          duration,
-          ...details,
-          ...context.metadata
-        }
-      },
-      duration > 1000 ? AuditLevel.WARN : AuditLevel.INFO,
-      AuditCategory.PERFORMANCE,
-      ['performance', operation]
-    );
+    const auditLog: AuditLogCreate = {
+      clientId: context.clientId,
+      userId: context.userId,
+      tableName: 'performance_events',
+      recordId: operation,
+      action: 'SELECT',
+      ipAddress: context.ipAddress,
+      userAgent: context.userAgent,
+      sessionId: context.sessionId,
+      endpoint: context.endpoint,
+      httpMethod: context.httpMethod,
+      operationDurationMs: duration,
+      metadata: {
+        ...context.metadata,
+        operation,
+        duration,
+        level: duration > 1000 ? AuditLevel.WARN : AuditLevel.INFO,
+        category: AuditCategory.PERFORMANCE,
+        tags: ['performance', operation],
+        ...details
+      }
+    };
+
+    await auditService.log(auditLog);
   } catch (error) {
     console.error('Failed to log performance event:', error);
   }
@@ -289,28 +456,28 @@ export async function auditSystemEvent(
   details?: Record<string, any>
 ): Promise<void> {
   try {
-    await auditService.logEnhanced(
-      {
-        clientId: context.clientId,
-        userId: context.userId,
-        tableName: 'system_events',
-        recordId: 'system',
-        action: 'SELECT',
-        endpoint: context.endpoint,
-        httpMethod: context.httpMethod,
-        ipAddress: context.ipAddress,
-        userAgent: context.userAgent,
-        sessionId: context.sessionId,
-        metadata: {
-          systemEvent: event,
-          ...details,
-          ...context.metadata
-        }
-      },
-      event === 'error_occurred' ? AuditLevel.ERROR : AuditLevel.INFO,
-      AuditCategory.SYSTEM,
-      ['system', event]
-    );
+    const auditLog: AuditLogCreate = {
+      clientId: context.clientId,
+      userId: context.userId,
+      tableName: 'system_events',
+      recordId: 'system',
+      action: 'SELECT',
+      ipAddress: context.ipAddress,
+      userAgent: context.userAgent,
+      sessionId: context.sessionId,
+      endpoint: context.endpoint,
+      httpMethod: context.httpMethod,
+      metadata: {
+        ...context.metadata,
+        systemEvent: event,
+        level: event === 'error_occurred' ? AuditLevel.ERROR : AuditLevel.INFO,
+        category: AuditCategory.SYSTEM,
+        tags: ['system', event],
+        ...details
+      }
+    };
+
+    await auditService.log(auditLog);
   } catch (error) {
     console.error('Failed to log system event:', error);
   }
@@ -359,6 +526,111 @@ export function auditMiddleware(handler: Function) {
         (error as Error).message
       );
       
+      throw error;
+    }
+  };
+}
+
+/**
+ * Database operation interceptor for audit logging
+ */
+export function withDatabaseAudit<T extends any[]>(
+  operation: (client: PoolClient, ...args: T) => Promise<any>,
+  tableName: string,
+  context: AuditContext
+) {
+  return async (client: PoolClient, ...args: T): Promise<any> => {
+    const startTime = Date.now();
+    let oldValues: Record<string, any> | undefined;
+    let newValues: Record<string, any> | undefined;
+    let recordId: string = 'unknown';
+    let action: 'INSERT' | 'UPDATE' | 'DELETE' | 'SELECT' = 'SELECT';
+
+    try {
+      // Determine operation type and capture old values for UPDATE/DELETE
+      const query = args[0] as string;
+      const queryLower = query.toLowerCase().trim();
+      
+      if (queryLower.startsWith('insert')) {
+        action = 'INSERT';
+        newValues = args[1] || {};
+        recordId = newValues.id || 'new';
+      } else if (queryLower.startsWith('update')) {
+        action = 'UPDATE';
+        newValues = args[1] || {};
+        
+        // Try to get old values for UPDATE operations
+        if (newValues.id) {
+          try {
+            const selectQuery = `SELECT * FROM ${tableName} WHERE id = $1`;
+            const oldResult = await client.query(selectQuery, [newValues.id]);
+            oldValues = oldResult.rows[0];
+            recordId = newValues.id;
+          } catch (err) {
+            console.warn('Could not fetch old values for audit:', err);
+          }
+        }
+      } else if (queryLower.startsWith('delete')) {
+        action = 'DELETE';
+        
+        // Try to get old values for DELETE operations
+        if (args[1] && args[1].length > 0) {
+          try {
+            const selectQuery = `SELECT * FROM ${tableName} WHERE id = $1`;
+            const oldResult = await client.query(selectQuery, [args[1][0]]);
+            oldValues = oldResult.rows[0];
+            recordId = args[1][0];
+          } catch (err) {
+            console.warn('Could not fetch old values for audit:', err);
+          }
+        }
+      }
+
+      // Execute the original operation
+      const result = await operation(client, ...args);
+      const duration = Date.now() - startTime;
+
+      // Log the database operation
+      await auditDatabaseOperation(
+        context,
+        tableName,
+        recordId,
+        action,
+        oldValues,
+        newValues,
+        duration
+      );
+
+      return result;
+    } catch (error) {
+      const duration = Date.now() - startTime;
+      
+      // Log the failed operation
+      const errorLog: AuditLogCreate = {
+        clientId: context.clientId,
+        userId: context.userId,
+        tableName,
+        recordId,
+        action,
+        ipAddress: context.ipAddress,
+        userAgent: context.userAgent,
+        sessionId: context.sessionId,
+        endpoint: context.endpoint,
+        httpMethod: context.httpMethod,
+        operationDurationMs: duration,
+        errorMessage: (error as Error).message,
+        metadata: {
+          ...context.metadata,
+          operation: 'database',
+          tableName,
+          recordId,
+          action,
+          error: (error as Error).message,
+          stack: (error as Error).stack
+        }
+      };
+
+      await auditService.log(errorLog);
       throw error;
     }
   };

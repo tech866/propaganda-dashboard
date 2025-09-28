@@ -1,6 +1,6 @@
 # Task ID: 7
 # Title: Implement Performance Metrics Calculations
-# Status: pending
+# Status: done
 # Dependencies: 6
 # Priority: medium
 # Description: Create backend logic to calculate Show Rate and Close Rate based on call data.
@@ -9,3 +9,130 @@ Develop functions to calculate Show Rate and Close Rate from the Calls table. En
 
 # Test Strategy:
 Create unit tests for the calculation functions. Validate that metrics are calculated correctly for various scenarios.
+
+# Subtasks:
+## 1. Understand Business Logic for Metrics [done]
+### Dependencies: None
+### Description: Gather and document the business rules for calculating Show Rate and Close Rate.
+### Details:
+Consult with stakeholders to clarify how Show Rate and Close Rate are defined and calculated based on call data.
+<info added on 2025-09-28T10:33:40.282Z>
+## Business Logic Analysis Complete ✅
+
+### Key Findings:
+
+**Show Rate Calculation:**
+- Formula: (Completed Calls / Total Scheduled Calls) × 100
+- Numerator: Calls with `status = 'completed'`
+- Denominator: All calls regardless of status
+- Includes: completed, no-show, rescheduled calls in denominator
+- Excludes: None from denominator
+
+**Close Rate Calculation:**
+- Formula: (Won Calls / Completed Calls) × 100  
+- Numerator: Calls with `status = 'completed'` AND `outcome = 'won'`
+- Denominator: Calls with `status = 'completed'` (regardless of outcome)
+- Excludes: no-show and rescheduled calls from denominator
+- Handles: `tbd` outcomes (excluded from numerator, included in denominator)
+
+**Data Requirements:**
+- Primary table: `calls` with key fields: status, outcome, client_id, user_id, completed_at
+- Multi-tenant isolation: All queries must filter by `client_id`
+- Role-based access: Sales (own data), Admin (client data), CEO (all clients)
+
+**Loss Reasons Analysis:**
+- Top 5 loss reasons by count
+- Percentage calculation: (Calls with reason / Total lost calls) × 100
+- Categories: Price, Interest, Timing, Competition, Technical, Internal
+
+**Edge Cases Handled:**
+- Zero division: Return 0% instead of undefined
+- Missing data: Appropriate NULL handling
+- Invalid status: Exclude from calculations
+- Future dates: Don't include in calculations
+
+**Performance Requirements:**
+- Target: P95 < 300ms for up to 50k calls per client
+- Caching: 15min for real-time, 1hr for historical
+- Optimization: Database indexes and efficient queries
+
+### Documentation Created:
+- Comprehensive business logic document: `.taskmaster/docs/metrics-business-logic.md`
+- Includes formulas, examples, edge cases, and implementation notes
+- Defines API response format and testing considerations
+</info added on 2025-09-28T10:33:40.282Z>
+
+## 2. Create Database Queries for Metrics [done]
+### Dependencies: 7.1
+### Description: Develop optimized SQL queries to retrieve necessary data for Show Rate and Close Rate calculations.
+### Details:
+Ensure queries are efficient and can handle large datasets without performance degradation.
+<info added on 2025-09-28T10:42:35.415Z>
+## Database Queries Implementation Complete ✅
+
+### Key Deliverables:
+
+**1. Comprehensive MetricsService Created:**
+- `src/lib/services/metricsService.ts` - Complete service layer with optimized SQL queries
+- Implements all business logic from Task 7.1 documentation
+- Handles multi-tenant data isolation and role-based access
+
+**2. Core Metrics Queries:**
+- **Show Rate Query:** `(Completed Calls / Total Calls) × 100`
+- **Close Rate Query:** `(Won Calls / Completed Calls) × 100`
+- **Loss Reasons Query:** Top 5 with percentages
+- **Performance Comparison:** User vs user metrics
+- **Trend Analysis:** Time-series data over configurable periods
+
+**3. Advanced Features:**
+- **Role-based filtering:** Sales (own data), Admin (client data), CEO (all data)
+- **Date range filtering:** Flexible date boundaries
+- **Performance optimization:** Efficient SQL with proper indexing considerations
+- **Edge case handling:** Zero division, NULL values, invalid data
+
+**4. API Integration:**
+- Updated `/api/metrics` to use real database queries
+- Added `/api/metrics/trend` for time-series data
+- Added `/api/metrics/performance` for user comparisons
+- Maintained backward compatibility with existing API structure
+
+**5. Query Performance:**
+- Single-query approach for basic metrics (reduces database round trips)
+- Optimized JOINs for loss reasons analysis
+- Proper parameterized queries to prevent SQL injection
+- Efficient aggregation with CASE statements
+
+**6. Data Structure:**
+- Comprehensive TypeScript interfaces for type safety
+- Consistent response format across all endpoints
+- Proper error handling and validation
+- Multi-tenant data isolation at query level
+
+### Technical Implementation:
+- **Database:** PostgreSQL with optimized queries
+- **Performance:** Target <300ms for up to 50k calls per client
+- **Security:** Role-based access control in queries
+- **Scalability:** Efficient aggregation and filtering
+- **Maintainability:** Clean service layer architecture
+
+All queries tested against the existing database schema and ready for integration with the calculation functions in Task 7.3.
+</info added on 2025-09-28T10:42:35.415Z>
+
+## 3. Implement Calculation Functions [done]
+### Dependencies: 7.2
+### Description: Write backend functions to calculate Show Rate and Close Rate using the retrieved data.
+### Details:
+Include error handling to manage potential issues during calculations.
+
+## 4. Create Metrics Service Layer [done]
+### Dependencies: 7.3
+### Description: Develop a service layer to encapsulate the metrics calculations and provide an API for access.
+### Details:
+Ensure the service layer is modular and can be easily integrated with existing systems.
+
+## 5. Add Unit Tests for Metrics [done]
+### Dependencies: 7.4
+### Description: Implement comprehensive unit tests for the metrics calculation functions and service layer.
+### Details:
+Ensure tests cover edge cases and validate the accuracy of the metrics.
+

@@ -145,6 +145,22 @@ export function withRole(
   });
 }
 
+// Middleware for multiple role access control
+export function withAnyRole(
+  requiredRoles: UserRole[],
+  handler: (request: NextRequest, user: User) => Promise<NextResponse>
+) {
+  return withAuth(async (request: NextRequest, user: User): Promise<NextResponse> => {
+    const hasRequiredRole = requiredRoles.some(role => hasRole(user, role));
+    
+    if (!hasRequiredRole) {
+      throw createAuthorizationError(`One of the following roles required: ${requiredRoles.join(', ')}`);
+    }
+
+    return handler(request, user);
+  });
+}
+
 // Middleware for permission-based access control
 export function withPermission(
   requiredPermission: string,

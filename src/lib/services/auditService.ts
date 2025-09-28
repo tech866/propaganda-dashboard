@@ -20,17 +20,15 @@ import {
   AuditCategory,
   EnhancedAuditLog
 } from '@/lib/types/audit';
-import { getDatabase } from '@/lib/database';
+import { query, withTransaction } from '@/lib/database';
 
 export class AuditService {
   private static instance: AuditService;
-  private db: Pool;
   private config: AuditConfig;
   private logBuffer: AuditLogCreate[] = [];
   private flushTimer?: NodeJS.Timeout;
 
   private constructor(config: AuditConfig = DEFAULT_AUDIT_CONFIG) {
-    this.db = getDatabase();
     this.config = config;
     this.startFlushTimer();
   }
@@ -193,7 +191,7 @@ export class AuditService {
   /**
    * Get audit logs with filtering
    */
-  public async getAuditLogs(query: AuditLogQuery): Promise<AuditLogResponse> {
+  public async getAuditLogs(queryParams: AuditLogQuery): Promise<AuditLogResponse> {
     const {
       clientId,
       userId,
@@ -208,7 +206,7 @@ export class AuditService {
       offset = 0,
       orderBy = 'created_at',
       orderDirection = 'DESC'
-    } = query;
+    } = queryParams;
 
     let whereConditions = ['al.client_id = $1'];
     let params: any[] = [clientId];
@@ -271,7 +269,7 @@ export class AuditService {
       WHERE ${whereClause}
     `;
 
-    const countResult = await this.db.query(countQuery, params);
+    const countResult = await query(countQuery, params);
     const total = parseInt(countResult.rows[0].total);
 
     // Get paginated results
@@ -306,7 +304,7 @@ export class AuditService {
     `;
 
     params.push(limit, offset);
-    const dataResult = await this.db.query(dataQuery, params);
+    const dataResult = await query(dataQuery, params);
 
     return {
       success: true,
@@ -328,18 +326,18 @@ export class AuditService {
     dateFrom?: Date,
     dateTo?: Date
   ): Promise<AuditLogStatsResponse> {
-    let whereConditions = ['client_id = $1'];
+    let whereConditions = ['al.client_id = $1'];
     let params: any[] = [clientId];
     let paramIndex = 2;
 
     if (dateFrom) {
-      whereConditions.push(`created_at >= $${paramIndex}`);
+      whereConditions.push(`al.created_at >= $${paramIndex}`);
       params.push(dateFrom);
       paramIndex++;
     }
 
     if (dateTo) {
-      whereConditions.push(`created_at <= $${paramIndex}`);
+      whereConditions.push(`al.created_at <= $${paramIndex}`);
       params.push(dateTo);
       paramIndex++;
     }
@@ -349,31 +347,31 @@ export class AuditService {
     const statsQuery = `
       SELECT 
         COUNT(*) as total_logs,
-        COUNT(CASE WHEN action = 'INSERT' THEN 1 END) as inserts,
-        COUNT(CASE WHEN action = 'UPDATE' THEN 1 END) as updates,
-        COUNT(CASE WHEN action = 'DELETE' THEN 1 END) as deletes,
-        COUNT(CASE WHEN action = 'SELECT' THEN 1 END) as selects,
-        COUNT(CASE WHEN status_code >= 400 THEN 1 END) as errors,
-        AVG(operation_duration_ms) as avg_duration,
-        MIN(created_at) as earliest_log,
-        MAX(created_at) as latest_log
-      FROM audit_logs
+        COUNT(CASE WHEN al.action = 'INSERT' THEN 1 END) as inserts,
+        COUNT(CASE WHEN al.action = 'UPDATE' THEN 1 END) as updates,
+        COUNT(CASE WHEN al.action = 'DELETE' THEN 1 END) as deletes,
+        COUNT(CASE WHEN al.action = 'SELECT' THEN 1 END) as selects,
+        COUNT(CASE WHEN al.status_code >= 400 THEN 1 END) as errors,
+        AVG(al.operation_duration_ms) as avg_duration,
+        MIN(al.created_at) as earliest_log,
+        MAX(al.created_at) as latest_log
+      FROM audit_logs al
       WHERE ${whereClause}
     `;
 
-    const result = await this.db.query(statsQuery, params);
+    const result = await query(statsQuery, params);
     const stats = result.rows[0];
 
     // Get logs by table
     const tableStatsQuery = `
-      SELECT table_name, COUNT(*) as count
-      FROM audit_logs
+      SELECT al.table_name, COUNT(*) as count
+      FROM audit_logs al
       WHERE ${whereClause}
-      GROUP BY table_name
+      GROUP BY al.table_name
       ORDER BY count DESC
     `;
 
-    const tableStatsResult = await this.db.query(tableStatsQuery, params);
+    const tableStatsResult = await query(tableStatsQuery, params);
     const logsByTable = tableStatsResult.rows.reduce((acc, row) => {
       acc[row.table_name] = parseInt(row.count);
       return acc;
@@ -389,7 +387,7 @@ export class AuditService {
       ORDER BY count DESC
     `;
 
-    const userStatsResult = await this.db.query(userStatsQuery, params);
+    const userStatsResult = await query(userStatsQuery, params);
     const logsByUser = userStatsResult.rows.reduce((acc, row) => {
       acc[row.user_name || 'Unknown'] = parseInt(row.count);
       return acc;
@@ -397,15 +395,15 @@ export class AuditService {
 
     // Get logs by endpoint
     const endpointStatsQuery = `
-      SELECT endpoint, COUNT(*) as count
-      FROM audit_logs
-      WHERE ${whereClause} AND endpoint IS NOT NULL
-      GROUP BY endpoint
+      SELECT al.endpoint, COUNT(*) as count
+      FROM audit_logs al
+      WHERE ${whereClause} AND al.endpoint IS NOT NULL
+      GROUP BY al.endpoint
       ORDER BY count DESC
       LIMIT 10
     `;
 
-    const endpointStatsResult = await this.db.query(endpointStatsQuery, params);
+    const endpointStatsResult = await query(endpointStatsQuery, params);
     const logsByEndpoint = endpointStatsResult.rows.reduce((acc, row) => {
       acc[row.endpoint] = parseInt(row.count);
       return acc;
@@ -440,12 +438,12 @@ export class AuditService {
    * Clean up old audit logs
    */
   public async cleanupOldLogs(retentionDays: number = 365): Promise<number> {
-    const query = `
+    const cleanupQuery = `
       DELETE FROM audit_logs 
       WHERE created_at < CURRENT_TIMESTAMP - INTERVAL '1 day' * $1
     `;
 
-    const result = await this.db.query(query, [retentionDays]);
+    const result = await query(cleanupQuery, [retentionDays]);
     return result.rowCount || 0;
   }
 
@@ -464,7 +462,7 @@ export class AuditService {
       return;
     }
 
-    const query = `
+    const insertQuery = `
       INSERT INTO audit_logs (
         client_id, user_id, table_name, record_id, action,
         old_values, new_values, ip_address, user_agent,
@@ -476,32 +474,35 @@ export class AuditService {
     `;
 
     try {
-      await this.db.query('BEGIN');
-      
-      for (const log of logs) {
-        await this.db.query(query, [
-          log.clientId,
-          log.userId,
-          log.tableName,
-          log.recordId,
-          log.action,
-          log.oldValues ? JSON.stringify(log.oldValues) : null,
-          log.newValues ? JSON.stringify(log.newValues) : null,
-          log.ipAddress,
-          log.userAgent,
-          log.sessionId,
-          log.endpoint,
-          log.httpMethod,
-          log.statusCode,
-          log.operationDurationMs,
-          log.errorMessage,
-          log.metadata ? JSON.stringify(log.metadata) : null
-        ]);
-      }
-      
-      await this.db.query('COMMIT');
+      await withTransaction(async (client) => {
+        for (const log of logs) {
+          // Validate and convert UUIDs
+          const clientId = this.validateUuid(log.clientId) ? log.clientId : null;
+          const userId = this.validateUuid(log.userId) ? log.userId : null;
+          // Generate a UUID for recordId if it's invalid or null
+          const recordId = this.validateUuid(log.recordId) ? log.recordId : this.generateUuid();
+          
+          await client.query(insertQuery, [
+            clientId,
+            userId,
+            log.tableName,
+            recordId,
+            log.action,
+            log.oldValues ? JSON.stringify(log.oldValues) : null,
+            log.newValues ? JSON.stringify(log.newValues) : null,
+            log.ipAddress,
+            log.userAgent,
+            log.sessionId,
+            log.endpoint,
+            log.httpMethod,
+            log.statusCode,
+            log.operationDurationMs,
+            log.errorMessage,
+            log.metadata ? JSON.stringify(log.metadata) : null
+          ]);
+        }
+      });
     } catch (error) {
-      await this.db.query('ROLLBACK');
       console.error('Failed to flush audit logs:', error);
       // Re-add logs to buffer for retry
       this.logBuffer.unshift(...logs);
@@ -524,6 +525,29 @@ export class AuditService {
       default:
         return true;
     }
+  }
+
+  /**
+   * Validate if a string is a valid UUID
+   */
+  private validateUuid(value: string | undefined | null): boolean {
+    if (!value || typeof value !== 'string') {
+      return false;
+    }
+    
+    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+    return uuidRegex.test(value);
+  }
+
+  /**
+   * Generate a new UUID
+   */
+  private generateUuid(): string {
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+      const r = Math.random() * 16 | 0;
+      const v = c == 'x' ? r : (r & 0x3 | 0x8);
+      return v.toString(16);
+    });
   }
 
   /**
