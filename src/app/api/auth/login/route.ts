@@ -1,17 +1,21 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
-import { createAuthenticationError, withErrorHandling } from '@/middleware/errors';
+import { createAuthenticationError, createValidationError, withErrorHandling } from '@/middleware/errors';
+import { validateLogin } from '@/lib/validation';
 
 // POST /api/auth/login - User login (NextAuth compatible)
 const login = withErrorHandling(async (request: NextRequest) => {
   const body = await request.json();
-  const { email, password } = body;
 
-  // Validate required fields
-  if (!email || !password) {
-    throw createAuthenticationError('Email and password are required');
+  // Validate request body using Yup schema
+  const validation = await validateLogin(body);
+  
+  if (!validation.isValid) {
+    throw createValidationError('Validation failed', validation.errors);
   }
+
+  const { email, password } = validation.data!;
 
   // Mock user data (in a real app, this would come from a database)
   const mockUsers = [

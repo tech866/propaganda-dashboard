@@ -16,7 +16,8 @@
     "next-auth": "^4.24.11",
     "pg": "^8.16.3",
     "react": "19.1.0",
-    "react-dom": "19.1.0"
+    "react-dom": "19.1.0",
+    "yup": "^1.7.1"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
@@ -24,6 +25,7 @@
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "@types/yup": "^0.32.0",
     "eslint": "^9",
     "eslint-config-next": "15.5.4",
     "tailwindcss": "^4",

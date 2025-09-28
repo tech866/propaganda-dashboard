@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { withAuth, User } from '@/middleware/auth';
-import { createNotFoundError, withErrorHandling } from '@/middleware/errors';
+import { createNotFoundError, createValidationError, withErrorHandling } from '@/middleware/errors';
 import { CallService, UpdateCallData } from '@/lib/services/callService';
+import { validateUpdateCall } from '@/lib/validation';
 
 // GET /api/calls/[id] - Get a specific call by ID
 const getCallById = withErrorHandling(async (
@@ -35,20 +36,29 @@ const updateCall = withErrorHandling(async (
   const { id } = await params;
   const body = await request.json();
 
-  // Create update data object (only include fields that are provided)
+  // Validate request body using Yup schema
+  const validation = await validateUpdateCall(body);
+  
+  if (!validation.isValid) {
+    throw createValidationError('Validation failed', validation.errors);
+  }
+
+  const validatedData = validation.data!;
+
+  // Create update data object with validated data
   const updateData: UpdateCallData = {};
   
-  if (body.prospect_name !== undefined) updateData.prospect_name = body.prospect_name;
-  if (body.prospect_email !== undefined) updateData.prospect_email = body.prospect_email;
-  if (body.prospect_phone !== undefined) updateData.prospect_phone = body.prospect_phone;
-  if (body.call_type !== undefined) updateData.call_type = body.call_type;
-  if (body.status !== undefined) updateData.status = body.status;
-  if (body.outcome !== undefined) updateData.outcome = body.outcome;
-  if (body.loss_reason_id !== undefined) updateData.loss_reason_id = body.loss_reason_id;
-  if (body.notes !== undefined) updateData.notes = body.notes;
-  if (body.call_duration !== undefined) updateData.call_duration = body.call_duration;
-  if (body.scheduled_at !== undefined) updateData.scheduled_at = body.scheduled_at;
-  if (body.completed_at !== undefined) updateData.completed_at = body.completed_at;
+  if (validatedData.prospect_name !== undefined) updateData.prospect_name = validatedData.prospect_name;
+  if (validatedData.prospect_email !== undefined) updateData.prospect_email = validatedData.prospect_email;
+  if (validatedData.prospect_phone !== undefined) updateData.prospect_phone = validatedData.prospect_phone;
+  if (validatedData.call_type !== undefined) updateData.call_type = validatedData.call_type;
+  if (validatedData.status !== undefined) updateData.status = validatedData.status;
+  if (validatedData.outcome !== undefined) updateData.outcome = validatedData.outcome;
+  if (validatedData.loss_reason_id !== undefined) updateData.loss_reason_id = validatedData.loss_reason_id;
+  if (validatedData.notes !== undefined) updateData.notes = validatedData.notes;
+  if (validatedData.call_duration !== undefined) updateData.call_duration = validatedData.call_duration;
+  if (validatedData.scheduled_at !== undefined) updateData.scheduled_at = validatedData.scheduled_at;
+  if (validatedData.completed_at !== undefined) updateData.completed_at = validatedData.completed_at;
 
   const updatedCall = await CallService.updateCall(id, updateData, user);
 

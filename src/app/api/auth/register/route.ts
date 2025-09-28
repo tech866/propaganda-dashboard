@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createValidationError, createConflictError, withErrorHandling } from '@/middleware/errors';
-import { validateRequiredFields } from '@/middleware/errors';
+import { validateRegister } from '@/lib/validation';
 
 // Mock user storage (in a real app, this would be a database)
 const mockUsers = [
@@ -33,16 +33,15 @@ const mockUsers = [
 // POST /api/auth/register - User registration
 const register = withErrorHandling(async (request: NextRequest) => {
   const body = await request.json();
-  const requiredFields = ['email', 'password', 'name', 'role', 'clientId'];
-  const validation = validateRequiredFields(body, requiredFields);
 
+  // Validate request body using Yup schema
+  const validation = await validateRegister(body);
+  
   if (!validation.isValid) {
-    throw createValidationError('Missing required fields', {
-      missingFields: validation.missingFields
-    });
+    throw createValidationError('Validation failed', validation.errors);
   }
 
-  const { email, password, name, role, clientId } = body;
+  const { email, password, name, clientId } = validation.data!;
 
   // Check if user already exists
   const existingUser = mockUsers.find(u => u.email === email);
@@ -50,19 +49,13 @@ const register = withErrorHandling(async (request: NextRequest) => {
     throw createConflictError('User with this email already exists');
   }
 
-  // Validate role
-  const validRoles = ['sales', 'admin', 'ceo'];
-  if (!validRoles.includes(role)) {
-    throw createValidationError('Invalid role. Must be one of: sales, admin, ceo');
-  }
-
-  // Create new user
+  // Create new user (default role is 'sales' for new registrations)
   const newUser = {
     id: `user-${Date.now()}`,
     email,
     password, // In production, hash this password
     name,
-    role,
+    role: 'sales', // Default role for new registrations
     clientId
   };
 
