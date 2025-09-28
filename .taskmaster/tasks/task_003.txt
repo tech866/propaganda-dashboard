@@ -1,0 +1,43 @@
+# Task ID: 3
+# Title: Setup Backend with Next.js API Routes
+# Status: done
+# Dependencies: 1
+# Priority: high
+# Description: Create the backend structure using Next.js API routes for handling server-side logic.
+# Details:
+Create an 'api' directory under the 'pages' directory in the Next.js project. Set up basic API route files for handling calls CRUD operations. Ensure the API structure follows RESTful principles.
+
+# Test Strategy:
+Test API routes using Postman or similar tool to ensure they respond correctly.
+
+# Subtasks:
+## 1. Create API Directory [done]
+### Dependencies: None
+### Description: Create an 'api' directory under the 'app' directory in the Next.js project.
+### Details:
+Ensure the directory structure aligns with Next.js 15.5.4 standards for API routes.
+
+## 2. Set Up Basic API Route Files [done]
+### Dependencies: 3.1
+### Description: Create basic API route files for handling CRUD operations for call logs.
+### Details:
+Implement files for create, read, update, and delete operations following RESTful principles.
+
+## 3. Implement Middleware for Authentication [done]
+### Dependencies: 3.2
+### Description: Develop middleware to handle user authentication for API routes.
+### Details:
+Ensure that only authenticated users can access the API endpoints.
+
+## 4. Add Error Handling for API Routes [done]
+### Dependencies: 3.3
+### Description: Implement error handling for the API routes to manage exceptions and return appropriate responses.
+### Details:
+Use try-catch blocks and return standardized error messages for different scenarios.
+
+## 5. Test API Routes [done]
+### Dependencies: 3.4
+### Description: Test all API routes using Postman or a similar tool to ensure they respond correctly.
+### Details:
+Perform CRUD operations and validate the responses against expected outcomes.
+

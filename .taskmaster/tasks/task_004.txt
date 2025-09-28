@@ -1,0 +1,43 @@
+# Task ID: 4
+# Title: Implement Database Schema in PostgreSQL
+# Status: done
+# Dependencies: 1
+# Priority: high
+# Description: Design and implement the PostgreSQL database schema to support multi-tenant architecture.
+# Details:
+Create a PostgreSQL database and define tables for Clients, Users, Calls, Loss Reasons, and Audit Logs. Use a multi-tenant schema design to ensure data segregation. Include necessary fields as per PRD requirements.
+
+# Test Strategy:
+Run SQL queries to verify table creation and structure. Ensure relationships between tables are correctly established.
+
+# Subtasks:
+## 1. Design Database Schema [done]
+### Dependencies: None
+### Description: Create an initial design for the PostgreSQL database schema that supports multi-tenant architecture.
+### Details:
+Outline the structure of the database including tables for Clients, Users, Calls, Loss Reasons, and Audit Logs, ensuring data segregation for multi-tenancy.
+
+## 2. Create Tables in PostgreSQL [done]
+### Dependencies: None
+### Description: Implement the database schema by creating the necessary tables in PostgreSQL.
+### Details:
+Execute SQL scripts to create tables for Clients, Users, Calls, Loss Reasons, and Audit Logs as per the designed schema.
+
+## 3. Define Relationships Between Tables [done]
+### Dependencies: None
+### Description: Establish relationships between the created tables to ensure data integrity.
+### Details:
+Implement foreign keys and constraints to define relationships between Clients, Users, Calls, Loss Reasons, and Audit Logs.
+
+## 4. Implement Multi-Tenant Data Segregation [done]
+### Dependencies: None
+### Description: Ensure that the database schema supports multi-tenant data segregation.
+### Details:
+Design and implement strategies such as tenant IDs in tables to segregate data for different clients.
+
+## 5. Document Database Schema [done]
+### Dependencies: None
+### Description: Create documentation for the implemented database schema.
+### Details:
+Document the schema design, table structures, relationships, and any specific implementation details for future reference.
+

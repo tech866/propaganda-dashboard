@@ -1,0 +1,11 @@
+# Task ID: 10
+# Title: Create Audit Logging Mechanism
+# Status: pending
+# Dependencies: 6
+# Priority: medium
+# Description: Implement audit logging for all data changes and access events in the application.
+# Details:
+Develop middleware for logging create, update, and delete actions in the database. Store logs in the Audit Logs table with user identification and timestamps.
+
+# Test Strategy:
+Perform various CRUD operations and verify that corresponding logs are created in the Audit Logs table.

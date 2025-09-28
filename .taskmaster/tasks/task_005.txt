@@ -1,0 +1,43 @@
+# Task ID: 5
+# Title: Setup Authentication with JWT
+# Status: done
+# Dependencies: 3
+# Priority: high
+# Description: Implement JWT-based authentication for user login and role-based access control.
+# Details:
+Use NextAuth.js for authentication. Configure JWT settings and define user roles (CEO, Admin, Sales Team). Implement login and registration endpoints in the API routes.
+
+# Test Strategy:
+Test user registration and login functionality. Verify JWT tokens are issued and can be used for authenticated requests.
+
+# Subtasks:
+## 1. Configure NextAuth.js [done]
+### Dependencies: None
+### Description: Set up NextAuth.js for handling authentication and session management.
+### Details:
+Install NextAuth.js and configure it to use JWT for authentication. Define the necessary providers and callbacks.
+
+## 2. Define User Roles [done]
+### Dependencies: None
+### Description: Establish user roles for the application including CEO, Admin, and Sales Team.
+### Details:
+Create a role management system that assigns roles to users during registration and login.
+
+## 3. Implement Login Endpoint [done]
+### Dependencies: None
+### Description: Create an API endpoint for user login that issues JWT tokens.
+### Details:
+Develop the login API route that authenticates users and returns a JWT token upon successful login.
+
+## 4. Implement Registration Endpoint [done]
+### Dependencies: None
+### Description: Create an API endpoint for user registration that includes role assignment.
+### Details:
+Develop the registration API route that allows new users to sign up and assigns them a default role.
+
+## 5. Integrate JWT Middleware [done]
+### Dependencies: None
+### Description: Implement middleware to validate JWT tokens for protected routes.
+### Details:
+Create middleware that checks for a valid JWT token in the request headers and grants access to protected resources.
+
