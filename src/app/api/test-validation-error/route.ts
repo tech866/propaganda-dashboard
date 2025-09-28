@@ -1,23 +1,37 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createValidationError, withErrorHandling } from '@/middleware/errors';
-import { validateLogin } from '@/lib/validation';
+import { createValidationError, withErrorHandling, formatErrorResponse } from '@/middleware/errors';
 
-// POST /api/test-validation-error - Test validation error handling
-const testValidationError = withErrorHandling(async (request: NextRequest) => {
+// GET /api/test-validation-error - Test validation error handling (simple)
+const testValidationErrorGet = async (request: NextRequest) => {
+  try {
+    // Just throw a validation error without reading the body
+    throw createValidationError('This is a test validation error from test-validation-error endpoint', {
+      field: 'testField',
+      reason: 'testReason'
+    });
+  } catch (error) {
+    return formatErrorResponse(error);
+  }
+};
+
+// POST /api/test-validation-error - Test validation error handling (with body)
+const testValidationErrorPost = withErrorHandling(async (request: NextRequest) => {
   const body = await request.json();
 
-  // Test validation
-  const validation = await validateLogin(body);
-  
-  if (!validation.isValid) {
-    throw createValidationError('Validation failed', validation.errors);
+  // Test validation with the provided data
+  if (!body.email || !body.password) {
+    throw createValidationError('Validation failed', {
+      email: 'Email is required',
+      password: 'Password is required'
+    });
   }
 
   return NextResponse.json({
     success: true,
     message: 'Validation passed',
-    data: validation.data
+    data: body
   });
 });
 
-export const POST = testValidationError;
+export const GET = testValidationErrorGet;
+export const POST = testValidationErrorPost;
