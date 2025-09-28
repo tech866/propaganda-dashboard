@@ -4,29 +4,53 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { withAuth, withRole, User } from '@/middleware/auth';
-import { withErrorHandling } from '@/middleware/errors';
+import { withAnyRole, User } from '@/middleware/auth';
 import { auditService } from '@/lib/services/auditService';
 
-// GET /api/audit/stats - Get audit log statistics
-const getAuditStats = withErrorHandling(async (request: NextRequest, user: User) => {
-  const { searchParams } = new URL(request.url);
+const getAuditStats = withAnyRole(['admin', 'ceo'], async (request: NextRequest, user: User) => {
+  try {
+    const searchParams = request.nextUrl.searchParams;
 
-  const dateFrom = searchParams.get('dateFrom') ? new Date(searchParams.get('dateFrom')!) : undefined;
-  const dateTo = searchParams.get('dateTo') ? new Date(searchParams.get('dateTo')!) : undefined;
+    let dateFrom: Date | undefined;
+    let dateTo: Date | undefined;
 
-  // Validate date range
-  if (dateFrom && dateTo && dateFrom > dateTo) {
-    return NextResponse.json(
-      { success: false, error: 'dateFrom must be before dateTo' },
-      { status: 400 }
-    );
+    // Safe date parsing
+    const dateFromStr = searchParams.get('dateFrom');
+    const dateToStr = searchParams.get('dateTo');
+
+    if (dateFromStr) {
+      const parsedDateFrom = new Date(dateFromStr);
+      if (!isNaN(parsedDateFrom.getTime())) {
+        dateFrom = parsedDateFrom;
+      }
+    }
+
+    if (dateToStr) {
+      const parsedDateTo = new Date(dateToStr);
+      if (!isNaN(parsedDateTo.getTime())) {
+        dateTo = parsedDateTo;
+      }
+    }
+
+    // Validate date range
+    if (dateFrom && dateTo && dateFrom > dateTo) {
+      return NextResponse.json(
+        { success: false, error: 'dateFrom must be before dateTo' },
+        { status: 400 }
+      );
+    }
+
+    const result = await auditService.getAuditStats(user.clientId, dateFrom, dateTo);
+
+    return NextResponse.json(result, { status: 200 });
+  } catch (error) {
+    console.error('Error in getAuditStats:', error);
+    return NextResponse.json({
+      success: false,
+      error: error instanceof Error ? error.message : 'Unknown error'
+    }, { status: 500 });
   }
-
-  const result = await auditService.getAuditStats(user.clientId, dateFrom, dateTo);
-
-  return NextResponse.json(result, { status: 200 });
 });
 
 // Only Admin and CEO roles can access audit statistics
-export const GET = withAuth(withRole(['admin', 'ceo'])(getAuditStats));
+export const GET = getAuditStats;

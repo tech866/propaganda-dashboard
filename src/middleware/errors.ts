@@ -157,7 +157,8 @@ export function withErrorHandling<T extends any[], R>(
         timestamp: new Date().toISOString()
       });
 
-      throw error; // Re-throw to be handled by the route handler
+      // Return error response instead of re-throwing
+      return formatErrorResponse(error instanceof Error ? error : new Error(String(error))) as R;
     }
   };
 }

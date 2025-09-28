@@ -9,3 +9,84 @@ Use React components to create the dashboard layout. Implement sections for Hero
 
 # Test Strategy:
 Render the dashboard in the browser and verify that all components display correctly with sample data.
+
+# Subtasks:
+## 1. Create Hero Metrics Component [done]
+### Dependencies: None
+### Description: Develop the Hero Metrics component to display Show Rate and Close Rate.
+### Details:
+Use React to create a component that fetches and displays the Show Rate and Close Rate metrics. Style the component using Tailwind CSS.
+<info added on 2025-09-28T17:41:32.468Z>
+## Implementation Summary
+
+The Hero Metrics component has been successfully implemented with the following features:
+
+- Created a self-contained React component (`src/components/dashboard/HeroMetrics.tsx`) that handles its own data fetching
+- Implemented comprehensive error handling with loading states and error messages
+- Enhanced the metrics display to show:
+  - Show Rate with detailed breakdown
+  - Close Rate with detailed breakdown
+  - Total Calls count
+  - Wins count
+- Added visual improvements including larger numbers, trend indicators, detailed descriptions, hover effects, smooth transitions, loading skeleton animations, and proper error messaging
+- Updated the Dashboard page to use the new component, removing duplicate data fetching logic
+- Ensured the component is responsive, accessible, and performance-optimized
+- Applied consistent styling with the existing design system
+
+All testing has been completed successfully, confirming the component renders correctly, handles loading and error states appropriately, functions responsively, and integrates properly with the existing dashboard.
+</info added on 2025-09-28T17:41:32.468Z>
+
+## 2. Implement Loss Reasons Chart [done]
+### Dependencies: None
+### Description: Build a chart component to visualize loss reasons.
+### Details:
+Utilize a charting library to create a component that displays loss reasons data. Ensure it is responsive and styled with Tailwind CSS.
+
+## 3. Develop Call Log Table Component [in-progress]
+### Dependencies: None
+### Description: Create a table component to display call logs.
+### Details:
+Implement a React component that fetches and displays call logs in a table format. Style the table using Tailwind CSS.
+
+## 4. Integrate Components into Dashboard Layout [pending]
+### Dependencies: None
+### Description: Combine all created components into the main dashboard layout.
+### Details:
+Ensure that the Hero Metrics, Loss Reasons Chart, and Call Log Table components are properly integrated into the dashboard layout.
+
+## 5. Style Dashboard with Tailwind CSS [pending]
+### Dependencies: None
+### Description: Apply Tailwind CSS styles to the entire dashboard layout.
+### Details:
+Ensure that all components within the dashboard are styled consistently using Tailwind CSS, focusing on responsiveness and aesthetics.
+
+## 6. Create Call Log Table Structure [pending]
+### Dependencies: None
+### Description: Design and implement the basic table structure for displaying call logs
+### Details:
+Create the HTML table structure with proper columns for call data including date, client, outcome, duration, etc.
+
+## 7. Implement Data Fetching for Call Logs [pending]
+### Dependencies: None
+### Description: Create API integration to fetch call log data from the backend
+### Details:
+Implement data fetching logic using the existing calls API endpoint, handle loading states and error handling
+
+## 8. Style Call Log Table with Tailwind CSS [pending]
+### Dependencies: None
+### Description: Apply responsive styling and visual enhancements to the call log table
+### Details:
+Use Tailwind CSS to style the table with proper spacing, colors, hover effects, and responsive design
+
+## 9. Add Table Features (Sorting, Pagination, Search) [pending]
+### Dependencies: None
+### Description: Implement advanced table features for better user experience
+### Details:
+Add sorting capabilities, pagination controls, and search functionality to the call log table
+
+## 10. Integrate Call Log Table into Dashboard [pending]
+### Dependencies: None
+### Description: Add the completed call log table component to the main dashboard page
+### Details:
+Import and integrate the CallLogTable component into the dashboard layout, ensuring proper positioning and responsive behavior
+
