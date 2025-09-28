@@ -553,8 +553,64 @@
           5,
           8
         ],
-        "status": "pending",
-        "subtasks": []
+        "status": "in-progress",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Create Role Context/Hook",
+            "description": "Develop a context or custom hook to manage user roles and permissions throughout the application.",
+            "dependencies": [],
+            "details": "Implement a React context or hook that provides user role information and permissions to components.",
+            "status": "done",
+            "testStrategy": "Verify that the context provides the correct role information to components."
+          },
+          {
+            "id": 2,
+            "title": "Implement Conditional Rendering",
+            "description": "Set up conditional rendering for components based on user roles (sales, admin, ceo).",
+            "dependencies": [
+              "9.1"
+            ],
+            "details": "Use the role context to conditionally render components like HeroMetrics, LossReasonsChart, and CallLogTable based on user permissions.",
+            "status": "done",
+            "testStrategy": "Log in as different user roles and check that the correct components are displayed."
+          },
+          {
+            "id": 3,
+            "title": "Protect Sensitive Components",
+            "description": "Ensure that sensitive components and data are only accessible to users with the appropriate roles.",
+            "dependencies": [
+              "9.2"
+            ],
+            "details": "Implement checks to prevent unauthorized access to sensitive data and components.",
+            "status": "done",
+            "testStrategy": "Attempt to access sensitive components with different user roles and verify access restrictions."
+          },
+          {
+            "id": 4,
+            "title": "Update Navigation Based on Roles",
+            "description": "Modify the navigation menu to show or hide features based on user roles.",
+            "dependencies": [
+              "9.1"
+            ],
+            "details": "Implement logic in the navigation component to conditionally render menu items based on user permissions.",
+            "status": "done",
+            "testStrategy": "Log in as different user roles and verify that the navigation reflects the correct features."
+          },
+          {
+            "id": 5,
+            "title": "Test Role-Based Access Control",
+            "description": "Conduct thorough testing of the role-based access control implementation with various user roles.",
+            "dependencies": [
+              "9.2",
+              "9.3",
+              "9.4"
+            ],
+            "details": "Create test cases for each user role to ensure the UI behaves as expected regarding access and visibility.",
+            "status": "in-progress",
+            "testStrategy": "Log in as each user role and validate that the UI displays the correct components and data."
+          }
+        ]
       },
       {
         "id": 10,
@@ -801,7 +857,7 @@
     ],
     "metadata": {
       "created": "2025-09-28T00:23:29.094Z",
-      "updated": "2025-09-28T18:52:52.673Z",
+      "updated": "2025-09-28T19:05:19.070Z",
       "description": "Tasks for master context"
     }
   }

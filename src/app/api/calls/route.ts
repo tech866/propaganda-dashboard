@@ -69,8 +69,14 @@ const getCalls = withErrorHandling(async (request: NextRequest, user: User) => {
 const createCall = withErrorHandling(async (request: NextRequest, user: User) => {
   const body = await request.json();
   
+  // Add client_id from authenticated user
+  const bodyWithClientId = {
+    ...body,
+    client_id: user.clientId
+  };
+  
   // Validate request body using Yup schema
-  const validation = await validateCreateCall(body);
+  const validation = await validateCreateCall(bodyWithClientId);
   
   if (!validation.isValid) {
     throw createValidationError('Validation failed', validation.errors);

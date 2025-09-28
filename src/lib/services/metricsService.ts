@@ -172,10 +172,11 @@ export class MetricsService {
 
     // Get loss reasons data
     const lossReasonsQuery = `
-      SELECT id, reason
+      SELECT id, name as reason
       FROM loss_reasons
+      WHERE client_id = $1 AND is_active = true
     `;
-    const lossReasonsResult = await query(lossReasonsQuery);
+    const lossReasonsResult = await query(lossReasonsQuery, [clientId]);
     const lossReasons: LossReasonData[] = lossReasonsResult.rows.map(row => ({
       id: row.id,
       reason: row.reason
@@ -319,10 +320,11 @@ export class MetricsService {
 
     // Get loss reasons data
     const lossReasonsQuery = `
-      SELECT id, reason
+      SELECT id, name as reason
       FROM loss_reasons
+      WHERE client_id = $1 AND is_active = true
     `;
-    const lossReasonsResult = await query(lossReasonsQuery);
+    const lossReasonsResult = await query(lossReasonsQuery, [clientId]);
     const lossReasons: LossReasonData[] = lossReasonsResult.rows.map(row => ({
       id: row.id,
       reason: row.reason
@@ -390,13 +392,13 @@ export class MetricsService {
     // Get top loss reasons
     const lossReasonsQuery = `
       SELECT 
-        lr.reason,
+        lr.name as reason,
         COUNT(c.id) as count
       FROM calls c
       LEFT JOIN loss_reasons lr ON c.loss_reason_id = lr.id
       ${whereClause}
       AND c.outcome = 'lost'
-      GROUP BY lr.reason
+      GROUP BY lr.name
       ORDER BY count DESC
       LIMIT 5
     `;
