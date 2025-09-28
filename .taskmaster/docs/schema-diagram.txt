@@ -1,0 +1,191 @@
+# Database Schema Diagram - Propaganda Dashboard
+
+## 🗄️ Entity Relationship Diagram
+
+```
+┌─────────────────┐
+│     CLIENTS     │
+├─────────────────┤
+│ id (PK)         │
+│ name            │
+│ email           │
+│ phone           │
+│ address         │
+│ is_active       │
+│ created_at      │
+│ updated_at      │
+└─────────────────┘
+         │
+         │ 1:N
+         │
+         ▼
+┌─────────────────┐
+│      USERS      │
+├─────────────────┤
+│ id (PK)         │
+│ client_id (FK)  │ ────┐
+│ email           │     │
+│ password_hash   │     │
+│ name            │     │
+│ role            │     │
+│ is_active       │     │
+│ last_login      │     │
+│ created_at      │     │
+│ updated_at      │     │
+└─────────────────┘     │
+         │               │
+         │ 1:N           │
+         │               │
+         ▼               │
+┌─────────────────┐     │
+│      CALLS      │     │
+├─────────────────┤     │
+│ id (PK)         │     │
+│ client_id (FK)  │ ────┼───┐
+│ user_id (FK)    │ ────┘   │
+│ prospect_name   │         │
+│ prospect_email  │         │
+│ prospect_phone  │         │
+│ call_type       │         │
+│ status          │         │
+│ outcome         │         │
+│ loss_reason_id  │ ────┐   │
+│ notes           │     │   │
+│ call_duration   │     │   │
+│ scheduled_at    │     │   │
+│ completed_at    │     │   │
+│ created_at      │     │   │
+│ updated_at      │     │   │
+└─────────────────┘     │   │
+         │               │   │
+         │               │   │
+         ▼               │   │
+┌─────────────────┐     │   │
+│  AUDIT LOGS     │     │   │
+├─────────────────┤     │   │
+│ id (PK)         │     │   │
+│ client_id (FK)  │ ────┼───┘
+│ user_id (FK)    │ ────┘
+│ table_name      │
+│ record_id       │
+│ action          │
+│ old_values      │
+│ new_values      │
+│ ip_address      │
+│ user_agent      │
+│ created_at      │
+└─────────────────┘
+
+┌─────────────────┐
+│  LOSS REASONS   │
+├─────────────────┤
+│ id (PK)         │
+│ client_id (FK)  │ ────┐
+│ name            │     │
+│ description     │     │
+│ is_active       │     │
+│ created_at      │     │
+│ updated_at      │     │
+└─────────────────┘     │
+         │               │
+         │ 1:N           │
+         │               │
+         ▼               │
+┌─────────────────┐     │
+│      CALLS      │     │
+├─────────────────┤     │
+│ id (PK)         │     │
+│ client_id (FK)  │ ────┘
+│ user_id (FK)    │
+│ prospect_name   │
+│ prospect_email  │
+│ prospect_phone  │
+│ call_type       │
+│ status          │
+│ outcome         │
+│ loss_reason_id  │ ────┐
+│ notes           │     │
+│ call_duration   │     │
+│ scheduled_at    │     │
+│ completed_at    │     │
+│ created_at      │     │
+│ updated_at      │     │
+└─────────────────┘     │
+         │               │
+         │               │
+         ▼               │
+┌─────────────────┐     │
+│  AUDIT LOGS     │     │
+├─────────────────┤     │
+│ id (PK)         │     │
+│ client_id (FK)  │     │
+│ user_id (FK)    │     │
+│ table_name      │     │
+│ record_id       │     │
+│ action          │     │
+│ old_values      │     │
+│ new_values      │     │
+│ ip_address      │     │
+│ user_agent      │     │
+│ created_at      │     │
+└─────────────────┘     │
+                        │
+                        │
+                        ▼
+┌─────────────────┐
+│  LOSS REASONS   │
+├─────────────────┤
+│ id (PK)         │
+│ client_id (FK)  │
+│ name            │
+│ description     │
+│ is_active       │
+│ created_at      │
+│ updated_at      │
+└─────────────────┘
+```
+
+## 🔗 Relationship Summary
+
+### Primary Relationships:
+1. **CLIENTS** ──(1:N)──> **USERS**
+   - One client has many users
+   - Each user belongs to one client
+
+2. **CLIENTS** ──(1:N)──> **LOSS REASONS**
+   - One client has many loss reasons
+   - Each loss reason belongs to one client
+
+3. **CLIENTS** ──(1:N)──> **CALLS**
+   - One client has many calls
+   - Each call belongs to one client
+
+4. **USERS** ──(1:N)──> **CALLS**
+   - One user has many calls
+   - Each call belongs to one user
+
+5. **LOSS REASONS** ──(1:N)──> **CALLS**
+   - One loss reason can be used in many calls
+   - Each call can optionally reference one loss reason
+
+6. **CLIENTS** ──(1:N)──> **AUDIT LOGS**
+   - One client has many audit logs
+   - Each audit log belongs to one client
+
+7. **USERS** ──(1:N)──> **AUDIT LOGS**
+   - One user has many audit logs
+   - Each audit log belongs to one user
+
+## 🏢 Multi-Tenant Architecture
+
+### Data Segregation:
+- All tables include `client_id` for tenant isolation
+- Foreign key constraints ensure data integrity
+- Application-level filtering by client_id
+- Row-level security through client_id filtering
+
+### Key Features:
+- **Tenant Isolation:** Complete data separation between clients
+- **Role-Based Access:** Different access levels within each tenant
+- **Audit Trail:** Complete tracking of all data changes
+- **Scalability:** Schema supports horizontal scaling by client
