@@ -4,8 +4,8 @@ import { createValidationError, withErrorHandling } from '@/middleware/errors';
 import { validateMetricsFilter } from '@/lib/validation';
 import { MetricsService } from '@/lib/services/metricsService';
 
-// GET /api/metrics - Get performance metrics
-const getMetrics = withErrorHandling(async (request: NextRequest, user: User) => {
+// GET /api/metrics/summary - Get comprehensive metrics summary
+const getMetricsSummary = withErrorHandling(async (request: NextRequest, user: User) => {
   const { searchParams } = new URL(request.url);
   
   // Prepare filter data for validation
@@ -52,17 +52,17 @@ const getMetrics = withErrorHandling(async (request: NextRequest, user: User) =>
     };
   }
 
-  // Get real metrics from database
-  const metrics = await MetricsService.getMetrics(metricsFilters);
+  // Get comprehensive metrics summary
+  const summary = await MetricsService.getMetricsSummary(metricsFilters);
 
   return NextResponse.json(
     {
       success: true,
-      data: metrics
+      data: summary
     },
     { status: 200 }
   );
 });
 
 // Export the protected handler
-export const GET = withAuth(getMetrics);
+export const GET = withAuth(getMetricsSummary);
