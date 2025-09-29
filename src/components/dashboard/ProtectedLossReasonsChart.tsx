@@ -4,6 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend } from 'recharts';
 import { useRole } from '@/contexts/RoleContext';
 import { ProtectedComponent } from '@/components/auth/ProtectedComponent';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 
 interface LossReason {
   reason: string;
@@ -15,7 +16,17 @@ interface ProtectedLossReasonsChartProps {
   showAllData?: boolean; // If true, shows all data regardless of role
 }
 
-const COLORS = ['#8884d8', '#82ca9d', '#ffc658', '#ff8042', '#0088FE', '#00C49F', '#FFBB28', '#FF8042'];
+// Modern color palette using design system colors
+const COLORS = [
+  'hsl(var(--primary))', // Primary blue
+  'hsl(var(--success))', // Success green
+  'hsl(var(--warning))', // Warning orange
+  'hsl(var(--destructive))', // Destructive red
+  'hsl(var(--info))', // Info cyan
+  'hsl(var(--secondary))', // Secondary purple
+  'hsl(var(--accent))', // Accent color
+  'hsl(var(--muted))', // Muted gray
+];
 
 function LossReasonsChartContent({ className = '', showAllData = false }: ProtectedLossReasonsChartProps) {
   const [data, setData] = useState<LossReason[]>([]);
@@ -59,73 +70,97 @@ function LossReasonsChartContent({ className = '', showAllData = false }: Protec
 
   if (loading) {
     return (
-      <div className={`bg-white p-6 rounded-lg shadow-md ${className}`}>
-        <div className="animate-pulse flex space-x-4">
-          <div className="rounded-full bg-gray-300 h-24 w-24"></div>
-          <div className="flex-1 space-y-4 py-1">
-            <div className="h-4 bg-gray-300 rounded w-3/4"></div>
-            <div className="space-y-2">
-              <div className="h-4 bg-gray-300 rounded"></div>
-              <div className="h-4 bg-gray-300 rounded w-5/6"></div>
+      <Card className={className}>
+        <CardContent className="space-card">
+          <div className="animate-pulse flex space-x-4">
+            <div className="rounded-full bg-muted/20 h-24 w-24"></div>
+            <div className="flex-1 space-y-4 py-1">
+              <div className="h-4 bg-muted/20 rounded w-3/4"></div>
+              <div className="space-y-2">
+                <div className="h-4 bg-muted/20 rounded"></div>
+                <div className="h-4 bg-muted/20 rounded w-5/6"></div>
+              </div>
             </div>
           </div>
-        </div>
-        <p className="text-center text-gray-500 mt-4">Loading loss reasons...</p>
-      </div>
+          <p className="text-center text-muted-foreground mt-4">Loading loss reasons...</p>
+        </CardContent>
+      </Card>
     );
   }
 
   if (error) {
     return (
-      <div className={`bg-white p-6 rounded-lg shadow-md ${className}`}>
-        <div className="text-center">
-          <h3 className="text-lg font-semibold text-gray-900 mb-2">Loss Reasons Unavailable</h3>
-          <p className="text-red-600">{error}</p>
-        </div>
-      </div>
+      <Card className={className}>
+        <CardContent className="space-card">
+          <div className="text-center">
+            <h3 className="text-h4 mb-2">Loss Reasons Unavailable</h3>
+            <p className="text-destructive">{error}</p>
+          </div>
+        </CardContent>
+      </Card>
     );
   }
 
   if (!data || data.length === 0) {
     return (
-      <div className={`bg-white p-6 rounded-lg shadow-md ${className}`}>
-        <div className="text-center">
-          <h3 className="text-lg font-semibold text-gray-900 mb-2">No Loss Reason Data</h3>
-          <p className="text-gray-600">No loss reason data available at this time.</p>
-        </div>
-      </div>
+      <Card className={className}>
+        <CardContent className="space-card">
+          <div className="text-center">
+            <h3 className="text-h4 mb-2">No Loss Reason Data</h3>
+            <p className="text-muted-foreground">No loss reason data available at this time.</p>
+          </div>
+        </CardContent>
+      </Card>
     );
   }
 
   return (
-    <div className={`bg-white p-6 rounded-lg shadow-md ${className}`}>
-      <div className="flex items-center justify-between mb-4">
-        <h3 className="text-lg font-semibold text-gray-800">Loss Reasons Breakdown</h3>
-        <div className="text-sm text-gray-500">
-          {hasAnyRole(['admin', 'ceo']) ? 'All Data' : 'Your Data'}
+    <Card className={className}>
+      <CardHeader>
+        <div className="flex items-center justify-between">
+          <div>
+            <CardTitle>Loss Reasons Breakdown</CardTitle>
+            <CardDescription>
+              {hasAnyRole(['admin', 'ceo']) ? 'All Data' : 'Your Data'}
+            </CardDescription>
+          </div>
         </div>
-      </div>
-      <ResponsiveContainer width="100%" height={300}>
-        <PieChart>
-          <Pie
-            data={data}
-            cx="50%"
-            cy="50%"
-            labelLine={false}
-            outerRadius={80}
-            fill="#8884d8"
-            dataKey="count"
-            nameKey="reason"
-          >
-            {data.map((entry, index) => (
-              <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-            ))}
-          </Pie>
-          <Tooltip />
-          <Legend />
-        </PieChart>
-      </ResponsiveContainer>
-    </div>
+      </CardHeader>
+      <CardContent className="space-card">
+        <ResponsiveContainer width="100%" height={300}>
+          <PieChart>
+            <Pie
+              data={data}
+              cx="50%"
+              cy="50%"
+              labelLine={false}
+              outerRadius={80}
+              fill="hsl(var(--primary))"
+              dataKey="count"
+              nameKey="reason"
+            >
+              {data.map((entry, index) => (
+                <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+              ))}
+            </Pie>
+            <Tooltip 
+              contentStyle={{ 
+                backgroundColor: 'hsl(var(--card))', 
+                border: '1px solid hsl(var(--border))', 
+                borderRadius: '8px',
+                color: 'hsl(var(--foreground))'
+              }}
+            />
+            <Legend 
+              wrapperStyle={{ 
+                color: 'hsl(var(--foreground))',
+                fontSize: '12px'
+              }}
+            />
+          </PieChart>
+        </ResponsiveContainer>
+      </CardContent>
+    </Card>
   );
 }
 

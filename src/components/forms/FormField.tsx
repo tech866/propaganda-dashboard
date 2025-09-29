@@ -1,4 +1,7 @@
 import React from 'react';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { cn } from '@/lib/utils';
 
 interface FormFieldProps {
   label: string;
@@ -29,12 +32,6 @@ export default function FormField({
   className = '',
   children
 }: FormFieldProps) {
-  const baseInputClasses = `
-    w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500
-    ${error ? 'border-red-500 focus:ring-red-500 focus:border-red-500' : 'border-gray-300'}
-    ${disabled ? 'bg-gray-100 cursor-not-allowed' : 'bg-white'}
-  `;
-
   const renderInput = () => {
     if (type === 'textarea') {
       return (
@@ -48,7 +45,10 @@ export default function FormField({
           required={required}
           disabled={disabled}
           rows={4}
-          className={baseInputClasses}
+          className={cn(
+            "input-modern min-h-[80px] resize-none",
+            error && "border-destructive focus-visible:ring-destructive"
+          )}
         />
       );
     }
@@ -63,7 +63,10 @@ export default function FormField({
           onBlur={onBlur}
           required={required}
           disabled={disabled}
-          className={baseInputClasses}
+          className={cn(
+            "input-modern",
+            error && "border-destructive focus-visible:ring-destructive"
+          )}
         >
           {children}
         </select>
@@ -71,7 +74,7 @@ export default function FormField({
     }
 
     return (
-      <input
+      <Input
         type={type}
         id={name}
         name={name}
@@ -81,20 +84,22 @@ export default function FormField({
         placeholder={placeholder}
         required={required}
         disabled={disabled}
-        className={baseInputClasses}
+        className={cn(
+          error && "border-destructive focus-visible:ring-destructive"
+        )}
       />
     );
   };
 
   return (
-    <div className={`mb-4 ${className}`}>
-      <label htmlFor={name} className="block text-sm font-medium text-gray-700 mb-1">
+    <div className={cn("space-y-2", className)}>
+      <Label htmlFor={name} className="text-foreground">
         {label}
-        {required && <span className="text-red-500 ml-1">*</span>}
-      </label>
+        {required && <span className="text-destructive ml-1">*</span>}
+      </Label>
       {renderInput()}
       {error && (
-        <p className="mt-1 text-sm text-red-600" role="alert">
+        <p className="text-sm text-destructive" role="alert">
           {error}
         </p>
       )}

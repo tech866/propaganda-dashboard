@@ -109,8 +109,8 @@ export default function NewUser() {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Loading...</p>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
+          <p className="mt-4 text-muted-foreground">Loading...</p>
         </div>
       </div>
     );
@@ -118,15 +118,15 @@ export default function NewUser() {
 
   if (success) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+      <div className="min-h-screen flex items-center justify-center bg-background py-12 px-4 sm:px-6 lg:px-8">
         <div className="max-w-md w-full">
           <FormContainer
             title="User Created Successfully!"
             subtitle="You will be redirected to the users list shortly."
           >
             <div className="text-center">
-              <div className="text-green-600 text-6xl mb-4">✓</div>
-              <p className="text-gray-600">The new user has been created successfully.</p>
+              <div className="text-success text-6xl mb-4">✓</div>
+              <p className="text-muted-foreground">The new user has been created successfully.</p>
             </div>
           </FormContainer>
         </div>
@@ -135,7 +135,7 @@ export default function NewUser() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-background py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-2xl mx-auto">
         <FormContainer
           title="Create New User"
@@ -208,7 +208,7 @@ export default function NewUser() {
             />
 
             {error && (
-              <div className="text-red-600 text-sm text-center bg-red-50 p-3 rounded-md">
+              <div className="text-destructive text-sm text-center bg-destructive/10 border border-destructive/20 p-3 rounded-md">
                 {error}
               </div>
             )}
@@ -232,8 +232,8 @@ export default function NewUser() {
               </FormButton>
             </div>
 
-            <div className="text-sm text-gray-600 bg-gray-50 p-4 rounded-md">
-              <p className="font-medium mb-2">Sample Client IDs for testing:</p>
+            <div className="text-sm text-muted-foreground bg-muted/30 p-4 rounded-md">
+              <p className="font-medium mb-2 text-foreground">Sample Client IDs for testing:</p>
               <ul className="space-y-1 text-xs">
                 <li>• 550e8400-e29b-41d4-a716-446655440001 (Propaganda Inc)</li>
                 <li>• 550e8400-e29b-41d4-a716-446655440002 (Tech Solutions)</li>

@@ -3,8 +3,23 @@
 import { useState, useEffect } from 'react';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
-import { useRole, RoleGuard, PermissionGuard } from '@/contexts/RoleContext';
+import { useRole } from '@/contexts/RoleContext';
 import DashboardNavigation from '@/components/navigation/DashboardNavigation';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Input } from '@/components/ui/input';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { 
+  FileText, 
+  Plus, 
+  Search, 
+  RefreshCw, 
+  Shield, 
+  Edit, 
+  Trash2,
+  AlertTriangle
+} from 'lucide-react';
 import Link from 'next/link';
 
 interface LossReason {
@@ -152,10 +167,10 @@ export default function LossReasonsManagement() {
 
   if (status === 'loading') {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Loading...</p>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
+          <p className="mt-4 text-muted-foreground">Loading...</p>
         </div>
       </div>
     );
@@ -163,202 +178,212 @@ export default function LossReasonsManagement() {
 
   if (!hasAnyRole(['admin', 'ceo'])) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">Access Denied</h1>
-          <p className="text-gray-600 mb-4">You don't have permission to access this page.</p>
-          <button
-            onClick={() => router.push('/dashboard')}
-            className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700"
-          >
-            Return to Dashboard
-          </button>
-        </div>
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <Card className="w-full max-w-md">
+          <CardHeader className="text-center">
+            <div className="w-16 h-16 bg-destructive/10 rounded-full flex items-center justify-center mx-auto mb-4">
+              <Shield className="w-8 h-8 text-destructive" />
+            </div>
+            <CardTitle className="text-h2">Access Denied</CardTitle>
+            <CardDescription>You don&apos;t have permission to access loss reasons management.</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Button 
+              onClick={() => router.push('/dashboard')}
+              className="w-full"
+            >
+              Return to Dashboard
+            </Button>
+          </CardContent>
+        </Card>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Navigation */}
+    <div className="min-h-screen bg-background">
       <DashboardNavigation />
-
-      {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Header */}
-        <div className="mb-8">
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-3xl font-bold text-gray-900">Loss Reasons Management</h1>
-              <p className="mt-2 text-gray-600">
-                Configure and manage loss reason categories for call tracking
-              </p>
+        <div className="space-y-6">
+          {/* Header */}
+          <div className="flex justify-between items-center">
+            <div className="flex items-center space-x-3">
+              <div className="w-12 h-12 bg-gradient-to-br from-destructive to-destructive/80 rounded-xl flex items-center justify-center">
+                <FileText className="w-6 h-6 text-destructive-foreground" />
+              </div>
+              <div>
+                <h1 className="text-display">Loss Reasons Management</h1>
+                <p className="text-body-lg text-muted-foreground">
+                  Configure and manage loss reason categories for call tracking
+                </p>
+              </div>
             </div>
-            <Link
-              href="/admin/loss-reasons/new"
-              className="bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700 transition-colors"
-            >
-              Add New Reason
-            </Link>
+            <Button asChild>
+              <Link href="/admin/loss-reasons/new">
+                <Plus className="mr-2 h-4 w-4" /> Add New Reason
+              </Link>
+            </Button>
           </div>
-        </div>
 
-        {/* Filters */}
-        <div className="bg-white rounded-lg shadow-md p-6 mb-6">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Search Reasons
-              </label>
-              <input
-                type="text"
-                placeholder="Search by name or description..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Filter by Category
-              </label>
-              <select
-                value={categoryFilter}
-                onChange={(e) => setCategoryFilter(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
-              >
-                <option value="all">All Categories</option>
-                {categories.map(category => (
-                  <option key={category} value={category}>{category}</option>
-                ))}
-              </select>
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Filter by Status
-              </label>
-              <select
-                value={statusFilter}
-                onChange={(e) => setStatusFilter(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
-              >
-                <option value="all">All Status</option>
-                <option value="active">Active</option>
-                <option value="inactive">Inactive</option>
-              </select>
-            </div>
-            <div className="flex items-end">
-              <button
-                onClick={fetchLossReasons}
-                className="w-full bg-gray-100 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-200 transition-colors"
-              >
-                Refresh
-              </button>
-            </div>
-          </div>
-        </div>
+          {/* Filters */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-h4">Filters</CardTitle>
+              <CardDescription>Search and filter loss reasons</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-foreground mb-2">
+                    Search Reasons
+                  </label>
+                  <div className="relative">
+                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                    <Input
+                      type="text"
+                      placeholder="Search by name or description..."
+                      value={searchTerm}
+                      onChange={(e) => setSearchTerm(e.target.value)}
+                      className="pl-10"
+                    />
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-foreground mb-2">
+                    Filter by Category
+                  </label>
+                  <select
+                    value={categoryFilter}
+                    onChange={(e) => setCategoryFilter(e.target.value)}
+                    className="input-modern w-full"
+                  >
+                    <option value="all">All Categories</option>
+                    {categories.map(category => (
+                      <option key={category} value={category}>{category}</option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-foreground mb-2">
+                    Filter by Status
+                  </label>
+                  <select
+                    value={statusFilter}
+                    onChange={(e) => setStatusFilter(e.target.value)}
+                    className="input-modern w-full"
+                  >
+                    <option value="all">All Status</option>
+                    <option value="active">Active</option>
+                    <option value="inactive">Inactive</option>
+                  </select>
+                </div>
+                <div className="flex items-end">
+                  <Button
+                    onClick={fetchLossReasons}
+                    variant="secondary"
+                    className="w-full"
+                  >
+                    <RefreshCw className="mr-2 h-4 w-4" /> Refresh
+                  </Button>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
 
-        {/* Error Message */}
-        {error && (
-          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-md mb-6">
-            {error}
-          </div>
-        )}
-
-        {/* Loss Reasons Table */}
-        <div className="bg-white rounded-lg shadow-md overflow-hidden">
-          {loading ? (
-            <div className="p-8 text-center">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-red-600 mx-auto"></div>
-              <p className="mt-2 text-gray-600">Loading loss reasons...</p>
-            </div>
-          ) : filteredLossReasons.length === 0 ? (
-            <div className="p-8 text-center">
-              <p className="text-gray-500">No loss reasons found matching your criteria.</p>
-            </div>
-          ) : (
-            <div className="overflow-x-auto">
-              <table className="min-w-full divide-y divide-gray-200">
-                <thead className="bg-gray-50">
-                  <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Name
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Description
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Category
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Status
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Created
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Actions
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
-                  {filteredLossReasons.map((reason) => (
-                    <tr key={reason.id} className="hover:bg-gray-50">
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm font-medium text-gray-900">{reason.name}</div>
-                      </td>
-                      <td className="px-6 py-4">
-                        <div className="text-sm text-gray-500 max-w-xs truncate">
-                          {reason.description || 'No description'}
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-gray-100 text-gray-800">
-                          {reason.category}
-                        </span>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <button
-                          onClick={() => handleToggleLossReasonStatus(reason.id, reason.isActive)}
-                          className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                            reason.isActive 
-                              ? 'bg-green-100 text-green-800 hover:bg-green-200' 
-                              : 'bg-red-100 text-red-800 hover:bg-red-200'
-                          }`}
-                        >
-                          {reason.isActive ? 'Active' : 'Inactive'}
-                        </button>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        {new Date(reason.createdAt).toLocaleDateString()}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                        <div className="flex space-x-2">
-                          <Link
-                            href={`/admin/loss-reasons/${reason.id}/edit`}
-                            className="text-red-600 hover:text-red-900"
-                          >
-                            Edit
-                          </Link>
-                          <button
-                            onClick={() => handleDeleteLossReason(reason.id)}
-                            className="text-red-600 hover:text-red-900"
-                          >
-                            Delete
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+          {/* Error Message */}
+          {error && (
+            <Card className="border-destructive/20 bg-destructive/10">
+              <CardContent className="pt-6">
+                <div className="flex items-center space-x-2 text-destructive text-sm">
+                  <AlertTriangle className="h-4 w-4" />
+                  <span>{error}</span>
+                </div>
+              </CardContent>
+            </Card>
           )}
-        </div>
 
-        {/* Summary */}
-        <div className="mt-6 text-sm text-gray-500">
-          Showing {filteredLossReasons.length} of {lossReasons.length} loss reasons
+          {/* Loss Reasons Table */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-h4">Loss Reasons</CardTitle>
+              <CardDescription>Manage loss reason categories and their status</CardDescription>
+            </CardHeader>
+            <CardContent>
+              {loading ? (
+                <div className="p-8 text-center">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-destructive mx-auto"></div>
+                  <p className="mt-2 text-muted-foreground">Loading loss reasons...</p>
+                </div>
+              ) : filteredLossReasons.length === 0 ? (
+                <div className="p-8 text-center">
+                  <FileText className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                  <p className="text-muted-foreground">No loss reasons found matching your criteria.</p>
+                </div>
+              ) : (
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Name</TableHead>
+                      <TableHead>Description</TableHead>
+                      <TableHead>Category</TableHead>
+                      <TableHead>Status</TableHead>
+                      <TableHead>Created</TableHead>
+                      <TableHead>Actions</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {filteredLossReasons.map((reason) => (
+                      <TableRow key={reason.id}>
+                        <TableCell className="font-medium text-foreground">{reason.name}</TableCell>
+                        <TableCell className="text-muted-foreground max-w-xs truncate">
+                          {reason.description || 'No description'}
+                        </TableCell>
+                        <TableCell>
+                          <Badge variant="secondary">{reason.category}</Badge>
+                        </TableCell>
+                        <TableCell>
+                          <Button
+                            onClick={() => handleToggleLossReasonStatus(reason.id, reason.isActive)}
+                            variant={reason.isActive ? "success" : "destructive"}
+                            size="sm"
+                          >
+                            {reason.isActive ? 'Active' : 'Inactive'}
+                          </Button>
+                        </TableCell>
+                        <TableCell className="text-muted-foreground">
+                          {new Date(reason.createdAt).toLocaleDateString()}
+                        </TableCell>
+                        <TableCell>
+                          <div className="flex space-x-2">
+                            <Button variant="ghost" size="sm" asChild>
+                              <Link href={`/admin/loss-reasons/${reason.id}/edit`}>
+                                <Edit className="h-4 w-4" />
+                              </Link>
+                            </Button>
+                            <Button
+                              onClick={() => handleDeleteLossReason(reason.id)}
+                              variant="ghost"
+                              size="sm"
+                              className="text-destructive hover:text-destructive"
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              )}
+            </CardContent>
+          </Card>
+
+          {/* Summary */}
+          <div className="mt-6 p-4 bg-muted/30 rounded-xl">
+            <p className="text-sm text-muted-foreground">
+              Showing {filteredLossReasons.length} of {lossReasons.length} loss reasons
+            </p>
+          </div>
         </div>
       </main>
     </div>

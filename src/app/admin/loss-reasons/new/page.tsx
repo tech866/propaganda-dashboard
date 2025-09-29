@@ -116,8 +116,8 @@ export default function NewLossReason() {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-red-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Loading...</p>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-destructive mx-auto"></div>
+          <p className="mt-4 text-muted-foreground">Loading...</p>
         </div>
       </div>
     );
@@ -125,15 +125,15 @@ export default function NewLossReason() {
 
   if (success) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+      <div className="min-h-screen flex items-center justify-center bg-background py-12 px-4 sm:px-6 lg:px-8">
         <div className="max-w-md w-full">
           <FormContainer
             title="Loss Reason Created Successfully!"
             subtitle="You will be redirected to the loss reasons list shortly."
           >
             <div className="text-center">
-              <div className="text-red-600 text-6xl mb-4">✓</div>
-              <p className="text-gray-600">The new loss reason has been created successfully.</p>
+              <div className="text-destructive text-6xl mb-4">✓</div>
+              <p className="text-muted-foreground">The new loss reason has been created successfully.</p>
             </div>
           </FormContainer>
         </div>
@@ -142,7 +142,7 @@ export default function NewLossReason() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-background py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-2xl mx-auto">
         <FormContainer
           title="Create New Loss Reason"
@@ -195,7 +195,7 @@ export default function NewLossReason() {
             </FormField>
 
             {error && (
-              <div className="text-red-600 text-sm text-center bg-red-50 p-3 rounded-md">
+              <div className="text-destructive text-sm text-center bg-destructive/10 border border-destructive/20 p-3 rounded-md">
                 {error}
               </div>
             )}
@@ -213,14 +213,15 @@ export default function NewLossReason() {
                 type="submit"
                 loading={loading}
                 disabled={loading}
-                className="flex-1 bg-red-600 hover:bg-red-700"
+                variant="danger"
+                className="flex-1"
               >
                 Create Loss Reason
               </FormButton>
             </div>
 
-            <div className="text-sm text-gray-600 bg-gray-50 p-4 rounded-md">
-              <p className="font-medium mb-2">Tips for creating effective loss reasons:</p>
+            <div className="text-sm text-muted-foreground bg-muted/30 p-4 rounded-md">
+              <p className="font-medium mb-2 text-foreground">Tips for creating effective loss reasons:</p>
               <ul className="space-y-1 text-xs">
                 <li>• Use clear, specific names that sales teams will understand</li>
                 <li>• Group similar reasons into logical categories</li>

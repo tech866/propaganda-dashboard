@@ -1,29 +1,38 @@
 'use client';
 
-import { useSession, signOut } from 'next-auth/react';
+import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
-import Link from 'next/link';
-import HeroMetrics from '@/components/dashboard/HeroMetrics';
-import LossReasonsChart from '@/components/dashboard/LossReasonsChart';
-import CallLogTable from '@/components/dashboard/CallLogTable';
-import DashboardFilters, { FilterState } from '@/components/dashboard/DashboardFilters';
-import DashboardNavigation from '@/components/navigation/DashboardNavigation';
-import { useRole, RoleGuard, PermissionGuard } from '@/contexts/RoleContext';
+import { useEffect } from 'react';
+import ModernDashboardLayout from '@/components/layout/ModernDashboardLayout';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Input } from '@/components/ui/input';
+import { 
+  Table, 
+  TableBody, 
+  TableCell, 
+  TableHead, 
+  TableHeader, 
+  TableRow 
+} from '@/components/ui/table';
+import ModernLineChart from '@/components/dashboard/ModernLineChart';
+import { 
+  FunnelIcon, 
+  DownloadIcon, 
+  RefreshCw, 
+  CalendarIcon,
+  DollarSign,
+  CreditCard,
+  Users,
+  Target,
+  TrendingUp,
+  TrendingDown
+} from 'lucide-react';
 
 export default function Dashboard() {
   const { data: session, status } = useSession();
   const router = useRouter();
-  const { user, hasAnyRole, canViewMetrics, canManageUsers, canViewAuditLogs } = useRole();
-  const [filters, setFilters] = useState<FilterState>({
-    dateFrom: '',
-    dateTo: '',
-    clientId: '',
-    userId: '',
-    callType: '',
-    status: '',
-    outcome: ''
-  });
 
   useEffect(() => {
     if (status === 'unauthenticated') {
@@ -31,142 +40,226 @@ export default function Dashboard() {
     }
   }, [status, router]);
 
-  const handleFiltersChange = (newFilters: FilterState) => {
-    setFilters(newFilters);
-  };
+  // KPI Data
+  const kpiData = [
+    {
+      title: 'Ad Spend',
+      value: '$847,293',
+      delta: { value: '+8.2%', trend: 'up' as const },
+      description: 'Total advertising expenditure',
+      icon: <DollarSign className="h-5 w-5" />
+    },
+    {
+      title: 'Cash Collected',
+      value: '$2,234,891',
+      delta: { value: '+15.3%', trend: 'up' as const },
+      description: 'Actual payments received',
+      icon: <CreditCard className="h-5 w-5" />
+    },
+    {
+      title: 'Average Order Value',
+      value: '$4,892',
+      delta: { value: '-2.1%', trend: 'down' as const },
+      description: 'Mean transaction value',
+      icon: <Users className="h-5 w-5" />
+    },
+    {
+      title: 'ROAS (Return on Ad Spend)',
+      value: '3.36x',
+      delta: { value: '+0.24x', trend: 'up' as const },
+      description: 'Return on ad spend',
+      icon: <Target className="h-5 w-5" />
+    }
+  ];
 
-  if (status === 'loading') {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Loading dashboard...</p>
-        </div>
-      </div>
-    );
-  }
-
-  if (!session) {
-    return null;
-  }
+  // Client P&L Data
+  const clientData = [
+    {
+      name: 'TechCorp Inc.',
+      status: 'excellent',
+      revenue: '$892k',
+      adSpend: '$268k',
+      margin: '70.0%',
+      total: '$624,400',
+      progress: 70,
+    },
+    {
+      name: 'StartupXYZ',
+      status: 'excellent',
+      revenue: '$650k',
+      adSpend: '$195k',
+      margin: '70.0%',
+      total: '$457,800',
+      progress: 70,
+    },
+  ];
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <header className="bg-white shadow-sm border-b">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center py-4">
-            <div className="flex items-center space-x-4">
-              <h1 className="text-2xl font-bold text-gray-900">Propaganda Dashboard</h1>
-              <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-purple-100 text-purple-800">
-                {session.user?.role?.toUpperCase()}
-              </span>
-            </div>
-            <div className="flex items-center space-x-4">
-              <span className="text-sm text-gray-600">Welcome, {session.user?.name}</span>
-              <button
-                onClick={() => signOut()}
-                className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors"
-              >
-                Sign Out
-              </button>
-            </div>
+    <ModernDashboardLayout>
+      <div className="space-y-8">
+        {/* Page Header */}
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div>
+            <h1 className="text-3xl font-bold tracking-tight">Insights and Financial Performance</h1>
+            <p className="text-lg text-muted-foreground mt-2">
+              Comprehensive overview of your advertising performance and revenue metrics
+            </p>
+          </div>
+          <div className="flex items-center gap-3">
+            <Badge variant="default" className="text-sm">
+              {session?.user?.role?.toUpperCase() || 'USER'}
+            </Badge>
+            <Button variant="outline" size="sm">
+              <RefreshCw className="mr-2 h-4 w-4" />
+              Refresh
+            </Button>
           </div>
         </div>
-      </header>
 
-      {/* Navigation */}
-      <DashboardNavigation />
-
-      {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Dashboard Filters */}
-        <DashboardFilters 
-          onFiltersChange={handleFiltersChange}
-          className="mb-8"
-          showAdvanced={hasAnyRole(['admin', 'ceo'])}
-        />
-
-        {/* Hero Metrics - Only show if user can view metrics */}
-        <PermissionGuard permission="view_own_metrics">
-          <HeroMetrics className="mb-8" filters={filters} />
-        </PermissionGuard>
-
-        {/* Main Dashboard Content */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          {/* Recent Activity */}
-          <div className="bg-white shadow rounded-lg">
-            <div className="px-4 py-5 sm:p-6">
-              <h3 className="text-lg leading-6 font-medium text-gray-900 mb-4">Quick Actions</h3>
-              <div className="space-y-3">
-                <Link
-                  href="/calls/new"
-                  className="block w-full bg-purple-600 hover:bg-purple-700 text-white text-center py-3 px-4 rounded-md font-medium transition-colors"
-                >
-                  Log New Call
-                </Link>
-                <Link
-                  href="/calls"
-                  className="block w-full bg-gray-100 hover:bg-gray-200 text-gray-700 text-center py-3 px-4 rounded-md font-medium transition-colors"
-                >
-                  View All Calls
-                </Link>
-                {canManageUsers && (
-                  <Link
-                    href="/admin/users/new"
-                    className="block w-full bg-blue-600 hover:bg-blue-700 text-white text-center py-3 px-4 rounded-md font-medium transition-colors"
-                  >
-                    Add New User
-                  </Link>
-                )}
-                {canViewAuditLogs && (
-                  <Link
-                    href="/audit"
-                    className="block w-full bg-green-600 hover:bg-green-700 text-white text-center py-3 px-4 rounded-md font-medium transition-colors"
-                  >
-                    View Audit Logs
-                  </Link>
-                )}
+        {/* Filter Controls */}
+        <Card>
+          <CardContent className="p-6">
+            <div className="flex flex-col sm:flex-row gap-4">
+              <div className="flex-1">
+                <label className="text-sm font-medium mb-2 block">Time Period</label>
+                <div className="relative">
+                  <select className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 pr-10">
+                    <option>Last 30 days</option>
+                    <option>Last 7 days</option>
+                    <option>This month</option>
+                    <option>Last quarter</option>
+                  </select>
+                  <CalendarIcon className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
+                </div>
+              </div>
+              <div className="flex gap-2">
+                <Button variant="outline" size="sm">
+                  <FunnelIcon className="mr-2 h-4 w-4" />
+                  Filters
+                </Button>
+                <Button variant="outline" size="sm">
+                  <DownloadIcon className="mr-2 h-4 w-4" />
+                  Export
+                </Button>
               </div>
             </div>
-          </div>
+          </CardContent>
+        </Card>
 
-          {/* User Info */}
-          <div className="bg-white shadow rounded-lg">
-            <div className="px-4 py-5 sm:p-6">
-              <h3 className="text-lg leading-6 font-medium text-gray-900 mb-4">Account Information</h3>
-              <dl className="grid grid-cols-1 gap-x-4 gap-y-6 sm:grid-cols-2">
-                <div>
-                  <dt className="text-sm font-medium text-gray-500">Name</dt>
-                  <dd className="mt-1 text-sm text-gray-900">{session.user?.name}</dd>
-                </div>
-                <div>
-                  <dt className="text-sm font-medium text-gray-500">Email</dt>
-                  <dd className="mt-1 text-sm text-gray-900">{session.user?.email}</dd>
-                </div>
-                <div>
-                  <dt className="text-sm font-medium text-gray-500">Role</dt>
-                  <dd className="mt-1 text-sm text-gray-900 capitalize">{session.user?.role}</dd>
-                </div>
-                <div>
-                  <dt className="text-sm font-medium text-gray-500">Client ID</dt>
-                  <dd className="mt-1 text-sm text-gray-900 font-mono">{session.user?.clientId}</dd>
-                </div>
-              </dl>
-            </div>
-          </div>
+        {/* KPI Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          {kpiData.map((kpi, index) => (
+            <Card key={index}>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">
+                  {kpi.title}
+                </CardTitle>
+                {kpi.icon}
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">{kpi.value}</div>
+                <p className="text-xs text-muted-foreground">
+                  {kpi.delta && (
+                    <span className={`inline-flex items-center gap-1 ${
+                      kpi.delta.trend === 'up' ? 'text-green-600' : 
+                      kpi.delta.trend === 'down' ? 'text-red-600' : 
+                      'text-muted-foreground'
+                    }`}>
+                      {kpi.delta.trend === 'up' && '▲'}
+                      {kpi.delta.trend === 'down' && '▼'}
+                      {kpi.delta.value}
+                    </span>
+                  )}
+                </p>
+                <p className="text-xs text-muted-foreground mt-1">
+                  {kpi.description}
+                </p>
+              </CardContent>
+            </Card>
+          ))}
         </div>
 
-        {/* Loss Reasons Chart - Only show if user can view metrics */}
-        <PermissionGuard permission="view_own_metrics">
-          <LossReasonsChart className="mt-8" />
-        </PermissionGuard>
+        {/* Charts Section */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Revenue Trend Chart */}
+          <ModernLineChart 
+            title="Revenue and Profit Trends"
+            description="Monthly performance over the past year"
+          />
 
-        {/* Call Log Table - Only show if user can view calls */}
-        <PermissionGuard permission="view_own_calls">
-          <CallLogTable className="mt-8" filters={filters} />
-        </PermissionGuard>
-      </main>
-    </div>
+          {/* Quick Metrics */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Quick Metrics</CardTitle>
+              <CardDescription>Key performance indicators at a glance</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-2">
+                  <TrendingUp className="h-4 w-4 text-muted-foreground" />
+                  <div>
+                    <p className="text-sm font-medium">Conversion Rate</p>
+                    <p className="text-xs text-muted-foreground">Last 30 days</p>
+                  </div>
+                </div>
+                <div className="text-right">
+                  <p className="text-2xl font-bold">3.2%</p>
+                  <p className="text-xs text-green-600">+0.5% vs prev</p>
+                </div>
+              </div>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-2">
+                  <TrendingDown className="h-4 w-4 text-muted-foreground" />
+                  <div>
+                    <p className="text-sm font-medium">Cost Per Lead</p>
+                    <p className="text-xs text-muted-foreground">Average</p>
+                  </div>
+                </div>
+                <div className="text-right">
+                  <p className="text-2xl font-bold">$45</p>
+                  <p className="text-xs text-red-600">-$3 vs prev</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Client P&L Summary */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Client P&L Summary</CardTitle>
+            <CardDescription>Profit and loss breakdown by client</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Client</TableHead>
+                  <TableHead>Status</TableHead>
+                  <TableHead>Revenue</TableHead>
+                  <TableHead>Ad Spend</TableHead>
+                  <TableHead>Margin</TableHead>
+                  <TableHead className="text-right">Total</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {clientData.map((client, index) => (
+                  <TableRow key={index}>
+                    <TableCell className="font-medium">{client.name}</TableCell>
+                    <TableCell>
+                      <Badge variant="success">{client.status}</Badge>
+                    </TableCell>
+                    <TableCell>{client.revenue}</TableCell>
+                    <TableCell>{client.adSpend}</TableCell>
+                    <TableCell>{client.margin}</TableCell>
+                    <TableCell className="text-right font-semibold">{client.total}</TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </CardContent>
+        </Card>
+      </div>
+    </ModernDashboardLayout>
   );
 }

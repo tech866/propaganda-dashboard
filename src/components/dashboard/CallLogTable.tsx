@@ -2,6 +2,19 @@
 
 import React, { useState, useEffect } from 'react';
 import { Call } from '@/lib/services/callService';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { 
+  Table, 
+  TableBody, 
+  TableCell, 
+  TableHead, 
+  TableHeader, 
+  TableRow 
+} from '@/components/ui/table';
+import { Search, ChevronUp, ChevronDown, RefreshCw } from 'lucide-react';
 
 interface CallLogTableProps {
   className?: string;
@@ -182,32 +195,32 @@ const CallLogTable: React.FC<CallLogTableProps> = ({ className = '', filters }) 
     return `${minutes}:${seconds.toString().padStart(2, '0')}`;
   };
 
-  // Get status badge color
-  const getStatusBadgeColor = (status: string) => {
+  // Get status badge variant
+  const getStatusBadgeVariant = (status: string) => {
     switch (status) {
-      case 'completed': return 'bg-green-100 text-green-800';
-      case 'no-show': return 'bg-red-100 text-red-800';
-      case 'rescheduled': return 'bg-yellow-100 text-yellow-800';
-      default: return 'bg-gray-100 text-gray-800';
+      case 'completed': return 'success';
+      case 'no-show': return 'destructive';
+      case 'rescheduled': return 'warning';
+      default: return 'muted';
     }
   };
 
-  // Get outcome badge color
-  const getOutcomeBadgeColor = (outcome: string) => {
+  // Get outcome badge variant
+  const getOutcomeBadgeVariant = (outcome: string) => {
     switch (outcome) {
-      case 'won': return 'bg-green-100 text-green-800';
-      case 'lost': return 'bg-red-100 text-red-800';
-      case 'tbd': return 'bg-gray-100 text-gray-800';
-      default: return 'bg-gray-100 text-gray-800';
+      case 'won': return 'success';
+      case 'lost': return 'destructive';
+      case 'tbd': return 'muted';
+      default: return 'muted';
     }
   };
 
-  // Get call type badge color
-  const getCallTypeBadgeColor = (callType: string) => {
+  // Get call type badge variant
+  const getCallTypeBadgeVariant = (callType: string) => {
     switch (callType) {
-      case 'inbound': return 'bg-blue-100 text-blue-800';
-      case 'outbound': return 'bg-purple-100 text-purple-800';
-      default: return 'bg-gray-100 text-gray-800';
+      case 'inbound': return 'info';
+      case 'outbound': return 'default';
+      default: return 'muted';
     }
   };
 
@@ -218,242 +231,232 @@ const CallLogTable: React.FC<CallLogTableProps> = ({ className = '', filters }) 
 
   if (state.loading) {
     return (
-      <div className={`bg-white rounded-lg shadow-sm border border-gray-200 ${className}`}>
-        <div className="p-6">
+      <Card className={className}>
+        <CardContent className="space-card">
           <div className="animate-pulse">
-            <div className="h-6 bg-gray-200 rounded w-1/4 mb-4"></div>
+            <div className="h-6 bg-muted/20 rounded w-1/4 mb-4"></div>
             <div className="space-y-3">
               {[...Array(5)].map((_, i) => (
-                <div key={i} className="h-4 bg-gray-200 rounded"></div>
+                <div key={i} className="h-4 bg-muted/20 rounded"></div>
               ))}
             </div>
           </div>
-        </div>
-      </div>
+        </CardContent>
+      </Card>
     );
   }
 
   if (state.error) {
     return (
-      <div className={`bg-white rounded-lg shadow-sm border border-gray-200 ${className}`}>
-        <div className="p-6">
+      <Card className={className}>
+        <CardContent className="space-card">
           <div className="text-center">
-            <div className="text-red-600 mb-2">
+            <div className="text-destructive mb-2">
               <svg className="w-8 h-8 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
             </div>
-            <h3 className="text-lg font-medium text-gray-900 mb-1">Error Loading Call Logs</h3>
-            <p className="text-gray-600">{state.error}</p>
-            <button
+            <h3 className="text-h4 mb-1">Error Loading Call Logs</h3>
+            <p className="text-muted-foreground mb-4">{state.error}</p>
+            <Button
               onClick={() => window.location.reload()}
-              className="mt-4 px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 transition-colors"
+              variant="outline"
             >
+              <RefreshCw className="mr-2 h-4 w-4" />
               Retry
-            </button>
+            </Button>
           </div>
-        </div>
-      </div>
+        </CardContent>
+      </Card>
     );
   }
 
   return (
-    <div className={`bg-white rounded-lg shadow-sm border border-gray-200 ${className}`}>
-      {/* Header */}
-      <div className="p-6 border-b border-gray-200">
+    <Card className={className}>
+      <CardHeader>
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
-            <h2 className="text-xl font-semibold text-gray-900">Call Logs</h2>
-            <p className="text-sm text-gray-600 mt-1">
+            <CardTitle>Call Logs</CardTitle>
+            <CardDescription>
               Showing {startItem}-{endItem} of {filteredCalls.length} calls
-            </p>
+            </CardDescription>
           </div>
           
           {/* Search */}
-          <div className="relative">
-            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-              <svg className="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-              </svg>
-            </div>
-            <input
+          <div className="relative w-full sm:w-80">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Input
               type="text"
               placeholder="Search calls..."
               value={state.searchTerm}
               onChange={handleSearch}
-              className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-purple-500 focus:border-purple-500 sm:text-sm"
+              className="pl-10"
             />
           </div>
         </div>
-      </div>
+      </CardHeader>
 
-      {/* Table */}
-      <div className="overflow-x-auto">
-        <table className="min-w-full divide-y divide-gray-200">
-          <thead className="bg-gray-50">
-            <tr>
-              <th
-                scope="col"
-                className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
+      <CardContent>
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead 
+                className="cursor-pointer hover:bg-muted/50"
                 onClick={() => handleSort('prospect_name')}
               >
                 <div className="flex items-center gap-1">
                   Prospect
                   {state.sortField === 'prospect_name' && (
-                    <svg className={`w-4 h-4 ${state.sortDirection === 'asc' ? 'transform rotate-180' : ''}`} fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
-                    </svg>
+                    state.sortDirection === 'asc' ? 
+                      <ChevronUp className="h-4 w-4" /> : 
+                      <ChevronDown className="h-4 w-4" />
                   )}
                 </div>
-              </th>
-              <th
-                scope="col"
-                className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
+              </TableHead>
+              <TableHead 
+                className="cursor-pointer hover:bg-muted/50"
                 onClick={() => handleSort('call_type')}
               >
                 <div className="flex items-center gap-1">
                   Type
                   {state.sortField === 'call_type' && (
-                    <svg className={`w-4 h-4 ${state.sortDirection === 'asc' ? 'transform rotate-180' : ''}`} fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
-                    </svg>
+                    state.sortDirection === 'asc' ? 
+                      <ChevronUp className="h-4 w-4" /> : 
+                      <ChevronDown className="h-4 w-4" />
                   )}
                 </div>
-              </th>
-              <th
-                scope="col"
-                className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
+              </TableHead>
+              <TableHead 
+                className="cursor-pointer hover:bg-muted/50"
                 onClick={() => handleSort('status')}
               >
                 <div className="flex items-center gap-1">
                   Status
                   {state.sortField === 'status' && (
-                    <svg className={`w-4 h-4 ${state.sortDirection === 'asc' ? 'transform rotate-180' : ''}`} fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
-                    </svg>
+                    state.sortDirection === 'asc' ? 
+                      <ChevronUp className="h-4 w-4" /> : 
+                      <ChevronDown className="h-4 w-4" />
                   )}
                 </div>
-              </th>
-              <th
-                scope="col"
-                className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
+              </TableHead>
+              <TableHead 
+                className="cursor-pointer hover:bg-muted/50"
                 onClick={() => handleSort('outcome')}
               >
                 <div className="flex items-center gap-1">
                   Outcome
                   {state.sortField === 'outcome' && (
-                    <svg className={`w-4 h-4 ${state.sortDirection === 'asc' ? 'transform rotate-180' : ''}`} fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
-                    </svg>
+                    state.sortDirection === 'asc' ? 
+                      <ChevronUp className="h-4 w-4" /> : 
+                      <ChevronDown className="h-4 w-4" />
                   )}
                 </div>
-              </th>
-              <th
-                scope="col"
-                className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
+              </TableHead>
+              <TableHead 
+                className="cursor-pointer hover:bg-muted/50"
                 onClick={() => handleSort('call_duration')}
               >
                 <div className="flex items-center gap-1">
                   Duration
                   {state.sortField === 'call_duration' && (
-                    <svg className={`w-4 h-4 ${state.sortDirection === 'asc' ? 'transform rotate-180' : ''}`} fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
-                    </svg>
+                    state.sortDirection === 'asc' ? 
+                      <ChevronUp className="h-4 w-4" /> : 
+                      <ChevronDown className="h-4 w-4" />
                   )}
                 </div>
-              </th>
-              <th
-                scope="col"
-                className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
+              </TableHead>
+              <TableHead 
+                className="cursor-pointer hover:bg-muted/50"
                 onClick={() => handleSort('created_at')}
               >
                 <div className="flex items-center gap-1">
                   Date
                   {state.sortField === 'created_at' && (
-                    <svg className={`w-4 h-4 ${state.sortDirection === 'asc' ? 'transform rotate-180' : ''}`} fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
-                    </svg>
+                    state.sortDirection === 'asc' ? 
+                      <ChevronUp className="h-4 w-4" /> : 
+                      <ChevronDown className="h-4 w-4" />
                   )}
                 </div>
-              </th>
-            </tr>
-          </thead>
-          <tbody className="bg-white divide-y divide-gray-200">
+              </TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
             {paginatedCalls.length === 0 ? (
-              <tr>
-                <td colSpan={6} className="px-6 py-12 text-center text-gray-500">
+              <TableRow>
+                <TableCell colSpan={6} className="text-center py-12">
                   <div className="flex flex-col items-center">
-                    <svg className="w-12 h-12 text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-12 h-12 text-muted-foreground mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                     </svg>
-                    <h3 className="text-lg font-medium text-gray-900 mb-1">No calls found</h3>
-                    <p className="text-gray-600">
+                    <h3 className="text-h4 mb-1">No calls found</h3>
+                    <p className="text-muted-foreground">
                       {state.searchTerm ? 'Try adjusting your search terms.' : 'No calls have been logged yet.'}
                     </p>
                   </div>
-                </td>
-              </tr>
+                </TableCell>
+              </TableRow>
             ) : (
               paginatedCalls.map((call) => (
-                <tr key={call.id} className="hover:bg-gray-50 transition-colors">
-                  <td className="px-6 py-4 whitespace-nowrap">
+                <TableRow key={call.id}>
+                  <TableCell>
                     <div>
-                      <div className="text-sm font-medium text-gray-900">{call.prospect_name}</div>
+                      <div className="font-medium">{call.prospect_name}</div>
                       {call.prospect_email && (
-                        <div className="text-sm text-gray-500">{call.prospect_email}</div>
+                        <div className="text-sm text-muted-foreground">{call.prospect_email}</div>
                       )}
                       {call.prospect_phone && (
-                        <div className="text-sm text-gray-500">{call.prospect_phone}</div>
+                        <div className="text-sm text-muted-foreground">{call.prospect_phone}</div>
                       )}
                     </div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getCallTypeBadgeColor(call.call_type)}`}>
+                  </TableCell>
+                  <TableCell>
+                    <Badge variant={getCallTypeBadgeVariant(call.call_type) as any}>
                       {call.call_type}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusBadgeColor(call.status)}`}>
+                    </Badge>
+                  </TableCell>
+                  <TableCell>
+                    <Badge variant={getStatusBadgeVariant(call.status) as any}>
                       {call.status}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getOutcomeBadgeColor(call.outcome)}`}>
+                    </Badge>
+                  </TableCell>
+                  <TableCell>
+                    <Badge variant={getOutcomeBadgeVariant(call.outcome) as any}>
                       {call.outcome}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                    </Badge>
+                  </TableCell>
+                  <TableCell>
                     {formatDuration(call.call_duration)}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                  </TableCell>
+                  <TableCell>
                     {formatDate(call.created_at)}
-                  </td>
-                </tr>
+                  </TableCell>
+                </TableRow>
               ))
             )}
-          </tbody>
-        </table>
-      </div>
+          </TableBody>
+        </Table>
+      </CardContent>
 
       {/* Pagination */}
       {totalPages > 1 && (
-        <div className="px-6 py-3 border-t border-gray-200 bg-gray-50">
+        <div className="px-6 py-3 border-t border-border bg-muted/30">
           <div className="flex items-center justify-between">
             <div className="flex items-center">
-              <p className="text-sm text-gray-700">
-                Showing <span className="font-medium">{startItem}</span> to{' '}
-                <span className="font-medium">{endItem}</span> of{' '}
-                <span className="font-medium">{filteredCalls.length}</span> results
+              <p className="text-body-sm text-muted-foreground">
+                Showing <span className="font-medium text-foreground">{startItem}</span> to{' '}
+                <span className="font-medium text-foreground">{endItem}</span> of{' '}
+                <span className="font-medium text-foreground">{filteredCalls.length}</span> results
               </p>
             </div>
             <div className="flex items-center space-x-2">
-              <button
+              <Button
+                variant="outline"
+                size="sm"
                 onClick={() => handlePageChange(state.currentPage - 1)}
                 disabled={state.currentPage === 1}
-                className="px-3 py-1 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 Previous
-              </button>
+              </Button>
               
               {/* Page numbers */}
               {[...Array(totalPages)].map((_, i) => {
@@ -466,38 +469,36 @@ const CallLogTable: React.FC<CallLogTableProps> = ({ className = '', filters }) 
                 
                 if (!shouldShow) {
                   if (page === state.currentPage - 2 || page === state.currentPage + 2) {
-                    return <span key={page} className="px-3 py-1 text-sm text-gray-500">...</span>;
+                    return <span key={page} className="px-3 py-1 text-sm text-muted-foreground">...</span>;
                   }
                   return null;
                 }
                 
                 return (
-                  <button
+                  <Button
                     key={page}
+                    variant={isCurrentPage ? "default" : "outline"}
+                    size="sm"
                     onClick={() => handlePageChange(page)}
-                    className={`px-3 py-1 text-sm font-medium rounded-md ${
-                      isCurrentPage
-                        ? 'bg-purple-600 text-white'
-                        : 'text-gray-500 bg-white border border-gray-300 hover:bg-gray-50'
-                    }`}
                   >
                     {page}
-                  </button>
+                  </Button>
                 );
               })}
               
-              <button
+              <Button
+                variant="outline"
+                size="sm"
                 onClick={() => handlePageChange(state.currentPage + 1)}
                 disabled={state.currentPage === totalPages}
-                className="px-3 py-1 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 Next
-              </button>
+              </Button>
             </div>
           </div>
         </div>
       )}
-    </div>
+    </Card>
   );
 };
 

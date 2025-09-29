@@ -1,4 +1,6 @@
 import React from 'react';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { cn } from '@/lib/utils';
 
 interface FormContainerProps {
   title?: string;
@@ -14,16 +16,16 @@ export default function FormContainer({
   className = ''
 }: FormContainerProps) {
   return (
-    <div className={`bg-white shadow-md rounded-lg p-6 ${className}`}>
-      {title && (
-        <div className="mb-6">
-          <h2 className="text-2xl font-bold text-gray-900">{title}</h2>
-          {subtitle && (
-            <p className="mt-1 text-sm text-gray-600">{subtitle}</p>
-          )}
-        </div>
+    <Card className={cn("w-full", className)}>
+      {(title || subtitle) && (
+        <CardHeader>
+          {title && <CardTitle className="text-h2">{title}</CardTitle>}
+          {subtitle && <CardDescription>{subtitle}</CardDescription>}
+        </CardHeader>
       )}
-      {children}
-    </div>
+      <CardContent className="space-card">
+        {children}
+      </CardContent>
+    </Card>
   );
 }

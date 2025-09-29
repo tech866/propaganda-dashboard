@@ -4,6 +4,16 @@ import React, { useEffect, useState } from 'react';
 import { useRole } from '@/contexts/RoleContext';
 import { ProtectedComponent } from '@/components/auth/ProtectedComponent';
 import { Call } from '@/lib/services/callService';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { 
+  Table, 
+  TableBody, 
+  TableCell, 
+  TableHead, 
+  TableHeader, 
+  TableRow 
+} from '@/components/ui/table';
 
 interface ProtectedCallLogTableProps {
   className?: string;
@@ -52,136 +62,143 @@ function CallLogTableContent({ className = '', showAllData = false }: ProtectedC
 
   if (loading) {
     return (
-      <div className={`bg-white p-6 rounded-lg shadow-md ${className}`}>
-        <div className="animate-pulse">
-          <div className="h-6 bg-gray-300 rounded w-1/4 mb-4"></div>
-          <div className="space-y-3">
-            {[1, 2, 3, 4, 5].map((i) => (
-              <div key={i} className="h-12 bg-gray-300 rounded"></div>
-            ))}
+      <Card className={className}>
+        <CardContent className="space-card">
+          <div className="animate-pulse">
+            <div className="h-6 bg-muted/20 rounded w-1/4 mb-4"></div>
+            <div className="space-y-3">
+              {[1, 2, 3, 4, 5].map((i) => (
+                <div key={i} className="h-12 bg-muted/20 rounded"></div>
+              ))}
+            </div>
           </div>
-        </div>
-      </div>
+        </CardContent>
+      </Card>
     );
   }
 
   if (error) {
     return (
-      <div className={`bg-white p-6 rounded-lg shadow-md ${className}`}>
-        <div className="text-center">
-          <h3 className="text-lg font-semibold text-gray-900 mb-2">Call Logs Unavailable</h3>
-          <p className="text-red-600">{error}</p>
-        </div>
-      </div>
+      <Card className={className}>
+        <CardContent className="space-card">
+          <div className="text-center">
+            <h3 className="text-h4 mb-2">Call Logs Unavailable</h3>
+            <p className="text-destructive">{error}</p>
+          </div>
+        </CardContent>
+      </Card>
     );
   }
 
   if (!calls || calls.length === 0) {
     return (
-      <div className={`bg-white p-6 rounded-lg shadow-md ${className}`}>
-        <div className="text-center">
-          <h3 className="text-lg font-semibold text-gray-900 mb-2">No Call Logs</h3>
-          <p className="text-gray-600">No call logs available at this time.</p>
-        </div>
-      </div>
+      <Card className={className}>
+        <CardContent className="space-card">
+          <div className="text-center">
+            <h3 className="text-h4 mb-2">No Call Logs</h3>
+            <p className="text-muted-foreground">No call logs available at this time.</p>
+          </div>
+        </CardContent>
+      </Card>
     );
   }
 
+  // Badge variant helpers
+  const getCallTypeBadgeVariant = (callType: string) => {
+    switch (callType) {
+      case 'inbound': return 'info';
+      case 'outbound': return 'default';
+      default: return 'muted';
+    }
+  };
+
+  const getStatusBadgeVariant = (status: string) => {
+    switch (status) {
+      case 'completed': return 'success';
+      case 'no-show': return 'destructive';
+      case 'rescheduled': return 'warning';
+      default: return 'muted';
+    }
+  };
+
+  const getOutcomeBadgeVariant = (outcome: string) => {
+    switch (outcome) {
+      case 'won': return 'success';
+      case 'lost': return 'destructive';
+      case 'tbd': return 'muted';
+      default: return 'muted';
+    }
+  };
+
   return (
-    <div className={`bg-white p-6 rounded-lg shadow-md overflow-x-auto ${className}`}>
-      <div className="flex items-center justify-between mb-4">
-        <h3 className="text-lg font-semibold text-gray-800">Recent Call Logs</h3>
-        <div className="text-sm text-gray-500">
-          {hasAnyRole(['admin', 'ceo']) ? 'All Calls' : 'Your Calls'}
+    <Card className={className}>
+      <CardHeader>
+        <div className="flex items-center justify-between">
+          <div>
+            <CardTitle>Recent Call Logs</CardTitle>
+            <CardDescription>
+              {hasAnyRole(['admin', 'ceo']) ? 'All Calls' : 'Your Calls'}
+            </CardDescription>
+          </div>
         </div>
-      </div>
-      <table className="min-w-full divide-y divide-gray-200">
-        <thead className="bg-gray-50">
-          <tr>
-            <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-              Prospect Name
-            </th>
-            <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-              Type
-            </th>
-            <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-              Status
-            </th>
-            <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-              Outcome
-            </th>
-            <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-              Duration (min)
-            </th>
-            <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-              Scheduled At
-            </th>
-            <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-              Completed At
-            </th>
-            {hasAnyRole(['admin', 'ceo']) && (
-              <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                User
-              </th>
-            )}
-          </tr>
-        </thead>
-        <tbody className="bg-white divide-y divide-gray-200">
-          {calls.map((call) => (
-            <tr key={call.id} className="hover:bg-gray-50">
-              <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                {call.prospect_name}
-              </td>
-              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                  call.call_type === 'inbound' 
-                    ? 'bg-blue-100 text-blue-800' 
-                    : 'bg-green-100 text-green-800'
-                }`}>
-                  {call.call_type}
-                </span>
-              </td>
-              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                  call.status === 'completed' 
-                    ? 'bg-green-100 text-green-800' 
-                    : call.status === 'no-show'
-                    ? 'bg-red-100 text-red-800'
-                    : 'bg-yellow-100 text-yellow-800'
-                }`}>
-                  {call.status}
-                </span>
-              </td>
-              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                  call.outcome === 'won' 
-                    ? 'bg-green-100 text-green-800' 
-                    : call.outcome === 'lost'
-                    ? 'bg-red-100 text-red-800'
-                    : 'bg-gray-100 text-gray-800'
-                }`}>
-                  {call.outcome}
-                </span>
-              </td>
-              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                {call.call_duration ?? 'N/A'}
-              </td>
-              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                {call.scheduled_at ? new Date(call.scheduled_at).toLocaleString() : 'N/A'}
-              </td>
-              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                {call.completed_at ? new Date(call.completed_at).toLocaleString() : 'N/A'}
-              </td>
+      </CardHeader>
+      <CardContent>
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Prospect Name</TableHead>
+              <TableHead>Type</TableHead>
+              <TableHead>Status</TableHead>
+              <TableHead>Outcome</TableHead>
+              <TableHead>Duration (min)</TableHead>
+              <TableHead>Scheduled At</TableHead>
+              <TableHead>Completed At</TableHead>
               {hasAnyRole(['admin', 'ceo']) && (
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                  {call.user_id}
-                </td>
+                <TableHead>User</TableHead>
               )}
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {calls.map((call) => (
+              <TableRow key={call.id}>
+                <TableCell className="font-medium">
+                  {call.prospect_name}
+                </TableCell>
+                <TableCell>
+                  <Badge variant={getCallTypeBadgeVariant(call.call_type) as any}>
+                    {call.call_type}
+                  </Badge>
+                </TableCell>
+                <TableCell>
+                  <Badge variant={getStatusBadgeVariant(call.status) as any}>
+                    {call.status}
+                  </Badge>
+                </TableCell>
+                <TableCell>
+                  <Badge variant={getOutcomeBadgeVariant(call.outcome) as any}>
+                    {call.outcome}
+                  </Badge>
+                </TableCell>
+                <TableCell>
+                  {call.call_duration ?? 'N/A'}
+                </TableCell>
+                <TableCell>
+                  {call.scheduled_at ? new Date(call.scheduled_at).toLocaleString() : 'N/A'}
+                </TableCell>
+                <TableCell>
+                  {call.completed_at ? new Date(call.completed_at).toLocaleString() : 'N/A'}
+                </TableCell>
+                {hasAnyRole(['admin', 'ceo']) && (
+                  <TableCell>
+                    {call.user_id}
+                  </TableCell>
+                )}
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </CardContent>
+    </Card>
   );
 }
 

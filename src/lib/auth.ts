@@ -1,8 +1,17 @@
-import NextAuth from 'next-auth';
-import { NextAuthOptions } from 'next-auth';
+import NextAuth, { NextAuthOptions } from 'next-auth';
 import CredentialsProvider from 'next-auth/providers/credentials';
 import jwt from 'jsonwebtoken';
-import { User, UserRole } from '@/middleware/auth';
+
+// User roles and permissions
+export type UserRole = 'ceo' | 'admin' | 'sales';
+
+export interface User {
+  id: string;
+  email: string;
+  name: string;
+  role: UserRole;
+  clientId: string;
+}
 
 // Mock user data (in a real app, this would come from a database)
 const mockUsers = [

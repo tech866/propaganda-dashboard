@@ -22,6 +22,7 @@ interface RoleContextType {
   canManageUsers: boolean;
   canManageLossReasons: boolean;
   canManageSystemConfig: boolean;
+  canManageClients: boolean;
   canViewAllData: boolean;
 }
 
@@ -48,6 +49,7 @@ const ROLE_PERMISSIONS: Record<UserRole, string[]> = {
     'manage_users',
     'manage_loss_reasons',
     'manage_system_config',
+    'manage_clients',
     'view_audit_logs',
     'view_all_data'
   ],
@@ -62,6 +64,7 @@ const ROLE_PERMISSIONS: Record<UserRole, string[]> = {
     'manage_users',
     'manage_loss_reasons',
     'manage_system_config',
+    'manage_clients',
     'view_audit_logs',
     'view_all_data',
     'view_financial_data',
@@ -141,6 +144,9 @@ export function RoleProvider({ children }: { children: React.ReactNode }) {
   // Check if user can manage system configuration (admin and ceo only)
   const canManageSystemConfig = hasAnyRole(['admin', 'ceo']);
 
+  // Check if user can manage clients (admin and ceo only)
+  const canManageClients = hasAnyRole(['admin', 'ceo']);
+
   // Check if user can view all data (admin and ceo only)
   const canViewAllData = hasPermission('view_all_data');
 
@@ -155,6 +161,7 @@ export function RoleProvider({ children }: { children: React.ReactNode }) {
     canManageUsers,
     canManageLossReasons,
     canManageSystemConfig,
+    canManageClients,
     canViewAllData
   };
 
