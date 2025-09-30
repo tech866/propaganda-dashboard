@@ -1,6 +1,5 @@
 'use client';
 
-import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { useRole } from '@/contexts/RoleContext';
@@ -49,9 +48,8 @@ interface ClientStats {
 }
 
 export default function ClientManagementPage() {
-  const { data: session, status } = useSession();
   const router = useRouter();
-  const { hasAnyRole, isLoading: roleLoading } = useRole();
+  const { user, hasAnyRole, isLoading: roleLoading } = useRole();
   const [clients, setClients] = useState<Client[]>([]);
   const [stats, setStats] = useState<ClientStats | null>(null);
   const [loading, setLoading] = useState(true);
@@ -59,21 +57,21 @@ export default function ClientManagementPage() {
   const [statusFilter, setStatusFilter] = useState('all');
 
   useEffect(() => {
-    if (status === 'unauthenticated') {
+    if (!user) {
       router.push('/auth/signin');
-    } else if (status === 'authenticated' && !hasAnyRole(['admin', 'ceo'])) {
+    } else if (user && !hasAnyRole(['admin', 'ceo'])) {
       router.push('/dashboard');
     }
-  }, [status, session, router, hasAnyRole]);
+  }, [user, router, hasAnyRole]);
 
   useEffect(() => {
-    if (session && hasAnyRole(['admin', 'ceo'])) {
+    if (user && hasAnyRole(['admin', 'ceo'])) {
       fetchClients();
     }
-  }, [session, hasAnyRole]);
+  }, [user, hasAnyRole]);
 
   // Show loading state while checking authentication and roles
-  if (status === 'loading' || roleLoading) {
+  if (roleLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
         <div className="text-center">
@@ -85,7 +83,7 @@ export default function ClientManagementPage() {
   }
 
   // Show access denied if user doesn't have required role
-  if (status === 'authenticated' && !hasAnyRole(['admin', 'ceo'])) {
+  if (user && !hasAnyRole(['admin', 'ceo'])) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
         <Card className="w-full max-w-md">
