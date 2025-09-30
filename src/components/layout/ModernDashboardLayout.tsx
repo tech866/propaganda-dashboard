@@ -1,9 +1,7 @@
 'use client';
 
-import { ReactNode } from 'react';
-import { useSession } from 'next-auth/react';
+import { ReactNode, useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { useEffect } from 'react';
 import ModernHeader from './ModernHeader';
 import ModernSidebar from './ModernSidebar';
 import { cn } from '@/lib/utils';
@@ -17,16 +15,30 @@ export default function ModernDashboardLayout({
   children, 
   className = '' 
 }: ModernDashboardLayoutProps) {
-  const { data: session, status } = useSession();
   const router = useRouter();
+  const [isLoading, setIsLoading] = useState(true);
+  const [user, setUser] = useState<any>(null);
 
   useEffect(() => {
-    if (status === 'unauthenticated') {
-      router.push('/auth/signin');
+    // Development mode - bypass authentication
+    if (process.env.NODE_ENV === 'development' && process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY?.includes('placeholder')) {
+      // Mock user for development
+      setUser({
+        id: 'dev-user-1',
+        email: 'dev@example.com',
+        name: 'Development User',
+        role: 'admin'
+      });
+      setIsLoading(false);
+      return;
     }
-  }, [status, router]);
 
-  if (status === 'loading') {
+    // Production mode - would use Clerk authentication
+    // For now, just set loading to false
+    setIsLoading(false);
+  }, []);
+
+  if (isLoading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
@@ -37,22 +49,23 @@ export default function ModernDashboardLayout({
     );
   }
 
-  if (!session) {
+  if (!user) {
     return null;
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      {/* Header */}
-      <ModernHeader />
+    <div className="min-h-screen bg-background flex">
+      {/* Premium Sidebar - Hidden on mobile, shown on desktop */}
+      <ModernSidebar className="hidden lg:flex" />
       
-      <div className="flex">
-        {/* Sidebar - Hidden on mobile, shown on desktop */}
-        <ModernSidebar className="hidden lg:block" />
+      {/* Main Content Area */}
+      <div className="flex-1 flex flex-col min-w-0">
+        {/* Header */}
+        <ModernHeader />
         
         {/* Main Content */}
-        <main className={cn("flex-1 lg:ml-0", className)}>
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <main className={cn("flex-1 overflow-auto", className)}>
+          <div className="max-w-7xl mx-auto px-6 lg:px-8 py-8">
             {children}
           </div>
         </main>

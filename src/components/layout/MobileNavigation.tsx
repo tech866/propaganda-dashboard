@@ -19,7 +19,10 @@ import {
   BarChart3, 
   Settings,
   Shield,
-  Activity
+  Activity,
+  Plug,
+  TrendingUp,
+  Building2
 } from 'lucide-react';
 
 interface MobileNavigationItem {
@@ -50,6 +53,31 @@ const navigationItems: MobileNavigationItem[] = [
     href: '/calls',
     icon: PhoneCall,
     description: 'View all your calls'
+  },
+  {
+    name: 'Integrations',
+    href: '/integrations',
+    icon: Plug,
+    description: 'Manage external service connections and data sync'
+  },
+  {
+    name: 'Performance',
+    href: '/performance',
+    icon: TrendingUp,
+    description: 'Advanced analytics and performance metrics'
+  },
+  {
+    name: 'Client Management',
+    href: '/clients',
+    icon: Building2,
+    description: 'Manage client accounts and settings',
+    requiredRoles: ['admin', 'ceo']
+  },
+  {
+    name: 'Settings',
+    href: '/settings',
+    icon: Settings,
+    description: 'Manage account preferences and system configuration'
   },
   {
     name: 'Manage Users',
@@ -125,7 +153,7 @@ export default function MobileNavigation({ className = '' }: MobileNavigationPro
 
   // Group items by category
   const mainItems = accessibleItems.filter(item => 
-    ['Dashboard', 'Log Call', 'View Calls'].includes(item.name)
+    ['Dashboard', 'Log Call', 'View Calls', 'Integrations', 'Performance', 'Client Management', 'Settings'].includes(item.name)
   );
   const adminItems = accessibleItems.filter(item => 
     ['Manage Users', 'Audit Logs', 'Reports'].includes(item.name)

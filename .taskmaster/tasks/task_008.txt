@@ -1,6 +1,6 @@
 # Task ID: 8
 # Title: Develop Dashboard UI Components
-# Status: pending
+# Status: done
 # Dependencies: 2, 7
 # Priority: medium
 # Description: Build the frontend components for the dashboard, including metrics display and call log table.
@@ -42,49 +42,49 @@ All testing has been completed successfully, confirming the component renders co
 ### Details:
 Utilize a charting library to create a component that displays loss reasons data. Ensure it is responsive and styled with Tailwind CSS.
 
-## 3. Develop Call Log Table Component [in-progress]
+## 3. Develop Call Log Table Component [done]
 ### Dependencies: None
 ### Description: Create a table component to display call logs.
 ### Details:
 Implement a React component that fetches and displays call logs in a table format. Style the table using Tailwind CSS.
 
-## 4. Integrate Components into Dashboard Layout [pending]
+## 4. Integrate Components into Dashboard Layout [done]
 ### Dependencies: None
 ### Description: Combine all created components into the main dashboard layout.
 ### Details:
 Ensure that the Hero Metrics, Loss Reasons Chart, and Call Log Table components are properly integrated into the dashboard layout.
 
-## 5. Style Dashboard with Tailwind CSS [pending]
+## 5. Style Dashboard with Tailwind CSS [done]
 ### Dependencies: None
 ### Description: Apply Tailwind CSS styles to the entire dashboard layout.
 ### Details:
 Ensure that all components within the dashboard are styled consistently using Tailwind CSS, focusing on responsiveness and aesthetics.
 
-## 6. Create Call Log Table Structure [pending]
+## 6. Create Call Log Table Structure [done]
 ### Dependencies: None
 ### Description: Design and implement the basic table structure for displaying call logs
 ### Details:
 Create the HTML table structure with proper columns for call data including date, client, outcome, duration, etc.
 
-## 7. Implement Data Fetching for Call Logs [pending]
+## 7. Implement Data Fetching for Call Logs [done]
 ### Dependencies: None
 ### Description: Create API integration to fetch call log data from the backend
 ### Details:
 Implement data fetching logic using the existing calls API endpoint, handle loading states and error handling
 
-## 8. Style Call Log Table with Tailwind CSS [pending]
+## 8. Style Call Log Table with Tailwind CSS [done]
 ### Dependencies: None
 ### Description: Apply responsive styling and visual enhancements to the call log table
 ### Details:
 Use Tailwind CSS to style the table with proper spacing, colors, hover effects, and responsive design
 
-## 9. Add Table Features (Sorting, Pagination, Search) [pending]
+## 9. Add Table Features (Sorting, Pagination, Search) [done]
 ### Dependencies: None
 ### Description: Implement advanced table features for better user experience
 ### Details:
 Add sorting capabilities, pagination controls, and search functionality to the call log table
 
-## 10. Integrate Call Log Table into Dashboard [pending]
+## 10. Integrate Call Log Table into Dashboard [done]
 ### Dependencies: None
 ### Description: Add the completed call log table component to the main dashboard page
 ### Details:

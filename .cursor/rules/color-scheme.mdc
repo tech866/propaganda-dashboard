@@ -1,0 +1,53 @@
+---
+description: Color scheme guidelines for the Propaganda Dashboard
+globs: src/**/*.tsx, src/**/*.ts, src/**/*.css
+alwaysApply: true
+---
+
+# Color Scheme Guidelines
+
+## **Primary Color Palette**
+- **Primary**: Use `bg-primary` and `text-primary` for main actions and branding
+- **Background**: Use `bg-background` for main backgrounds
+- **Foreground**: Use `text-foreground` for primary text
+- **Muted**: Use `text-muted-foreground` for secondary text
+- **Border**: Use `border-border` for borders and dividers
+
+## **Accent Colors**
+- **Blue**: `bg-blue-600`, `text-blue-300` for informational elements
+- **Green**: `bg-green-600`, `text-green-300` for success states
+- **Red**: `bg-red-600`, `text-red-300` for error states
+- **Yellow**: `bg-yellow-600`, `text-yellow-300` for warnings
+
+## **Gradient Backgrounds**
+- **Dark Theme**: `bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900`
+- **Card Backgrounds**: `bg-slate-800/50 backdrop-blur-sm border border-slate-700`
+
+## **❌ FORBIDDEN COLORS**
+- **NO PURPLE**: Do not use purple colors (`purple-600`, `purple-700`, `purple-900`, etc.)
+- **NO PURPLE GRADIENTS**: Do not use `via-purple-900` in gradients
+- **NO PURPLE BUTTONS**: Do not use `bg-purple-600` or `hover:bg-purple-700`
+
+## **✅ CORRECT USAGE**
+```tsx
+// ✅ DO: Use primary colors
+<Button className="bg-primary hover:bg-primary/90">Submit</Button>
+
+// ✅ DO: Use slate gradients
+<div className="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
+
+// ✅ DO: Use semantic colors
+<Alert className="bg-red-900/50 border-red-700">
+<Badge className="bg-green-600 text-white">
+
+// ❌ DON'T: Use purple colors
+<Button className="bg-purple-600 hover:bg-purple-700">Submit</Button>
+<div className="bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
+```
+
+## **Consistency Rules**
+- Always use the design system colors defined in `tailwind.config.js`
+- Maintain the modern dark theme aesthetic
+- Use glassmorphism effects with `backdrop-blur-sm` and transparency
+- Ensure proper contrast ratios for accessibility
+- Use consistent spacing and border radius (2xl for modern look)

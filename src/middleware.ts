@@ -1,100 +1,48 @@
 /**
  * Next.js Middleware
- * Propaganda Dashboard - Global middleware with basic request logging
+ * Propaganda Dashboard - Clerk authentication middleware
  * Note: Full audit logging is handled in API routes to avoid Edge Runtime issues
  */
 
+import { clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server';
 import { NextRequest, NextResponse } from 'next/server';
-import { getToken } from 'next-auth/jwt';
 
-export async function middleware(request: NextRequest) {
-  const startTime = Date.now();
-  
-  // Skip logging for certain paths
+// Define protected routes
+const isProtectedRoute = createRouteMatcher([
+  '/dashboard(.*)',
+  '/admin(.*)',
+  '/calls(.*)',
+  '/clients(.*)',
+  '/settings(.*)',
+  '/performance(.*)'
+]);
+
+// Temporarily disable Clerk middleware for development
+// TODO: Re-enable when proper Clerk keys are configured
+export default function middleware(req: NextRequest) {
+  // Basic request logging
   const skipPaths = [
     '/_next/',
     '/favicon.ico',
     '/api/health',
-    '/api/auth/session'
+    '/api/webhooks/clerk'
   ];
   
-  const shouldSkip = skipPaths.some(path => request.nextUrl.pathname.startsWith(path));
+  const shouldSkip = skipPaths.some(path => req.nextUrl.pathname.startsWith(path));
   
-  if (shouldSkip) {
-    return NextResponse.next();
-  }
-
-  // Extract basic user information from JWT token (Edge Runtime compatible)
-  let user: any = null;
-  try {
-    const token = await getToken({
-      req: request,
-      secret: process.env.NEXTAUTH_SECRET,
+  if (!shouldSkip) {
+    // Log basic request information
+    console.log('Request:', {
+      method: req.method,
+      endpoint: req.nextUrl.pathname,
+      userId: null,
+      agencyId: null,
+      ipAddress: req.headers.get('x-forwarded-for')?.split(',')[0] || req.ip || null,
+      timestamp: new Date().toISOString()
     });
-
-    if (token) {
-      user = {
-        id: token.sub || null,
-        email: token.email || 'unknown',
-        name: token.name || 'unknown',
-        role: (token as any).role || 'sales',
-        clientId: (token as any).clientId || null,
-      };
-    }
-  } catch (error) {
-    console.warn('Failed to extract user from request:', error);
   }
-
-  // Create basic audit context (without database operations)
-  const context = {
-    clientId: user?.clientId || null,
-    userId: user?.id || null,
-    sessionId: user?.sessionId || null,
-    ipAddress: request.headers.get('x-forwarded-for')?.split(',')[0] || request.ip || null,
-    userAgent: request.headers.get('user-agent') || null,
-    endpoint: request.nextUrl.pathname,
-    httpMethod: request.method,
-    metadata: {
-      referer: request.headers.get('referer'),
-      origin: request.headers.get('origin'),
-      timestamp: new Date().toISOString(),
-      userEmail: user?.email,
-      userRole: user?.role,
-    },
-  };
-
-  // Log basic request information (console only for Edge Runtime)
-  console.log('Request:', {
-    method: context.httpMethod,
-    endpoint: context.endpoint,
-    userId: context.userId,
-    clientId: context.clientId,
-    ipAddress: context.ipAddress,
-    timestamp: context.metadata.timestamp
-  });
-
-  // Create response with audit context
-  const response = NextResponse.next();
   
-  // Add audit context to response headers for downstream use
-  response.headers.set('x-audit-context', JSON.stringify({
-    clientId: context.clientId,
-    userId: context.userId,
-    sessionId: context.sessionId
-  }));
-
-  // Log basic response information
-  const duration = Date.now() - startTime;
-  console.log('Response:', {
-    method: context.httpMethod,
-    endpoint: context.endpoint,
-    status: response.status,
-    duration: `${duration}ms`,
-    userId: context.userId,
-    clientId: context.clientId
-  });
-
-  return response;
+  return NextResponse.next();
 }
 
 // Configure which paths the middleware should run on

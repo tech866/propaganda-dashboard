@@ -1,6 +1,6 @@
 # Task ID: 9
 # Title: Implement Role-Based Access Control in UI
-# Status: pending
+# Status: done
 # Dependencies: 5, 8
 # Priority: high
 # Description: Ensure that the frontend UI respects user roles and permissions for displaying features and data.
@@ -9,3 +9,35 @@ Use context or state management to manage user roles in the frontend. Conditiona
 
 # Test Strategy:
 Log in as different user roles and verify that the UI displays the correct components and data based on permissions.
+
+# Subtasks:
+## 1. Create Role Context/Hook [done]
+### Dependencies: None
+### Description: Develop a context or custom hook to manage user roles and permissions throughout the application.
+### Details:
+Implement a React context or hook that provides user role information and permissions to components.
+
+## 2. Implement Conditional Rendering [done]
+### Dependencies: 9.1
+### Description: Set up conditional rendering for components based on user roles (sales, admin, ceo).
+### Details:
+Use the role context to conditionally render components like HeroMetrics, LossReasonsChart, and CallLogTable based on user permissions.
+
+## 3. Protect Sensitive Components [done]
+### Dependencies: 9.2
+### Description: Ensure that sensitive components and data are only accessible to users with the appropriate roles.
+### Details:
+Implement checks to prevent unauthorized access to sensitive data and components.
+
+## 4. Update Navigation Based on Roles [done]
+### Dependencies: 9.1
+### Description: Modify the navigation menu to show or hide features based on user roles.
+### Details:
+Implement logic in the navigation component to conditionally render menu items based on user permissions.
+
+## 5. Test Role-Based Access Control [done]
+### Dependencies: 9.2, 9.3, 9.4
+### Description: Conduct thorough testing of the role-based access control implementation with various user roles.
+### Details:
+Create test cases for each user role to ensure the UI behaves as expected regarding access and visibility.
+

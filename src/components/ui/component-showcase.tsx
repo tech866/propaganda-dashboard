@@ -41,16 +41,18 @@ export function ComponentShowcase() {
     <div className="space-section max-w-7xl mx-auto px-4">
       <div className="space-y-8">
         {/* Header */}
-        <div className="text-center space-y-4">
-          <h1 className="text-display">Modern UI Components</h1>
+        <div className="text-center space-y-6">
+          <h1 className="text-display bg-gradient-to-r from-foreground to-foreground/80 bg-clip-text text-transparent">
+            Modern UI Components
+          </h1>
           <p className="text-body-lg text-muted-foreground max-w-2xl mx-auto">
-            A showcase of our modern design system components with dark theme and glassmorphism effects.
+            A showcase of our modern design system components with dark theme, glassmorphism effects, and enhanced accessibility.
           </p>
         </div>
 
         {/* Cards Section */}
         <section className="space-y-6">
-          <h2 className="text-h2">Cards</h2>
+          <h2 className="text-h2">Modern Cards</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             <Card>
               <CardHeader>
@@ -136,7 +138,7 @@ export function ComponentShowcase() {
 
         {/* Buttons Section */}
         <section className="space-y-6">
-          <h2 className="text-h2">Buttons</h2>
+          <h2 className="text-h2">Modern Buttons</h2>
           <div className="flex flex-wrap gap-4">
             <Button>Primary</Button>
             <Button variant="secondary">Secondary</Button>
@@ -154,11 +156,20 @@ export function ComponentShowcase() {
               <Settings className="h-4 w-4" />
             </Button>
           </div>
+          <div className="p-4 bg-muted/20 rounded-xl border border-border/50">
+            <p className="text-sm text-muted-foreground mb-2">Modern buttons feature:</p>
+            <ul className="text-sm text-muted-foreground space-y-1">
+              <li>• Enhanced hover effects with scale transforms</li>
+              <li>• Modern shadows and glassmorphism</li>
+              <li>• Improved focus states for accessibility</li>
+              <li>• Smooth transitions and animations</li>
+            </ul>
+          </div>
         </section>
 
         {/* Inputs Section */}
         <section className="space-y-6">
-          <h2 className="text-h2">Inputs</h2>
+          <h2 className="text-h2">Modern Inputs</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-2xl">
             <div className="space-y-2">
               <label className="text-body-sm font-medium">Email</label>
@@ -177,11 +188,20 @@ export function ComponentShowcase() {
               <Input disabled placeholder="Disabled input" />
             </div>
           </div>
+          <div className="p-4 bg-muted/20 rounded-xl border border-border/50">
+            <p className="text-sm text-muted-foreground mb-2">Modern inputs feature:</p>
+            <ul className="text-sm text-muted-foreground space-y-1">
+              <li>• Glassmorphism background with backdrop blur</li>
+              <li>• Enhanced focus states with ring effects</li>
+              <li>• Smooth hover and focus transitions</li>
+              <li>• Improved accessibility with proper contrast</li>
+            </ul>
+          </div>
         </section>
 
         {/* Badges Section */}
         <section className="space-y-6">
-          <h2 className="text-h2">Badges</h2>
+          <h2 className="text-h2">Modern Badges</h2>
           <div className="flex flex-wrap gap-4">
             <Badge>Default</Badge>
             <Badge variant="secondary">Secondary</Badge>
@@ -191,6 +211,15 @@ export function ComponentShowcase() {
             <Badge variant="info">Info</Badge>
             <Badge variant="muted">Muted</Badge>
             <Badge variant="outline">Outline</Badge>
+          </div>
+          <div className="p-4 bg-muted/20 rounded-xl border border-border/50">
+            <p className="text-sm text-muted-foreground mb-2">Modern badges feature:</p>
+            <ul className="text-sm text-muted-foreground space-y-1">
+              <li>• Rounded pill design with subtle borders</li>
+              <li>• Hover effects with scale transforms</li>
+              <li>• Enhanced color variants for better contrast</li>
+              <li>• Smooth transitions and animations</li>
+            </ul>
           </div>
         </section>
 
@@ -269,3 +298,4 @@ export function ComponentShowcase() {
     </div>
   )
 }
+

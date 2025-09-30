@@ -24,7 +24,7 @@ function NavigationItem({
   return (
     <Component
       className={cn(
-        "nav-item-modern w-full",
+        "nav-item-modern w-full group",
         isActive && "active",
         className
       )}
@@ -32,13 +32,13 @@ function NavigationItem({
       {...props}
     >
       {icon && (
-        <span className="flex-shrink-0">
+        <span className="flex-shrink-0 transition-transform duration-200 group-hover:scale-110">
           {icon}
         </span>
       )}
-      <span className="flex-1 text-left">{label}</span>
+      <span className="flex-1 text-left font-medium">{label}</span>
       {badge && (
-        <span className="badge-status badge-muted">
+        <span className="badge-status badge-muted animate-pulse">
           {badge}
         </span>
       )}
@@ -53,9 +53,9 @@ interface NavigationGroupProps extends React.ComponentProps<"div"> {
 
 function NavigationGroup({ className, title, children, ...props }: NavigationGroupProps) {
   return (
-    <div className={cn("space-y-1", className)} {...props}>
+    <div className={cn("space-y-2", className)} {...props}>
       {title && (
-        <h3 className="text-caption font-medium text-muted-foreground px-4 py-2">
+        <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider px-4 py-3 border-b border-border/20">
           {title}
         </h3>
       )}
@@ -72,10 +72,11 @@ interface NavigationProps extends React.ComponentProps<"nav"> {
 
 function Navigation({ className, children, ...props }: NavigationProps) {
   return (
-    <nav className={cn("space-y-6", className)} {...props}>
+    <nav className={cn("space-y-8", className)} {...props}>
       {children}
     </nav>
   )
 }
 
 export { Navigation, NavigationGroup, NavigationItem }
+

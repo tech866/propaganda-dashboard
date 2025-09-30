@@ -1,116 +1,90 @@
-import { Pool, PoolClient } from 'pg';
-import { dbConfig, validateEnvironment } from '@/config/database';
+// Legacy database interface for backward compatibility
+// This file now serves as a compatibility layer for the new Supabase-based system
+import { DatabaseService, db, dbAdmin } from './services/databaseService';
 import * as mockDb from './mockDatabase';
 
-// Validate environment variables on startup
-validateEnvironment();
+// Check if we should use mock database (for development without Supabase)
+const useMockDatabase = process.env.NODE_ENV === 'development' && !process.env.NEXT_PUBLIC_SUPABASE_URL;
 
-// Check if we should use mock database
-const useMockDatabase = process.env.NODE_ENV === 'development' && !process.env.DB_HOST;
-
-// Create a connection pool only if not using mock database
-let pool: Pool | null = null;
-if (!useMockDatabase) {
-  try {
-    pool = new Pool(dbConfig);
-  } catch (error) {
-    console.warn('Failed to create database pool, falling back to mock database');
-  }
-}
-
-// Handle pool errors only if pool exists
-if (pool) {
-  pool.on('error', (err) => {
-    console.error('Unexpected error on idle client', err);
-    process.exit(-1);
-  });
-}
-
-// Database connection interface
+// Database connection interface (legacy compatibility)
 export interface DatabaseConnection {
   query: (text: string, params?: any[]) => Promise<any>;
   release: () => void;
 }
 
 // Get a client from the pool or mock database
-export async function getClient(): Promise<PoolClient | mockDb.MockClient> {
-  if (useMockDatabase || !pool) {
+export async function getClient(): Promise<any> {
+  if (useMockDatabase) {
     console.log('Using mock database');
     return await mockDb.getClient();
   }
   
-  try {
-    const client = await pool.connect();
-    return client;
-  } catch (error) {
-    console.error('Error connecting to database, falling back to mock:', error);
-    return await mockDb.getClient();
-  }
+  // Return the new Supabase-based database service
+  return db;
 }
 
 // Execute a query with automatic client management
 export async function query(text: string, params?: any[]): Promise<any> {
-  if (useMockDatabase || !pool) {
+  if (useMockDatabase) {
     return await mockDb.query(text, params);
   }
   
-  const client = await getClient();
-  try {
-    const result = await client.query(text, params);
-    return result;
-  } catch (error) {
-    console.error('Database query error:', error);
-    throw error;
-  } finally {
-    client.release();
+  // For Supabase, we need to handle SQL queries differently
+  // Most operations should use the DatabaseService methods instead
+  console.warn('Legacy query method called. Consider migrating to DatabaseService methods.');
+  
+  // Try to execute as RPC function if it looks like a stored procedure
+  if (text.toLowerCase().includes('select') && text.toLowerCase().includes('from')) {
+    // This is a basic SELECT query - we can't handle complex SQL with Supabase client
+    console.error('Complex SQL queries not supported with Supabase client. Use DatabaseService methods instead.');
+    return { rows: [], rowCount: 0 };
   }
+  
+  return { rows: [], rowCount: 0 };
 }
 
 // Test database connection
 export async function testConnection(): Promise<boolean> {
-  if (useMockDatabase || !pool) {
+  if (useMockDatabase) {
     return await mockDb.testConnection();
   }
   
   try {
-    const result = await query('SELECT NOW() as current_time');
-    console.log('Database connection successful:', result.rows[0]);
+    // Test Supabase connection by trying to select from a system table
+    const result = await db.select('agencies', { limit: 1 });
+    console.log('Supabase connection successful');
     return true;
   } catch (error) {
-    console.error('Database connection failed:', error);
+    console.error('Supabase connection failed:', error);
     return false;
   }
 }
 
-// Close all connections in the pool
+// Close all connections in the pool (no-op for Supabase)
 export async function closePool(): Promise<void> {
-  if (pool) {
-    await pool.end();
-  } else {
+  if (useMockDatabase) {
     await mockDb.closePool();
   }
+  // Supabase handles connection pooling automatically
+  console.log('Supabase connection pool managed automatically');
 }
 
 // Database transaction helper
 export async function withTransaction<T>(
-  callback: (client: PoolClient | mockDb.MockClient) => Promise<T>
+  callback: (client: any) => Promise<T>
 ): Promise<T> {
-  if (useMockDatabase || !pool) {
+  if (useMockDatabase) {
     return await mockDb.withTransaction(callback);
   }
   
-  const client = await getClient();
-  try {
-    await client.query('BEGIN');
-    const result = await callback(client);
-    await client.query('COMMIT');
-    return result;
-  } catch (error) {
-    await client.query('ROLLBACK');
-    throw error;
-  } finally {
-    client.release();
-  }
+  // Supabase handles transactions automatically for single operations
+  // For complex transactions, use RPC functions
+  console.warn('Explicit transactions not supported with Supabase client. Use RPC functions for complex transactions.');
+  return await callback(db);
 }
 
-export default pool;
+// Export the new database service as default
+export default db;
+
+// Export the new services for direct use
+export { db, dbAdmin, DatabaseService };

@@ -1,0 +1,11 @@
+# Task ID: 18
+# Title: Create Client Management Page
+# Status: pending
+# Dependencies: 16
+# Priority: high
+# Description: Develop a Client Management page for admin users to manage client accounts, view client performance, and configure client settings.
+# Details:
+Build a comprehensive Client Management page that includes client CRUD operations, performance dashboards per client, and client-specific analytics. Ensure proper RBAC access control so only admin users can access this page. Use the v0.dev dark theme design and shadcn/ui components for consistency.
+
+# Test Strategy:
+Test the Client Management page with different user roles to ensure only admin users can access it. Verify that all CRUD operations work correctly and that client-specific data is displayed properly.

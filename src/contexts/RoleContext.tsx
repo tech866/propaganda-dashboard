@@ -1,8 +1,8 @@
 'use client';
 
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import { useSession } from 'next-auth/react';
-import { UserRole } from '@/middleware/auth';
+import { useUser, useOrganization } from '@clerk/nextjs';
+import { UserRole } from '@/lib/clerk';
 
 // Define the role context interface
 interface RoleContextType {
@@ -35,6 +35,18 @@ const ROLE_PERMISSIONS: Record<UserRole, string[]> = {
     'view_own_calls',
     'create_calls',
     'update_own_calls',
+    'view_own_metrics',
+    'view_own_dashboard'
+  ],
+  agency_user: [
+    'view_own_calls',
+    'create_calls',
+    'update_own_calls',
+    'view_own_metrics',
+    'view_own_dashboard'
+  ],
+  client_user: [
+    'view_own_calls',
     'view_own_metrics',
     'view_own_dashboard'
   ],
@@ -74,41 +86,66 @@ const ROLE_PERMISSIONS: Record<UserRole, string[]> = {
 
 // Role hierarchy for access control
 const ROLE_HIERARCHY: Record<UserRole, number> = {
-  sales: 1,
-  admin: 2,
-  ceo: 3
+  client_user: 1,
+  sales: 2,
+  agency_user: 2,
+  admin: 3,
+  ceo: 4
 };
 
 // Role provider component
 export function RoleProvider({ children }: { children: React.ReactNode }) {
-  const { data: session, status } = useSession();
+  // Temporarily disable Clerk hooks for development
+  // TODO: Re-enable when proper Clerk keys are configured
   const [user, setUser] = useState<RoleContextType['user']>(null);
-  const [isLoading, setIsLoading] = useState(true);
-
-  useEffect(() => {
-    if (status === 'loading') {
-      setIsLoading(true);
-      return;
-    }
-
-    if (status === 'unauthenticated') {
-      setUser(null);
+  const [isLoading, setIsLoading] = useState(false);
+  
+  // Mock user for development
+  React.useEffect(() => {
+    if (process.env.NODE_ENV === 'development' && process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY?.includes('placeholder')) {
+      setUser({
+        id: 'dev-user-1',
+        email: 'dev@example.com',
+        name: 'Development User',
+        role: 'admin',
+        clientId: 'dev-agency-1'
+      });
       setIsLoading(false);
       return;
     }
+  }, []);
+  
+  // Original Clerk implementation (commented out for development)
+  // const { user: clerkUser, isLoaded: userLoaded } = useUser();
+  // const { organization, isLoaded: orgLoaded } = useOrganization();
 
-    if (session?.user) {
-      setUser({
-        id: session.user.id,
-        email: session.user.email || '',
-        name: session.user.name || '',
-        role: session.user.role || 'sales',
-        clientId: session.user.clientId || ''
-      });
-    }
+  // Original Clerk useEffect (commented out for development)
+  // useEffect(() => {
+  //   if (!userLoaded || !orgLoaded) {
+  //     setIsLoading(true);
+  //     return;
+  //   }
 
-    setIsLoading(false);
-  }, [session, status]);
+  //   if (!clerkUser) {
+  //     setUser(null);
+  //     setIsLoading(false);
+  //     return;
+  //   }
+
+  //   // Get role from Clerk user metadata
+  //   const role = (clerkUser.publicMetadata?.role as UserRole) || 'agency_user';
+  //   const agencyId = organization?.id || '';
+
+  //   setUser({
+  //     id: clerkUser.id,
+  //     email: clerkUser.primaryEmailAddress?.emailAddress || '',
+  //     name: clerkUser.fullName || '',
+  //     role: role,
+  //     clientId: agencyId
+  //   });
+
+  //   setIsLoading(false);
+  // }, [clerkUser, userLoaded, organization, orgLoaded]);
 
   // Check if user has a specific role
   const hasRole = (role: UserRole): boolean => {

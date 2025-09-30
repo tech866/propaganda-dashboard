@@ -1,0 +1,460 @@
+'use client';
+
+import { useEffect, useState } from 'react';
+import { useAgency } from '@/contexts/AgencyContext';
+import { useRole } from '@/contexts/RoleContext';
+import { 
+  Card, 
+  CardContent, 
+  CardDescription, 
+  CardHeader, 
+  CardTitle
+} from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { 
+  Table, 
+  TableBody, 
+  TableCell, 
+  TableHead, 
+  TableHeader, 
+  TableRow 
+} from '@/components/ui/table';
+import { 
+  FunnelIcon, 
+  DownloadIcon, 
+  RefreshCw, 
+  CalendarIcon,
+  DollarSign,
+  CreditCard,
+  Users,
+  Target,
+  TrendingUp,
+  TrendingDown,
+  Building2,
+  Activity,
+  BarChart3
+} from 'lucide-react';
+import { 
+  DashboardService, 
+  DashboardKPIs, 
+  ClientSummary, 
+  CampaignMetrics,
+  FinancialRecord,
+  formatCurrency,
+  formatPercentage,
+  formatROAS,
+  getStatusColor
+} from '@/lib/services/dashboardService';
+import { 
+  RoleBasedAccess, 
+  AdminOnly, 
+  CEOOnly, 
+  CanViewAllData, 
+  CanViewFinancialData 
+} from '@/components/auth/RoleBasedAccess';
+
+interface EnhancedDashboardProps {
+  onRefresh?: () => void;
+}
+
+export default function EnhancedDashboard({ onRefresh }: EnhancedDashboardProps) {
+  const { agency, isLoading: agencyLoading } = useAgency();
+  const { user: roleUser } = useRole();
+  const [kpis, setKpis] = useState<DashboardKPIs | null>(null);
+  const [clientSummaries, setClientSummaries] = useState<ClientSummary[]>([]);
+  const [recentCampaigns, setRecentCampaigns] = useState<CampaignMetrics[]>([]);
+  const [recentFinancial, setRecentFinancial] = useState<FinancialRecord[]>([]);
+  const [agencyStats, setAgencyStats] = useState({ totalClients: 0, totalCampaigns: 0, totalUsers: 0 });
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  // Initialize dashboard service when agency is available
+  useEffect(() => {
+    if (agency && !agencyLoading) {
+      loadDashboardData();
+    }
+  }, [agency, agencyLoading]);
+
+  const loadDashboardData = async () => {
+    if (!agency) return;
+
+    setLoading(true);
+    setError(null);
+
+    try {
+      const dashboardService = new DashboardService(agency.id);
+
+      // Load all dashboard data in parallel
+      const [kpisData, clientsData, campaignsData, financialData, statsData] = await Promise.all([
+        dashboardService.getKPIs(),
+        dashboardService.getClientSummaries(),
+        dashboardService.getRecentCampaigns(5),
+        dashboardService.getRecentFinancialActivity(10),
+        dashboardService.getAgencyStats()
+      ]);
+
+      setKpis(kpisData);
+      setClientSummaries(clientsData);
+      setRecentCampaigns(campaignsData);
+      setRecentFinancial(financialData);
+      setAgencyStats(statsData);
+    } catch (err) {
+      console.error('Error loading dashboard data:', err);
+      setError('Failed to load dashboard data');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleRefresh = () => {
+    loadDashboardData();
+    onRefresh?.();
+  };
+
+  if (agencyLoading || loading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="text-center">
+          <p className="text-red-600 mb-4">{error}</p>
+          <Button onClick={handleRefresh} variant="outline">
+            <RefreshCw className="mr-2 h-4 w-4" />
+            Retry
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
+  if (!agency) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="text-center">
+          <p className="text-muted-foreground">No agency data available</p>
+        </div>
+      </div>
+    );
+  }
+
+  // KPI Cards Data
+  const kpiCards = kpis ? [
+    {
+      title: 'Ad Spend',
+      value: formatCurrency(kpis.totalAdSpend),
+      delta: { value: formatPercentage(kpis.adSpendChange), trend: kpis.adSpendChange >= 0 ? 'up' as const : 'down' as const },
+      description: 'Total advertising expenditure',
+      icon: <DollarSign className="h-5 w-5" />
+    },
+    {
+      title: 'Revenue',
+      value: formatCurrency(kpis.totalRevenue),
+      delta: { value: formatPercentage(kpis.revenueChange), trend: kpis.revenueChange >= 0 ? 'up' as const : 'down' as const },
+      description: 'Total revenue generated',
+      icon: <CreditCard className="h-5 w-5" />
+    },
+    {
+      title: 'Average Order Value',
+      value: formatCurrency(kpis.averageOrderValue),
+      delta: { value: formatPercentage(kpis.aovChange), trend: kpis.aovChange >= 0 ? 'up' as const : 'down' as const },
+      description: 'Mean transaction value',
+      icon: <Users className="h-5 w-5" />
+    },
+    {
+      title: 'ROAS',
+      value: formatROAS(kpis.roas),
+      delta: { value: `+${kpis.roasChange.toFixed(2)}x`, trend: kpis.roasChange >= 0 ? 'up' as const : 'down' as const },
+      description: 'Return on ad spend',
+      icon: <Target className="h-5 w-5" />
+    }
+  ] : [];
+
+  return (
+    <div className="space-y-8">
+      {/* Page Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight">
+            {agency.name} Dashboard
+          </h1>
+          <p className="text-lg text-muted-foreground mt-2">
+            Comprehensive overview of {agency.name}'s advertising performance and revenue metrics
+          </p>
+          <div className="flex items-center gap-4 mt-2">
+            <Badge variant="outline" className="text-xs">
+              {agency.subscription_plan.toUpperCase()}
+            </Badge>
+            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+              <Building2 className="h-4 w-4" />
+              <span>{agencyStats.totalClients} Clients</span>
+              <Activity className="h-4 w-4 ml-2" />
+              <span>{agencyStats.totalCampaigns} Campaigns</span>
+              <Users className="h-4 w-4 ml-2" />
+              <span>{agencyStats.totalUsers} Users</span>
+            </div>
+          </div>
+        </div>
+        <div className="flex items-center gap-3">
+          <Badge variant="default" className="text-sm">
+            {roleUser?.role?.toUpperCase() || 'USER'}
+          </Badge>
+          <Button variant="outline" size="sm" onClick={handleRefresh}>
+            <RefreshCw className="mr-2 h-4 w-4" />
+            Refresh
+          </Button>
+        </div>
+      </div>
+
+      {/* Filter Controls */}
+      <Card>
+        <CardContent className="p-6">
+          <div className="flex flex-col sm:flex-row gap-4">
+            <div className="flex-1">
+              <label className="text-sm font-medium mb-2 block">Time Period</label>
+              <div className="relative">
+                <select className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 pr-10">
+                  <option>Last 30 days</option>
+                  <option>Last 7 days</option>
+                  <option>This month</option>
+                  <option>Last quarter</option>
+                </select>
+                <CalendarIcon className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
+              </div>
+            </div>
+            <div className="flex gap-2">
+              <Button variant="outline" size="sm">
+                <FunnelIcon className="mr-2 h-4 w-4" />
+                Filters
+              </Button>
+              <Button variant="outline" size="sm">
+                <DownloadIcon className="mr-2 h-4 w-4" />
+                Export
+              </Button>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* KPI Cards */}
+      <CanViewFinancialData 
+        fallback={
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">Campaigns</CardTitle>
+                <Activity className="h-5 w-5 text-muted-foreground" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">{agencyStats.totalCampaigns}</div>
+                <p className="text-xs text-muted-foreground">Active campaigns</p>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">Clients</CardTitle>
+                <Building2 className="h-5 w-5 text-muted-foreground" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">{agencyStats.totalClients}</div>
+                <p className="text-xs text-muted-foreground">Total clients</p>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">Team Members</CardTitle>
+                <Users className="h-5 w-5 text-muted-foreground" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">{agencyStats.totalUsers}</div>
+                <p className="text-xs text-muted-foreground">Active users</p>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">Plan</CardTitle>
+                <Target className="h-5 w-5 text-muted-foreground" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">{agency.subscription_plan.toUpperCase()}</div>
+                <p className="text-xs text-muted-foreground">Subscription plan</p>
+              </CardContent>
+            </Card>
+          </div>
+        }
+      >
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          {kpiCards.map((kpi, index) => (
+            <Card key={index}>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">{kpi.title}</CardTitle>
+                {kpi.icon}
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">{kpi.value}</div>
+                {kpi.delta && (
+                  <Badge 
+                    variant={kpi.delta.trend === 'up' ? 'default' : 'destructive'}
+                    className="text-xs mt-1"
+                  >
+                    {kpi.delta.trend === 'up' ? '↗' : '↘'} {kpi.delta.value}%
+                  </Badge>
+                )}
+                <p className="text-xs text-muted-foreground mt-1">{kpi.description}</p>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      </CanViewFinancialData>
+
+      {/* Main Content Grid */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Client P&L Summary */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Client Performance</CardTitle>
+            <CardDescription>Profit and loss breakdown by client</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Client</TableHead>
+                  <TableHead>Status</TableHead>
+                  <TableHead>Revenue</TableHead>
+                  <TableHead>Ad Spend</TableHead>
+                  <TableHead>Margin</TableHead>
+                  <TableHead className="text-right">Profit</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {clientSummaries.map((client) => (
+                  <TableRow key={client.id}>
+                    <TableCell className="font-medium">{client.name}</TableCell>
+                    <TableCell>
+                      <Badge 
+                        variant="outline" 
+                        className={`text-xs ${getStatusColor(client.status)}`}
+                      >
+                        {client.status.replace('_', ' ')}
+                      </Badge>
+                    </TableCell>
+                    <TableCell>{formatCurrency(client.totalRevenue)}</TableCell>
+                    <TableCell>{formatCurrency(client.totalAdSpend)}</TableCell>
+                    <TableCell>{client.margin.toFixed(1)}%</TableCell>
+                    <TableCell className="text-right font-semibold">
+                      {formatCurrency(client.profit)}
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </CardContent>
+        </Card>
+
+        {/* Recent Campaigns */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Recent Campaigns</CardTitle>
+            <CardDescription>Latest campaign performance</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              {recentCampaigns.map((campaign) => (
+                <div key={campaign.id} className="flex items-center justify-between p-3 border rounded-lg">
+                  <div className="flex-1">
+                    <p className="font-medium">{campaign.name}</p>
+                    <p className="text-sm text-muted-foreground">{campaign.clientName}</p>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-sm font-medium">{formatROAS(campaign.roas)}</p>
+                    <Badge 
+                      variant="outline" 
+                      className={`text-xs ${
+                        campaign.status === 'active' ? 'text-green-600 bg-green-50' :
+                        campaign.status === 'paused' ? 'text-yellow-600 bg-yellow-50' :
+                        campaign.status === 'completed' ? 'text-blue-600 bg-blue-50' :
+                        'text-gray-600 bg-gray-50'
+                      }`}
+                    >
+                      {campaign.status}
+                    </Badge>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Recent Financial Activity */}
+      <CanViewFinancialData 
+        fallback={
+          <Card>
+            <CardHeader>
+              <CardTitle>Recent Activity</CardTitle>
+              <CardDescription>Latest campaign and client activity</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="text-center py-8 text-muted-foreground">
+                <BarChart3 className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                <p>Financial data is only available to authorized users.</p>
+                <p className="text-sm">Contact your administrator for access.</p>
+              </div>
+            </CardContent>
+          </Card>
+        }
+      >
+        <Card>
+          <CardHeader>
+            <CardTitle>Recent Financial Activity</CardTitle>
+            <CardDescription>Latest revenue and expense transactions</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Date</TableHead>
+                  <TableHead>Type</TableHead>
+                  <TableHead>Description</TableHead>
+                  <TableHead className="text-right">Amount</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {recentFinancial.map((record) => (
+                  <TableRow key={record.id}>
+                    <TableCell className="text-sm">
+                      {new Date(record.date).toLocaleDateString()}
+                    </TableCell>
+                    <TableCell>
+                      <Badge 
+                        variant="outline"
+                        className={`text-xs ${
+                          record.type === 'revenue' ? 'text-green-600 bg-green-50' :
+                          record.type === 'expense' ? 'text-red-600 bg-red-50' :
+                          'text-yellow-600 bg-yellow-50'
+                        }`}
+                      >
+                        {record.type}
+                      </Badge>
+                    </TableCell>
+                    <TableCell className="text-sm">{record.description}</TableCell>
+                    <TableCell className="text-right font-medium">
+                      {formatCurrency(record.amount)}
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </CardContent>
+        </Card>
+      </CanViewFinancialData>
+    </div>
+  );
+}

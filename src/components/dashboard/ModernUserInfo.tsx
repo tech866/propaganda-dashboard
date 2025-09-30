@@ -1,6 +1,7 @@
 'use client';
 
-import { useSession } from 'next-auth/react';
+// import { useUser } from '@clerk/nextjs'; // Temporarily disabled for development
+import { useRole } from '@/contexts/RoleContext';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -12,9 +13,9 @@ interface ModernUserInfoProps {
 }
 
 export default function ModernUserInfo({ className = '' }: ModernUserInfoProps) {
-  const { data: session } = useSession();
+  const { user: roleUser } = useRole();
 
-  if (!session) return null;
+  if (!roleUser) return null;
 
   const getRoleColor = (role?: string) => {
     switch (role?.toLowerCase()) {
@@ -24,6 +25,10 @@ export default function ModernUserInfo({ className = '' }: ModernUserInfoProps) 
         return 'bg-blue-100 text-blue-800 border-blue-200';
       case 'sales':
         return 'bg-green-100 text-green-800 border-green-200';
+      case 'agency_user':
+        return 'bg-indigo-100 text-indigo-800 border-indigo-200';
+      case 'client_user':
+        return 'bg-orange-100 text-orange-800 border-orange-200';
       default:
         return 'bg-gray-100 text-gray-800 border-gray-200';
     }
@@ -51,20 +56,20 @@ export default function ModernUserInfo({ className = '' }: ModernUserInfoProps) 
         {/* User Avatar and Basic Info */}
         <div className="flex items-center space-x-4">
           <Avatar className="h-16 w-16">
-            <AvatarImage src={session.user?.image || ''} alt={session.user?.name || ''} />
-            <AvatarFallback className="bg-gradient-to-br from-purple-600 to-blue-600 text-white text-lg font-semibold">
-              {getInitials(session.user?.name)}
+            <AvatarImage src={''} alt={roleUser.name || ''} />
+            <AvatarFallback className="bg-gradient-to-br from-primary to-primary/80 text-primary-foreground text-lg font-semibold">
+              {getInitials(roleUser.name || '')}
             </AvatarFallback>
           </Avatar>
           <div className="flex-1">
             <h3 className="text-lg font-semibold text-gray-900">
-              {session.user?.name || 'User'}
+              {roleUser.name || 'User'}
             </h3>
             <Badge 
               variant="outline" 
-              className={`${getRoleColor(session.user?.role)} font-medium`}
+              className={`${getRoleColor(roleUser?.role)} font-medium`}
             >
-              {session.user?.role?.toUpperCase() || 'USER'}
+              {roleUser?.role?.toUpperCase() || 'USER'}
             </Badge>
           </div>
         </div>
@@ -79,7 +84,7 @@ export default function ModernUserInfo({ className = '' }: ModernUserInfoProps) 
             </div>
             <div>
               <p className="text-sm font-medium text-gray-500">Email</p>
-              <p className="text-sm text-gray-900">{session.user?.email}</p>
+              <p className="text-sm text-gray-900">{roleUser.email}</p>
             </div>
           </div>
 
@@ -89,7 +94,7 @@ export default function ModernUserInfo({ className = '' }: ModernUserInfoProps) 
             </div>
             <div>
               <p className="text-sm font-medium text-gray-500">Role</p>
-              <p className="text-sm text-gray-900 capitalize">{session.user?.role}</p>
+              <p className="text-sm text-gray-900 capitalize">{roleUser?.role}</p>
             </div>
           </div>
 
@@ -98,9 +103,9 @@ export default function ModernUserInfo({ className = '' }: ModernUserInfoProps) 
               <Building className="h-4 w-4 text-gray-600" />
             </div>
             <div>
-              <p className="text-sm font-medium text-gray-500">Client ID</p>
+              <p className="text-sm font-medium text-gray-500">Agency ID</p>
               <p className="text-sm text-gray-900 font-mono bg-gray-50 px-2 py-1 rounded">
-                {session.user?.clientId}
+                {roleUser?.clientId || 'N/A'}
               </p>
             </div>
           </div>

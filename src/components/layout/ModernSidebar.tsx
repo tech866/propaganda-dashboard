@@ -16,7 +16,10 @@ import {
   BarChart3, 
   Settings,
   Shield,
-  Activity
+  Activity,
+  Building2,
+  Plug,
+  TrendingUp
 } from 'lucide-react';
 
 interface SidebarNavigationItem {
@@ -47,6 +50,31 @@ const navigationItems: SidebarNavigationItem[] = [
     href: '/calls',
     icon: PhoneCall,
     description: 'View all your calls'
+  },
+  {
+    name: 'Client Management',
+    href: '/clients',
+    icon: Building2,
+    description: 'Manage client accounts and settings',
+    requiredRoles: ['admin', 'ceo']
+  },
+  {
+    name: 'Integrations',
+    href: '/integrations',
+    icon: Plug,
+    description: 'Manage external service connections and data sync'
+  },
+  {
+    name: 'Performance',
+    href: '/performance',
+    icon: TrendingUp,
+    description: 'Advanced analytics and performance metrics'
+  },
+  {
+    name: 'Settings',
+    href: '/settings',
+    icon: Settings,
+    description: 'Manage account preferences and system configuration'
   },
   {
     name: 'Manage Users',
@@ -119,9 +147,26 @@ export default function ModernSidebar({ className = '' }: ModernSidebarProps) {
 
   const accessibleItems = navigationItems.filter(canAccessItem);
 
+  const getRoleVariant = (role?: string) => {
+    switch (role?.toLowerCase()) {
+      case 'ceo':
+        return 'default';
+      case 'admin':
+        return 'info';
+      case 'sales':
+        return 'success';
+      case 'agency_user':
+        return 'secondary';
+      case 'client_user':
+        return 'outline';
+      default:
+        return 'muted';
+    }
+  };
+
   // Group items by category
   const mainItems = accessibleItems.filter(item => 
-    ['Dashboard', 'Log Call', 'View Calls'].includes(item.name)
+    ['Dashboard', 'Log Call', 'View Calls', 'Client Workspaces', 'Integrations', 'Performance', 'Client Management', 'Settings'].includes(item.name)
   );
   const adminItems = accessibleItems.filter(item => 
     ['Manage Users', 'Audit Logs', 'Reports'].includes(item.name)
@@ -133,21 +178,24 @@ export default function ModernSidebar({ className = '' }: ModernSidebarProps) {
   return (
     <aside className={cn("sidebar-modern", className)}>
       <div className="flex flex-col h-full">
-        {/* Logo/Brand */}
-        <div className="p-6 border-b border-sidebar-border">
-          <div className="flex items-center space-x-3">
-            <div className="w-8 h-8 bg-gradient-to-br from-primary to-primary/80 rounded-xl flex items-center justify-center">
-              <span className="text-primary-foreground font-bold text-sm">P</span>
+        {/* Premium Logo/Brand Section */}
+        <div className="p-8 border-b border-sidebar-border">
+          <div className="flex items-center space-x-4">
+            <div className="relative">
+              <div className="w-12 h-12 bg-gradient-to-br from-primary via-primary/90 to-primary/80 rounded-2xl flex items-center justify-center shadow-lg">
+                <span className="text-primary-foreground font-bold text-lg">P</span>
+              </div>
+              <div className="absolute -top-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-card"></div>
             </div>
-            <div>
-              <h1 className="text-h4 text-sidebar-foreground">Propaganda</h1>
-              <p className="text-caption text-sidebar-foreground/60">Dashboard</p>
+            <div className="flex-1">
+              <h1 className="text-xl font-bold text-foreground tracking-tight">Propaganda</h1>
+              <p className="text-sm text-muted-foreground font-medium">Agency Dashboard</p>
             </div>
           </div>
         </div>
 
-        {/* Navigation */}
-        <div className="flex-1 p-4">
+        {/* Navigation with Better Spacing */}
+        <div className="flex-1 p-6 space-y-8">
           <Navigation>
             <NavigationGroup>
               {mainItems.map((item) => {
@@ -155,7 +203,7 @@ export default function ModernSidebar({ className = '' }: ModernSidebarProps) {
                 return (
                   <NavigationItem
                     key={item.name}
-                    icon={<Icon className="h-4 w-4" />}
+                    icon={<Icon className="h-5 w-5" />}
                     label={item.name}
                     isActive={isActive(item.href)}
                     href={item.href}
@@ -172,7 +220,7 @@ export default function ModernSidebar({ className = '' }: ModernSidebarProps) {
                   return (
                     <NavigationItem
                       key={item.name}
-                      icon={<Icon className="h-4 w-4" />}
+                      icon={<Icon className="h-5 w-5" />}
                       label={item.name}
                       isActive={isActive(item.href)}
                       href={item.href}
@@ -190,7 +238,7 @@ export default function ModernSidebar({ className = '' }: ModernSidebarProps) {
                   return (
                     <NavigationItem
                       key={item.name}
-                      icon={<Icon className="h-4 w-4" />}
+                      icon={<Icon className="h-5 w-5" />}
                       label={item.name}
                       isActive={isActive(item.href)}
                       href={item.href}
@@ -203,21 +251,24 @@ export default function ModernSidebar({ className = '' }: ModernSidebarProps) {
           </Navigation>
         </div>
 
-        {/* User Info Footer */}
-        <div className="p-4 border-t border-sidebar-border">
-          <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 bg-gradient-to-br from-primary to-primary/80 rounded-xl flex items-center justify-center">
-              <span className="text-primary-foreground font-medium text-sm">
-                {user?.name?.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2) || 'U'}
-              </span>
+        {/* Premium User Info Footer */}
+        <div className="p-6 border-t border-sidebar-border">
+          <div className="flex items-center space-x-4">
+            <div className="relative">
+              <div className="w-12 h-12 bg-gradient-to-br from-primary to-primary/80 rounded-2xl flex items-center justify-center">
+                <span className="text-primary-foreground font-semibold text-sm">
+                  {user?.name?.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2) || 'U'}
+                </span>
+              </div>
+              <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-card"></div>
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-body-sm font-medium text-sidebar-foreground truncate">
+              <p className="text-sm font-semibold text-foreground truncate">
                 {user?.name || 'User'}
               </p>
               <Badge 
-                variant="muted" 
-                className="text-xs mt-1"
+                variant={getRoleVariant(user?.role) as any}
+                className="text-xs mt-1 font-medium"
               >
                 {user?.role?.toUpperCase() || 'USER'}
               </Badge>

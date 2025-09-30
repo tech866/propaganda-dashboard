@@ -1,6 +1,6 @@
 # Task ID: 11
 # Title: Implement Filtering Capabilities for Dashboard
-# Status: pending
+# Status: done
 # Dependencies: 8
 # Priority: medium
 # Description: Add filtering options for the dashboard to allow users to filter data by date range, client, and sales user.

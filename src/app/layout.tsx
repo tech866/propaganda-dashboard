@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
-import SessionProvider from "@/components/SessionProvider";
+import { ClerkProviderWrapper } from "@/components/providers/ClerkProvider";
 import { RoleProvider } from "@/contexts/RoleContext";
+import { AgencyProvider } from "@/contexts/AgencyContext";
 import { ThemeProvider } from "@/components/theme-provider";
 
 const inter = Inter({
@@ -23,18 +24,20 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={`${inter.variable} font-sans antialiased bg-background text-foreground`}>
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="dark"
-          enableSystem
-          disableTransitionOnChange
-        >
-          <SessionProvider>
+        <ClerkProviderWrapper>
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="dark"
+            enableSystem
+            disableTransitionOnChange
+          >
             <RoleProvider>
-              {children}
+              <AgencyProvider>
+                {children}
+              </AgencyProvider>
             </RoleProvider>
-          </SessionProvider>
-        </ThemeProvider>
+          </ThemeProvider>
+        </ClerkProviderWrapper>
       </body>
     </html>
   );

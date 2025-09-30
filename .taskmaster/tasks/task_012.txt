@@ -1,6 +1,6 @@
 # Task ID: 12
 # Title: Create Admin Management Screens
-# Status: pending
+# Status: done
 # Dependencies: 9
 # Priority: medium
 # Description: Develop admin screens for managing users and loss reasons, accessible only to Admin users.

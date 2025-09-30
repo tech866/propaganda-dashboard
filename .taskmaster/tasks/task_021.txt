@@ -1,0 +1,73 @@
+# Task ID: 21
+# Title: Implement Meta Marketing API Integration for Client Workspaces
+# Status: pending
+# Dependencies: 4, 5, 16
+# Priority: high
+# Description: Create a comprehensive integration with the Meta Marketing API to allow clients to connect their Facebook/Instagram ad accounts and display real-time ad spend data in dedicated workspaces.
+# Details:
+1. Implement the Meta OAuth authentication flow using OAuth 2.0 to securely connect client accounts. Ensure proper handling of long-lived access tokens and refresh mechanisms. 2. Develop backend logic to fetch ad spend data, impressions, clicks, and conversion metrics from the Meta Marketing API. 3. Create a client workspace UI that displays performance metrics, including individual campaign performance breakdowns and historical data with date range filtering. 4. Implement a multi-client management system to allow agencies to manage multiple client accounts seamlessly. 5. Ensure real-time data updates and caching strategies are in place to optimize performance and reduce API calls. 6. Follow best practices for secure token storage and error handling, including rate limiting. 7. Design the UI to match the existing v0 design system, ensuring a professional and cohesive look.
+
+# Test Strategy:
+1. Verify the OAuth authentication flow by connecting a test Facebook/Instagram account and ensuring tokens are stored securely. 2. Test the API integration by fetching ad spend data and confirming it displays correctly in the client workspace. 3. Validate the performance metrics calculations against known values from the Meta Marketing API. 4. Conduct user testing to ensure the UI is intuitive and meets design specifications. 5. Test the multi-client management functionality by adding, removing, and switching between client accounts. 6. Ensure real-time updates are functioning by simulating changes in ad spend data and verifying updates in the UI.
+
+# Subtasks:
+## 1. Meta Developer App Setup [pending]
+### Dependencies: None
+### Description: Set up and configure a Meta Developer App to enable access to the Meta Marketing API.
+### Details:
+Create a new app in the Meta Developer portal, configure necessary permissions, and obtain App ID and App Secret.
+
+## 2. Implement OAuth Authentication Flow [pending]
+### Dependencies: 21.1
+### Description: Develop the OAuth 2.0 authentication flow to securely connect client Facebook/Instagram accounts.
+### Details:
+Implement the authorization code flow, handle token exchange, and manage long-lived access tokens.
+
+## 3. Develop API Service Layer [pending]
+### Dependencies: 21.2
+### Description: Create a service layer to interact with the Meta Marketing API for fetching ad spend data.
+### Details:
+Develop functions to retrieve ad spend, impressions, clicks, and conversion metrics from the API.
+
+## 4. Design Client Workspace UI [pending]
+### Dependencies: 21.3
+### Description: Create the user interface for the client workspace to display performance metrics.
+### Details:
+Design UI components that show campaign performance breakdowns and allow date range filtering.
+
+## 5. Implement Data Caching and Real-Time Updates [pending]
+### Dependencies: 21.4
+### Description: Ensure real-time data updates and implement caching strategies to optimize performance.
+### Details:
+Develop caching mechanisms to reduce API calls and ensure data is updated in real-time.
+
+## 6. Create Database Schema for Meta Integration [pending]
+### Dependencies: None
+### Description: Design and implement database tables to store Meta API connections, ad accounts, and cached ad spend data
+### Details:
+Create tables for client_meta_connections, client_ad_accounts, ad_spend_data, and campaign_data to support the Meta API integration
+
+## 7. Implement Meta API Service Layer [pending]
+### Dependencies: None
+### Description: Create the MetaApiService class with methods for fetching ad spend data, campaign metrics, and token management
+### Details:
+Develop service methods for getAdAccounts(), getAdSpendData(), getCampaignData(), and exchangeForLongLivedToken() with proper error handling
+
+## 8. Create Client Workspace UI Components [pending]
+### Dependencies: None
+### Description: Build the client management page and individual client workspace UI with performance metrics display
+### Details:
+Create /clients page for client overview and /clients/[clientId] page for individual client workspaces with ad spend metrics, campaign performance, and date filtering
+
+## 9. Implement Error Handling and Rate Limiting [pending]
+### Dependencies: None
+### Description: Add comprehensive error handling, rate limiting, and security measures for Meta API integration
+### Details:
+Implement proper error handling for API failures, rate limiting to respect Meta API limits, token refresh mechanisms, and secure token storage
+
+## 10. Create Setup Documentation and Environment Configuration [pending]
+### Dependencies: None
+### Description: Create comprehensive setup guide and configure environment variables for Meta API integration
+### Details:
+Document the complete setup process including Meta Developer App configuration, environment variables, database setup, and deployment considerations
+

@@ -1,0 +1,11 @@
+# Task ID: 19
+# Title: Create Settings Page
+# Status: pending
+# Dependencies: 16
+# Priority: medium
+# Description: Build a Settings page for system configuration, user preferences, and application settings with role-based access control.
+# Details:
+Create a comprehensive Settings page that includes user profile management, notification preferences, system configuration options, and integration settings. Implement role-based access to different settings sections - basic settings for all users, advanced settings for admin users, and system settings for CEO users. Use the v0.dev dark theme design and shadcn/ui components.
+
+# Test Strategy:
+Test the Settings page with different user roles to ensure proper access control to different settings sections. Verify that all settings can be updated and saved correctly.
