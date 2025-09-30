@@ -14,12 +14,17 @@ const clerkConfig = {
 
 // Clerk provider wrapper component
 export function ClerkProviderWrapper({ children }: { children: ReactNode }) {
-  // Temporarily disable Clerk for development
-  // TODO: Re-enable when proper Clerk keys are configured
-  if (process.env.NODE_ENV === 'development' && process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY?.includes('placeholder')) {
+  // Check if Clerk is properly configured
+  const isClerkConfigured = clerkConfig.publishableKey && 
+    !clerkConfig.publishableKey.includes('placeholder') &&
+    clerkConfig.publishableKey.length > 20;
+
+  // If Clerk is not configured, render children without Clerk provider
+  if (!isClerkConfigured) {
+    console.log('Clerk not configured, rendering without authentication');
     return <>{children}</>;
   }
-  
+
   return (
     <ClerkProvider
       publishableKey={clerkConfig.publishableKey}
