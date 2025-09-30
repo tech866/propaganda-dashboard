@@ -7,7 +7,11 @@ const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'placeholde
 // Check if we're using placeholder values (development mode)
 const isDevelopment = supabaseUrl.includes('placeholder') || supabaseAnonKey.includes('placeholder')
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey)
+// Only create client if we have valid URLs and keys
+export const supabase = supabaseUrl && supabaseAnonKey && 
+  !supabaseUrl.includes('placeholder') && !supabaseAnonKey.includes('placeholder')
+  ? createClient(supabaseUrl, supabaseAnonKey)
+  : null
 
 // For server-side operations (if needed)
 export const supabaseAdmin = createClient(

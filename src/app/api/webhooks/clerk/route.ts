@@ -3,11 +3,14 @@ import { Webhook } from 'svix';
 import { headers } from 'next/headers';
 import { createClient } from '@supabase/supabase-js';
 
-// Initialize Supabase client
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
+// Initialize Supabase client only if environment variables are available
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+const supabase = supabaseUrl && supabaseServiceKey && 
+  !supabaseUrl.includes('placeholder') && !supabaseServiceKey.includes('placeholder')
+  ? createClient(supabaseUrl, supabaseServiceKey)
+  : null;
 
 // Webhook event types
 interface WebhookEvent {
@@ -283,6 +286,12 @@ async function handleOrganizationMembershipEvent(type: string, data: Organizatio
 // Main webhook handler
 export async function POST(request: NextRequest) {
   try {
+    // Check if Supabase is configured
+    if (!supabase) {
+      console.log('Supabase not configured, skipping webhook processing');
+      return NextResponse.json({ success: true, message: 'Supabase not configured' });
+    }
+
     // Get headers
     const headerPayload = headers();
     const svix_id = headerPayload.get('svix-id');
