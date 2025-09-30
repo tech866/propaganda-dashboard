@@ -5,6 +5,7 @@ import { ClerkProviderWrapper } from "@/components/providers/ClerkProvider";
 import { RoleProvider } from "@/contexts/RoleContext";
 import { AgencyProvider } from "@/contexts/AgencyContext";
 import { ThemeProvider } from "@/components/theme-provider";
+import { TailusProvider } from "@/components/providers/TailusProvider";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -31,11 +32,13 @@ export default function RootLayout({
             enableSystem
             disableTransitionOnChange
           >
-            <RoleProvider>
-              <AgencyProvider>
-                {children}
-              </AgencyProvider>
-            </RoleProvider>
+            <TailusProvider>
+              <RoleProvider>
+                <AgencyProvider>
+                  {children}
+                </AgencyProvider>
+              </RoleProvider>
+            </TailusProvider>
           </ThemeProvider>
         </ClerkProviderWrapper>
       </body>

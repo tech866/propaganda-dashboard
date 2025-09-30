@@ -1,11 +1,10 @@
 'use client';
 
-import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useRole } from '@/contexts/RoleContext';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { avatar, fallback } from '@tailus/themer';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -24,21 +23,7 @@ interface ModernHeaderProps {
 
 export default function ModernHeader({ className = '' }: ModernHeaderProps) {
   const router = useRouter();
-  const { user: roleUser } = useRole();
-  const [user, setUser] = useState<any>(null);
-
-  useEffect(() => {
-    // Development mode - mock user
-    if (process.env.NODE_ENV === 'development' && process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY?.includes('placeholder')) {
-      setUser({
-        id: 'dev-user-1',
-        fullName: 'Development User',
-        imageUrl: null,
-        primaryEmailAddress: { emailAddress: 'dev@example.com' }
-      });
-      return;
-    }
-  }, []);
+  const { user } = useRole();
 
   const handleSignOut = () => {
     // Development mode - redirect to home
@@ -107,26 +92,25 @@ export default function ModernHeader({ className = '' }: ModernHeaderProps) {
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" className="relative h-9 w-9 rounded-full hover-modern-subtle">
-                  <Avatar className="h-8 w-8">
-                    <AvatarImage src={user.imageUrl || ''} alt={user.fullName || ''} />
-                    <AvatarFallback className="bg-gradient-to-br from-primary to-primary/80 text-primary-foreground text-sm font-semibold">
-                      {getInitials(user.fullName || '')}
-                    </AvatarFallback>
-                  </Avatar>
+                  <div className={avatar()}>
+                    <div className={fallback()}>
+                      {user?.name?.split(' ').map(n => n[0]).join('').toUpperCase() || 'U'}
+                    </div>
+                  </div>
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent className="w-64 glass-premium" align="end" forceMount>
                 <DropdownMenuLabel className="font-normal">
                   <div className="flex flex-col space-y-2">
-                    <p className="text-sm font-medium leading-none">{user.fullName}</p>
+                    <p className="text-sm font-medium leading-none">{user?.name}</p>
                     <p className="text-xs leading-none text-muted-foreground">
-                      {user.primaryEmailAddress?.emailAddress}
+                      {user?.email}
                     </p>
                     <Badge 
-                      variant={getRoleVariant(roleUser?.role) as any}
+                      variant={getRoleVariant(user?.role) as any}
                       className="w-fit text-xs"
                     >
-                      {roleUser?.role?.toUpperCase()}
+                      {user?.role?.toUpperCase()}
                     </Badge>
                   </div>
                 </DropdownMenuLabel>

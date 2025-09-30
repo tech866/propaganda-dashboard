@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useRole } from '@/contexts/RoleContext';
 import { cn } from '@/lib/utils';
-import { Navigation, NavigationGroup, NavigationItem } from '@/components/ui/navigation';
+import { menu, separator as menuSeparator } from '@tailus/themer';
 import { Badge } from '@/components/ui/badge';
 import { 
   LayoutDashboard, 
@@ -194,62 +194,104 @@ export default function ModernSidebar({ className = '' }: ModernSidebarProps) {
           </div>
         </div>
 
-        {/* Navigation with Better Spacing */}
-        <div className="flex-1 p-6 space-y-8">
-          <Navigation>
-            <NavigationGroup>
-              {mainItems.map((item) => {
-                const Icon = item.icon;
-                return (
-                  <NavigationItem
-                    key={item.name}
-                    icon={<Icon className="h-5 w-5" />}
-                    label={item.name}
-                    isActive={isActive(item.href)}
-                    href={item.href}
-                    badge={item.badge}
-                  />
-                );
-              })}
-            </NavigationGroup>
+            {/* Navigation with Tailus Menu */}
+            <div className="flex-1 p-6 space-y-8">
+              <nav className={menu()}>
+                <div className="space-y-2">
+                  {mainItems.map((item) => {
+                    const Icon = item.icon;
+                    return (
+                      <Link
+                        key={item.name}
+                        href={item.href}
+                        className={cn(
+                          "flex items-center space-x-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors",
+                          isActive(item.href)
+                            ? "bg-primary text-primary-foreground"
+                            : "text-muted-foreground hover:text-foreground hover:bg-muted"
+                        )}
+                      >
+                        <Icon className="h-5 w-5" />
+                        <span>{item.name}</span>
+                        {item.badge && (
+                          <Badge variant="secondary" className="ml-auto">
+                            {item.badge}
+                          </Badge>
+                        )}
+                      </Link>
+                    );
+                  })}
+                </div>
 
-            {adminItems.length > 0 && (
-              <NavigationGroup title="Administration">
-                {adminItems.map((item) => {
-                  const Icon = item.icon;
-                  return (
-                    <NavigationItem
-                      key={item.name}
-                      icon={<Icon className="h-5 w-5" />}
-                      label={item.name}
-                      isActive={isActive(item.href)}
-                      href={item.href}
-                      badge={item.badge}
-                    />
-                  );
-                })}
-              </NavigationGroup>
-            )}
+                {adminItems.length > 0 && (
+                  <>
+                    <div className={menuSeparator()} />
+                    <div className="space-y-1">
+                      <h3 className="px-3 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                        Administration
+                      </h3>
+                      {adminItems.map((item) => {
+                        const Icon = item.icon;
+                        return (
+                          <Link
+                            key={item.name}
+                            href={item.href}
+                            className={cn(
+                              "flex items-center space-x-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors",
+                              isActive(item.href)
+                                ? "bg-primary text-primary-foreground"
+                                : "text-muted-foreground hover:text-foreground hover:bg-muted"
+                            )}
+                          >
+                            <Icon className="h-5 w-5" />
+                            <span>{item.name}</span>
+                            {item.badge && (
+                              <Badge variant="secondary" className="ml-auto">
+                                {item.badge}
+                              </Badge>
+                            )}
+                          </Link>
+                        );
+                      })}
+                    </div>
+                  </>
+                )}
 
-            {settingsItems.length > 0 && (
-              <NavigationGroup title="Settings">
-                {settingsItems.map((item) => {
-                  const Icon = item.icon;
-                  return (
-                    <NavigationItem
-                      key={item.name}
-                      icon={<Icon className="h-5 w-5" />}
-                      label={item.name}
-                      isActive={isActive(item.href)}
-                      href={item.href}
-                      badge={item.badge}
-                    />
-                  );
-                })}
-              </NavigationGroup>
-            )}
-          </Navigation>
-        </div>
+                {settingsItems.length > 0 && (
+                  <>
+                    <div className={menuSeparator()} />
+                    <div className="space-y-1">
+                      <h3 className="px-3 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                        Settings
+                      </h3>
+                      {settingsItems.map((item) => {
+                        const Icon = item.icon;
+                        return (
+                          <Link
+                            key={item.name}
+                            href={item.href}
+                            className={cn(
+                              "flex items-center space-x-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors",
+                              isActive(item.href)
+                                ? "bg-primary text-primary-foreground"
+                                : "text-muted-foreground hover:text-foreground hover:bg-muted"
+                            )}
+                          >
+                            <Icon className="h-5 w-5" />
+                            <span>{item.name}</span>
+                            {item.badge && (
+                              <Badge variant="secondary" className="ml-auto">
+                                {item.badge}
+                              </Badge>
+                            )}
+                          </Link>
+                        );
+                      })}
+                    </div>
+                  </>
+                )}
+              </nav>
+            </div>
 
         {/* Premium User Info Footer */}
         <div className="p-6 border-t border-sidebar-border">

@@ -1,6 +1,6 @@
 import { Metadata } from 'next';
 import { PerformancePage } from '@/components/performance/PerformancePage';
-import { RoleBasedAccess } from '@/components/auth/RoleBasedAccess';
+import RoleBasedAccess from '@/components/auth/RoleBasedAccess';
 
 export const metadata: Metadata = {
   title: 'Performance Analytics | Propaganda Dashboard',

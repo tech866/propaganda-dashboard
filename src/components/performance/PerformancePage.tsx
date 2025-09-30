@@ -15,7 +15,7 @@ import { ConversionFunnelChart } from './ConversionFunnelChart';
 import { PerformanceBreakdownTable } from './PerformanceBreakdownTable';
 
 export function PerformancePage() {
-  const { userRole } = useRole();
+  const { user } = useRole();
   const { agency } = useAgency();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);

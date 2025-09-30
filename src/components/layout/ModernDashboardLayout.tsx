@@ -1,10 +1,10 @@
 'use client';
 
-import { ReactNode, useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { ReactNode } from 'react';
 import ModernHeader from './ModernHeader';
 import ModernSidebar from './ModernSidebar';
 import { cn } from '@/lib/utils';
+import { useRole } from '@/contexts/RoleContext';
 
 interface ModernDashboardLayoutProps {
   children: ReactNode;
@@ -15,28 +15,7 @@ export default function ModernDashboardLayout({
   children, 
   className = '' 
 }: ModernDashboardLayoutProps) {
-  const router = useRouter();
-  const [isLoading, setIsLoading] = useState(true);
-  const [user, setUser] = useState<any>(null);
-
-  useEffect(() => {
-    // Development mode - bypass authentication
-    if (process.env.NODE_ENV === 'development' && process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY?.includes('placeholder')) {
-      // Mock user for development
-      setUser({
-        id: 'dev-user-1',
-        email: 'dev@example.com',
-        name: 'Development User',
-        role: 'admin'
-      });
-      setIsLoading(false);
-      return;
-    }
-
-    // Production mode - would use Clerk authentication
-    // For now, just set loading to false
-    setIsLoading(false);
-  }, []);
+  const { user, isLoading } = useRole();
 
   if (isLoading) {
     return (
@@ -50,7 +29,14 @@ export default function ModernDashboardLayout({
   }
 
   if (!user) {
-    return null;
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-center">
+          <h2 className="text-2xl font-semibold mb-2">Authentication Required</h2>
+          <p className="text-muted-foreground">Please sign in to access the dashboard.</p>
+        </div>
+      </div>
+    );
   }
 
   return (

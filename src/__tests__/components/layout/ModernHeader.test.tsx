@@ -1,16 +1,17 @@
 import React from 'react';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import { useRouter } from 'next/navigation';
 import ModernHeader from '@/components/layout/ModernHeader';
+import { useRole } from '@/contexts/RoleContext';
 
-// Mock next/navigation
+// Mock Next.js router
 jest.mock('next/navigation', () => ({
-  useRouter: jest.fn(),
+  useRouter: jest.fn()
 }));
 
-// Mock the RoleContext
+// Mock the role context
 jest.mock('@/contexts/RoleContext', () => ({
-  useRole: jest.fn(),
+  useRole: jest.fn()
 }));
 
 // Mock child components
@@ -20,142 +21,209 @@ jest.mock('@/components/layout/MobileNavigation', () => {
   };
 });
 
-// Mock environment variables
-const originalEnv = process.env;
+const mockUseRouter = useRouter as jest.MockedFunction<typeof useRouter>;
+const mockUseRole = useRole as jest.MockedFunction<typeof useRole>;
 
 describe('ModernHeader', () => {
   const mockPush = jest.fn();
-  const mockUseRole = require('@/contexts/RoleContext').useRole;
-  
+  const mockHasAnyRole = jest.fn();
+
   beforeEach(() => {
-    jest.clearAllMocks();
-    (useRouter as jest.Mock).mockReturnValue({
+    mockUseRouter.mockReturnValue({
       push: mockPush,
-    });
-    
-    // Mock role context
+      replace: jest.fn(),
+      prefetch: jest.fn(),
+      back: jest.fn(),
+      forward: jest.fn(),
+      refresh: jest.fn(),
+    } as any);
+
+    mockHasAnyRole.mockReturnValue(true);
+  });
+
+  afterEach(() => {
+    jest.clearAllMocks();
+  });
+
+  it('renders header with user information', () => {
+    const mockUser = {
+      id: 'user-1',
+      name: 'John Doe',
+      email: 'john@example.com',
+      role: 'admin'
+    };
+
     mockUseRole.mockReturnValue({
-      user: {
-        role: 'admin'
-      }
+      user: mockUser,
+      isLoading: false,
+      hasAnyRole: mockHasAnyRole,
+      hasPermission: jest.fn(),
     });
-    
-    // Reset environment variables
-    process.env = { ...originalEnv };
-  });
-
-  afterAll(() => {
-    process.env = originalEnv;
-  });
-
-  it('renders nothing when no user in production mode', () => {
-    process.env.NODE_ENV = 'production';
-    process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY = 'pk_live_real_key';
-
-    const { container } = render(<ModernHeader />);
-    expect(container.firstChild).toBeNull();
-  });
-
-  it('renders header with mock user in development mode', async () => {
-    process.env.NODE_ENV = 'development';
-    process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY = 'pk_test_placeholder_key';
 
     render(<ModernHeader />);
 
-    await waitFor(() => {
-      expect(screen.getByText('Propaganda')).toBeInTheDocument();
+    expect(screen.getByText('John Doe')).toBeInTheDocument();
+    expect(screen.getByText('john@example.com')).toBeInTheDocument();
+    expect(screen.getByText('ADMIN')).toBeInTheDocument();
+  });
+
+  it('renders mobile navigation', () => {
+    const mockUser = {
+      id: 'user-1',
+      name: 'John Doe',
+      email: 'john@example.com',
+      role: 'admin'
+    };
+
+    mockUseRole.mockReturnValue({
+      user: mockUser,
+      isLoading: false,
+      hasAnyRole: mockHasAnyRole,
+      hasPermission: jest.fn(),
     });
 
-    expect(screen.getByText('Dashboard')).toBeInTheDocument();
-    expect(screen.getByText('ADMIN')).toBeInTheDocument();
+    render(<ModernHeader />);
+
     expect(screen.getByTestId('mobile-navigation')).toBeInTheDocument();
   });
 
-  it('displays user information correctly', async () => {
-    process.env.NODE_ENV = 'development';
-    process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY = 'pk_test_placeholder_key';
+  it('displays user avatar with initials', () => {
+    const mockUser = {
+      id: 'user-1',
+      name: 'John Doe',
+      email: 'john@example.com',
+      role: 'admin'
+    };
+
+    mockUseRole.mockReturnValue({
+      user: mockUser,
+      isLoading: false,
+      hasAnyRole: mockHasAnyRole,
+      hasPermission: jest.fn(),
+    });
 
     render(<ModernHeader />);
 
-    await waitFor(() => {
-      expect(screen.getByText('DU')).toBeInTheDocument(); // Avatar initials
-    });
-
-    // Check that the user avatar button exists
-    const userButton = screen.getByRole('button', { name: 'DU' });
-    expect(userButton).toBeInTheDocument();
-    expect(userButton).toHaveAttribute('aria-haspopup', 'menu');
+    // Check that avatar displays initials
+    expect(screen.getByText('JD')).toBeInTheDocument();
   });
 
-  it('handles sign out in development mode', async () => {
-    process.env.NODE_ENV = 'development';
-    process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY = 'pk_test_placeholder_key';
+  it('handles sign out action', () => {
+    const mockUser = {
+      id: 'user-1',
+      name: 'John Doe',
+      email: 'john@example.com',
+      role: 'admin'
+    };
+
+    mockUseRole.mockReturnValue({
+      user: mockUser,
+      isLoading: false,
+      hasAnyRole: mockHasAnyRole,
+      hasPermission: jest.fn(),
+    });
 
     render(<ModernHeader />);
 
-    await waitFor(() => {
-      expect(screen.getByText('DU')).toBeInTheDocument(); // Avatar initials
+    // Click on user menu trigger
+    const userButton = screen.getByRole('button');
+    fireEvent.click(userButton);
+
+    // Click on sign out
+    const signOutButton = screen.getByText('Sign out');
+    fireEvent.click(signOutButton);
+
+    // In development mode, should redirect to home
+    expect(mockPush).toHaveBeenCalledWith('/');
+  });
+
+  it('shows correct role badge variant', () => {
+    const mockUser = {
+      id: 'user-1',
+      name: 'John Doe',
+      email: 'john@example.com',
+      role: 'ceo'
+    };
+
+    mockUseRole.mockReturnValue({
+      user: mockUser,
+      isLoading: false,
+      hasAnyRole: mockHasAnyRole,
+      hasPermission: jest.fn(),
     });
-
-    // Check that the user avatar button exists and can be clicked
-    const userButton = screen.getByRole('button', { name: 'DU' });
-    expect(userButton).toBeInTheDocument();
-    
-    // Test that clicking the button doesn't throw an error
-    expect(() => fireEvent.click(userButton)).not.toThrow();
-  });
-
-  it('displays correct role badge', async () => {
-    process.env.NODE_ENV = 'development';
-    process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY = 'pk_test_placeholder_key';
-
-    // Test different roles
-    const roles = ['admin', 'ceo', 'sales', 'agency_user', 'client_user'];
-    
-    for (const role of roles) {
-      mockUseRole.mockReturnValue({
-        user: { role }
-      });
-
-      const { unmount } = render(<ModernHeader />);
-
-      await waitFor(() => {
-        expect(screen.getByText(role.toUpperCase())).toBeInTheDocument();
-      });
-
-      unmount();
-    }
-  });
-
-  it('renders notification bell with indicator', async () => {
-    process.env.NODE_ENV = 'development';
-    process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY = 'pk_test_placeholder_key';
 
     render(<ModernHeader />);
 
-    await waitFor(() => {
-      expect(screen.getByText('DU')).toBeInTheDocument(); // Avatar initials
+    expect(screen.getByText('CEO')).toBeInTheDocument();
+  });
+
+  it('renders notification and settings buttons', () => {
+    const mockUser = {
+      id: 'user-1',
+      name: 'John Doe',
+      email: 'john@example.com',
+      role: 'admin'
+    };
+
+    mockUseRole.mockReturnValue({
+      user: mockUser,
+      isLoading: false,
+      hasAnyRole: mockHasAnyRole,
+      hasPermission: jest.fn(),
     });
 
-    const notificationButton = screen.getAllByRole('button')[0]; // First button is the notification bell
+    render(<ModernHeader />);
+
+    // Check for notification button
+    const notificationButton = screen.getByRole('button', { name: /notifications/i });
     expect(notificationButton).toBeInTheDocument();
+
+    // Check for settings button in dropdown
+    const userButton = screen.getByRole('button');
+    fireEvent.click(userButton);
     
-    // Check for notification indicator
-    const indicator = notificationButton.querySelector('.bg-destructive');
-    expect(indicator).toBeInTheDocument();
+    expect(screen.getByText('Settings')).toBeInTheDocument();
   });
 
-  it('applies custom className', async () => {
-    process.env.NODE_ENV = 'development';
-    process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY = 'pk_test_placeholder_key';
+  it('handles user with no name gracefully', () => {
+    const mockUser = {
+      id: 'user-1',
+      name: null,
+      email: 'john@example.com',
+      role: 'admin'
+    };
 
-    render(<ModernHeader className="custom-header-class" />);
-
-    await waitFor(() => {
-      expect(screen.getByText('DU')).toBeInTheDocument(); // Avatar initials
+    mockUseRole.mockReturnValue({
+      user: mockUser,
+      isLoading: false,
+      hasAnyRole: mockHasAnyRole,
+      hasPermission: jest.fn(),
     });
 
-    const header = screen.getByRole('banner');
-    expect(header).toHaveClass('custom-header-class');
+    render(<ModernHeader />);
+
+    // Should show 'U' as fallback
+    expect(screen.getByText('U')).toBeInTheDocument();
+  });
+
+  it('applies custom className', () => {
+    const mockUser = {
+      id: 'user-1',
+      name: 'John Doe',
+      email: 'john@example.com',
+      role: 'admin'
+    };
+
+    mockUseRole.mockReturnValue({
+      user: mockUser,
+      isLoading: false,
+      hasAnyRole: mockHasAnyRole,
+      hasPermission: jest.fn(),
+    });
+
+    render(<ModernHeader className="custom-header" />);
+
+    const header = screen.getByTestId('mobile-navigation').parentElement;
+    expect(header).toHaveClass('custom-header');
   });
 });
