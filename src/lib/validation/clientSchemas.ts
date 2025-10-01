@@ -31,6 +31,21 @@ export const createCallSchema = yup.object().shape({
   call_duration: yup.number().integer('Call duration must be an integer').min(0, 'Call duration cannot be negative').optional().nullable(),
   scheduled_at: yup.date().optional().nullable(),
   completed_at: yup.date().optional().nullable(),
+  // Enhanced call logging form fields
+  closer_first_name: yup.string().optional().nullable(),
+  closer_last_name: yup.string().optional().nullable(),
+  source_of_set_appointment: yup.string().oneOf(['sdr_booked_call', 'non_sdr_booked_call', 'email', 'vsl', 'self_booking'], 'Invalid source of set appointment').optional().nullable(),
+  enhanced_call_outcome: yup.string().oneOf(['no_show', 'no_close', 'cancelled', 'disqualified', 'rescheduled', 'payment_plan', 'deposit', 'closed_paid_in_full', 'follow_up_call_scheduled'], 'Invalid enhanced call outcome').optional().nullable(),
+  initial_payment_collected_on: yup.date().optional().nullable(),
+  customer_full_name: yup.string().optional().nullable(),
+  customer_email: yup.string().email('Invalid customer email format').optional().nullable(),
+  calls_taken: yup.number().integer('Calls taken must be an integer').min(1, 'Calls taken must be at least 1').optional().nullable(),
+  setter_first_name: yup.string().optional().nullable(),
+  setter_last_name: yup.string().optional().nullable(),
+  cash_collected_upfront: yup.number().min(0, 'Cash collected upfront cannot be negative').optional().nullable(),
+  total_amount_owed: yup.number().min(0, 'Total amount owed cannot be negative').optional().nullable(),
+  prospect_notes: yup.string().optional().nullable(),
+  lead_source: yup.string().oneOf(['organic', 'ads'], 'Lead source must be either organic or ads').optional().nullable(),
 });
 
 // Update Call Schema (all fields optional)
@@ -46,6 +61,21 @@ export const updateCallSchema = yup.object().shape({
   call_duration: yup.number().integer('Call duration must be an integer').min(0, 'Call duration cannot be negative').optional().nullable(),
   scheduled_at: yup.date().optional().nullable(),
   completed_at: yup.date().optional().nullable(),
+  // Enhanced call logging form fields
+  closer_first_name: yup.string().optional().nullable(),
+  closer_last_name: yup.string().optional().nullable(),
+  source_of_set_appointment: yup.string().oneOf(['sdr_booked_call', 'non_sdr_booked_call', 'email', 'vsl', 'self_booking'], 'Invalid source of set appointment').optional().nullable(),
+  enhanced_call_outcome: yup.string().oneOf(['no_show', 'no_close', 'cancelled', 'disqualified', 'rescheduled', 'payment_plan', 'deposit', 'closed_paid_in_full', 'follow_up_call_scheduled'], 'Invalid enhanced call outcome').optional().nullable(),
+  initial_payment_collected_on: yup.date().optional().nullable(),
+  customer_full_name: yup.string().optional().nullable(),
+  customer_email: yup.string().email('Invalid customer email format').optional().nullable(),
+  calls_taken: yup.number().integer('Calls taken must be an integer').min(1, 'Calls taken must be at least 1').optional().nullable(),
+  setter_first_name: yup.string().optional().nullable(),
+  setter_last_name: yup.string().optional().nullable(),
+  cash_collected_upfront: yup.number().min(0, 'Cash collected upfront cannot be negative').optional().nullable(),
+  total_amount_owed: yup.number().min(0, 'Total amount owed cannot be negative').optional().nullable(),
+  prospect_notes: yup.string().optional().nullable(),
+  lead_source: yup.string().oneOf(['organic', 'ads'], 'Lead source must be either organic or ads').optional().nullable(),
 });
 
 // Create User Schema (for admin panel)

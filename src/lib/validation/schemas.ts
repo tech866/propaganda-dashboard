@@ -75,6 +75,94 @@ export const createCallSchema = yup.object({
     .optional()
     .min(new Date('1900-01-01'), 'Completed date cannot be before 1900')
     .max(new Date('2100-12-31'), 'Completed date cannot be after 2100'),
+  
+  // Enhanced call logging form fields
+  closer_first_name: yup
+    .string()
+    .optional()
+    .min(2, 'Closer first name must be at least 2 characters')
+    .max(100, 'Closer first name must be less than 100 characters')
+    .trim(),
+  
+  closer_last_name: yup
+    .string()
+    .optional()
+    .min(2, 'Closer last name must be at least 2 characters')
+    .max(100, 'Closer last name must be less than 100 characters')
+    .trim(),
+  
+  source_of_set_appointment: yup
+    .string()
+    .optional()
+    .oneOf(['sdr_booked_call', 'non_sdr_booked_call', 'email', 'vsl', 'self_booking'], 'Invalid source of set appointment'),
+  
+  enhanced_call_outcome: yup
+    .string()
+    .optional()
+    .oneOf(['no_show', 'no_close', 'cancelled', 'disqualified', 'rescheduled', 'payment_plan', 'deposit', 'closed_paid_in_full', 'follow_up_call_scheduled'], 'Invalid enhanced call outcome'),
+  
+  initial_payment_collected_on: yup
+    .date()
+    .optional()
+    .min(new Date('1900-01-01'), 'Payment date cannot be before 1900')
+    .max(new Date('2100-12-31'), 'Payment date cannot be after 2100'),
+  
+  customer_full_name: yup
+    .string()
+    .optional()
+    .min(2, 'Customer full name must be at least 2 characters')
+    .max(255, 'Customer full name must be less than 255 characters')
+    .trim(),
+  
+  customer_email: yup
+    .string()
+    .optional()
+    .email('Invalid customer email format')
+    .max(255, 'Customer email must be less than 255 characters'),
+  
+  calls_taken: yup
+    .number()
+    .optional()
+    .min(1, 'Calls taken must be at least 1')
+    .max(100, 'Calls taken must be less than 100')
+    .integer('Calls taken must be a whole number'),
+  
+  setter_first_name: yup
+    .string()
+    .optional()
+    .min(2, 'Setter first name must be at least 2 characters')
+    .max(100, 'Setter first name must be less than 100 characters')
+    .trim(),
+  
+  setter_last_name: yup
+    .string()
+    .optional()
+    .min(2, 'Setter last name must be at least 2 characters')
+    .max(100, 'Setter last name must be less than 100 characters')
+    .trim(),
+  
+  cash_collected_upfront: yup
+    .number()
+    .optional()
+    .min(0, 'Cash collected upfront cannot be negative')
+    .max(999999.99, 'Cash collected upfront must be less than $1,000,000'),
+  
+  total_amount_owed: yup
+    .number()
+    .optional()
+    .min(0, 'Total amount owed cannot be negative')
+    .max(999999.99, 'Total amount owed must be less than $1,000,000'),
+  
+  prospect_notes: yup
+    .string()
+    .optional()
+    .max(2000, 'Prospect notes must be less than 2000 characters')
+    .trim(),
+  
+  lead_source: yup
+    .string()
+    .optional()
+    .oneOf(['organic', 'ads'], 'Lead source must be either organic or ads'),
 });
 
 export const updateCallSchema = yup.object({
@@ -141,6 +229,94 @@ export const updateCallSchema = yup.object({
     .optional()
     .min(new Date('1900-01-01'), 'Completed date cannot be before 1900')
     .max(new Date('2100-12-31'), 'Completed date cannot be after 2100'),
+  
+  // Enhanced call logging form fields
+  closer_first_name: yup
+    .string()
+    .optional()
+    .min(2, 'Closer first name must be at least 2 characters')
+    .max(100, 'Closer first name must be less than 100 characters')
+    .trim(),
+  
+  closer_last_name: yup
+    .string()
+    .optional()
+    .min(2, 'Closer last name must be at least 2 characters')
+    .max(100, 'Closer last name must be less than 100 characters')
+    .trim(),
+  
+  source_of_set_appointment: yup
+    .string()
+    .optional()
+    .oneOf(['sdr_booked_call', 'non_sdr_booked_call', 'email', 'vsl', 'self_booking'], 'Invalid source of set appointment'),
+  
+  enhanced_call_outcome: yup
+    .string()
+    .optional()
+    .oneOf(['no_show', 'no_close', 'cancelled', 'disqualified', 'rescheduled', 'payment_plan', 'deposit', 'closed_paid_in_full', 'follow_up_call_scheduled'], 'Invalid enhanced call outcome'),
+  
+  initial_payment_collected_on: yup
+    .date()
+    .optional()
+    .min(new Date('1900-01-01'), 'Payment date cannot be before 1900')
+    .max(new Date('2100-12-31'), 'Payment date cannot be after 2100'),
+  
+  customer_full_name: yup
+    .string()
+    .optional()
+    .min(2, 'Customer full name must be at least 2 characters')
+    .max(255, 'Customer full name must be less than 255 characters')
+    .trim(),
+  
+  customer_email: yup
+    .string()
+    .optional()
+    .email('Invalid customer email format')
+    .max(255, 'Customer email must be less than 255 characters'),
+  
+  calls_taken: yup
+    .number()
+    .optional()
+    .min(1, 'Calls taken must be at least 1')
+    .max(100, 'Calls taken must be less than 100')
+    .integer('Calls taken must be a whole number'),
+  
+  setter_first_name: yup
+    .string()
+    .optional()
+    .min(2, 'Setter first name must be at least 2 characters')
+    .max(100, 'Setter first name must be less than 100 characters')
+    .trim(),
+  
+  setter_last_name: yup
+    .string()
+    .optional()
+    .min(2, 'Setter last name must be at least 2 characters')
+    .max(100, 'Setter last name must be less than 100 characters')
+    .trim(),
+  
+  cash_collected_upfront: yup
+    .number()
+    .optional()
+    .min(0, 'Cash collected upfront cannot be negative')
+    .max(999999.99, 'Cash collected upfront must be less than $1,000,000'),
+  
+  total_amount_owed: yup
+    .number()
+    .optional()
+    .min(0, 'Total amount owed cannot be negative')
+    .max(999999.99, 'Total amount owed must be less than $1,000,000'),
+  
+  prospect_notes: yup
+    .string()
+    .optional()
+    .max(2000, 'Prospect notes must be less than 2000 characters')
+    .trim(),
+  
+  lead_source: yup
+    .string()
+    .optional()
+    .oneOf(['organic', 'ads'], 'Lead source must be either organic or ads'),
 });
 
 // User validation schemas

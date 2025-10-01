@@ -1,167 +1,217 @@
 import * as yup from 'yup';
 
-// Enhanced call validation schema
-export const createEnhancedCallSchema = yup.object().shape({
-  client_id: yup.string().uuid().required('Client ID is required'),
-  prospect_name: yup.string().required('Prospect name is required').min(1, 'Prospect name cannot be empty'),
-  prospect_email: yup.string().email('Invalid email format').nullable(),
-  prospect_phone: yup.string().nullable(),
-  company_name: yup.string().nullable(),
-  closer_first_name: yup.string().nullable(),
-  closer_last_name: yup.string().nullable(),
-  source: yup.string().oneOf(['sdr_call', 'non_sdr_booked'], 'Invalid source').nullable(),
-  traffic_source: yup.string().oneOf(['organic', 'paid_ads'], 'Invalid traffic source').nullable(),
-  call_type: yup.string().oneOf(['inbound', 'outbound'], 'Invalid call type').required('Call type is required'),
-  status: yup.string().oneOf(['completed', 'no-show', 'rescheduled'], 'Invalid status').required('Status is required'),
-  outcome: yup.string().oneOf(['won', 'lost', 'tbd'], 'Invalid outcome').required('Outcome is required'),
-  enhanced_outcome: yup.string().oneOf([
-    'no_show', 'no_close', 'canceled', 'disqualified', 'rescheduled', 
-    'payment_plan_deposit', 'close_paid_in_full', 'follow_call_scheduled'
-  ], 'Invalid enhanced outcome').nullable(),
-  loss_reason_id: yup.string().uuid().nullable(),
-  offer_pitched: yup.string().nullable(),
-  setter_first_name: yup.string().nullable(),
-  setter_last_name: yup.string().nullable(),
-  cash_collected_upfront: yup.number().min(0, 'Cash collected cannot be negative').nullable(),
-  total_amount_owed: yup.number().min(0, 'Total amount owed cannot be negative').nullable(),
-  payment_installments: yup.number().integer().min(1, 'Payment installments must be at least 1').nullable(),
-  payment_completion_status: yup.string().oneOf(['pending', 'in_progress', 'completed'], 'Invalid payment status').nullable(),
-  crm_updated: yup.boolean().nullable(),
-  prospect_notes: yup.string().nullable(),
-  notes: yup.string().nullable(),
-  call_duration: yup.number().integer().min(0, 'Call duration cannot be negative').nullable(),
-  scheduled_at: yup.date().nullable(),
-  completed_at: yup.date().nullable(),
-  payment_schedule: yup.array().of(
-    yup.object().shape({
-      installment_number: yup.number().integer().min(1, 'Installment number must be at least 1').required(),
-      amount_due: yup.number().min(0, 'Amount due cannot be negative').required(),
-      due_date: yup.date().required('Due date is required'),
+// UUID regex for validation
+const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+
+// Enhanced Call Logging Form Schema
+export const enhancedCallLoggingSchema = yup.object().shape({
+  // Basic call information
+  client_id: yup.string().matches(uuidRegex, 'Client ID must be a valid UUID').required('Client ID is required'),
+  prospect_name: yup.string().min(2, 'Prospect name must be at least 2 characters').required('Prospect name is required'),
+  prospect_email: yup.string().email('Invalid email format').optional().nullable(),
+  prospect_phone: yup.string().optional().nullable(),
+  call_type: yup.string().oneOf(['inbound', 'outbound'], 'Call type must be either inbound or outbound').required('Call type is required'),
+  status: yup.string().oneOf(['completed', 'no-show', 'rescheduled'], 'Status must be completed, no-show, or rescheduled').required('Status is required'),
+  outcome: yup.string().oneOf(['won', 'lost', 'tbd'], 'Outcome must be won, lost, or tbd').default('tbd'),
+  loss_reason_id: yup.string().matches(uuidRegex, 'Loss Reason ID must be a valid UUID').optional().nullable(),
+  notes: yup.string().optional().nullable(),
+  call_duration: yup.number().integer('Call duration must be an integer').min(0, 'Call duration cannot be negative').optional().nullable(),
+  scheduled_at: yup.date().optional().nullable(),
+  completed_at: yup.date().optional().nullable(),
+  
+  // Enhanced fields with specific validation rules
+  closer_first_name: yup.string().min(1, 'Closer first name is required').required('Closer first name is required'),
+  closer_last_name: yup.string().min(1, 'Closer last name is required').required('Closer last name is required'),
+  
+  source_of_set_appointment: yup.string()
+    .oneOf(['sdr_booked_call', 'non_sdr_booked_call', 'email', 'vsl', 'self_booking'], 'Invalid source of set appointment')
+    .required('Source of set appointment is required'),
+  
+  enhanced_call_outcome: yup.string()
+    .oneOf(['no_show', 'no_close', 'cancelled', 'disqualified', 'rescheduled', 'payment_plan', 'deposit', 'closed_paid_in_full', 'follow_up_call_scheduled'], 'Invalid enhanced call outcome')
+    .required('Call outcome is required'),
+  
+  initial_payment_collected_on: yup.date()
+    .max(new Date(), 'Payment date cannot be in the future')
+    .optional()
+    .nullable()
+    .test('payment-date-logic', 'Payment date is required when outcome is deposit or closed_paid_in_full', function(value) {
+      const outcome = this.parent.enhanced_call_outcome;
+      if ((outcome === 'deposit' || outcome === 'closed_paid_in_full') && !value) {
+        return this.createError({ message: 'Payment date is required for deposit or closed deals' });
+      }
+      return true;
+    }),
+  
+  customer_full_name: yup.string()
+    .min(2, 'Customer full name must be at least 2 characters')
+    .optional()
+    .nullable()
+    .test('customer-name-logic', 'Customer name is required when outcome is deposit or closed_paid_in_full', function(value) {
+      const outcome = this.parent.enhanced_call_outcome;
+      if ((outcome === 'deposit' || outcome === 'closed_paid_in_full') && !value) {
+        return this.createError({ message: 'Customer name is required for deposit or closed deals' });
+      }
+      return true;
+    }),
+  
+  customer_email: yup.string()
+    .email('Invalid customer email format')
+    .optional()
+    .nullable()
+    .test('customer-email-logic', 'Customer email is required when outcome is deposit or closed_paid_in_full', function(value) {
+      const outcome = this.parent.enhanced_call_outcome;
+      if ((outcome === 'deposit' || outcome === 'closed_paid_in_full') && !value) {
+        return this.createError({ message: 'Customer email is required for deposit or closed deals' });
+      }
+      return true;
+    }),
+  
+  calls_taken: yup.number()
+    .integer('Calls taken must be an integer')
+    .min(1, 'Calls taken must be at least 1')
+    .max(100, 'Calls taken cannot exceed 100')
+    .default(1),
+  
+  setter_first_name: yup.string()
+    .min(1, 'Setter first name is required')
+    .required('Setter first name is required'),
+  
+  setter_last_name: yup.string()
+    .min(1, 'Setter last name is required')
+    .required('Setter last name is required'),
+  
+  cash_collected_upfront: yup.number()
+    .min(0, 'Cash collected upfront cannot be negative')
+    .max(1000000, 'Cash collected upfront cannot exceed $1,000,000')
+    .optional()
+    .nullable()
+    .test('cash-logic', 'Cash collected is required when outcome is deposit or closed_paid_in_full', function(value) {
+      const outcome = this.parent.enhanced_call_outcome;
+      if ((outcome === 'deposit' || outcome === 'closed_paid_in_full') && (!value || value === 0)) {
+        return this.createError({ message: 'Cash collected is required for deposit or closed deals' });
+      }
+      return true;
+    }),
+  
+  total_amount_owed: yup.number()
+    .min(0, 'Total amount owed cannot be negative')
+    .max(1000000, 'Total amount owed cannot exceed $1,000,000')
+    .optional()
+    .nullable()
+    .test('total-amount-logic', 'Total amount is required when outcome is deposit or closed_paid_in_full', function(value) {
+      const outcome = this.parent.enhanced_call_outcome;
+      if ((outcome === 'deposit' || outcome === 'closed_paid_in_full') && (!value || value === 0)) {
+        return this.createError({ message: 'Total amount is required for deposit or closed deals' });
+      }
+      return true;
     })
-  ).nullable(),
+    .test('amount-consistency', 'Total amount must be greater than or equal to cash collected upfront', function(value) {
+      const cashCollected = this.parent.cash_collected_upfront;
+      if (value && cashCollected && value < cashCollected) {
+        return this.createError({ message: 'Total amount cannot be less than cash collected upfront' });
+      }
+      return true;
+    }),
+  
+  prospect_notes: yup.string()
+    .max(2000, 'Prospect notes cannot exceed 2000 characters')
+    .optional()
+    .nullable(),
+  
+  lead_source: yup.string()
+    .oneOf(['organic', 'ads'], 'Lead source must be either organic or ads')
+    .required('Lead source is required'),
 });
 
-// Ad spend validation schema
-export const createAdSpendSchema = yup.object().shape({
-  client_id: yup.string().uuid().required('Client ID is required'),
-  campaign_name: yup.string().nullable(),
-  platform: yup.string().oneOf(['meta', 'google', 'other'], 'Invalid platform').required('Platform is required'),
-  spend_amount: yup.number().min(0, 'Spend amount cannot be negative').required('Spend amount is required'),
-  date_from: yup.date().required('Start date is required'),
-  date_to: yup.date().required('End date is required').min(yup.ref('date_from'), 'End date must be after start date'),
-  clicks: yup.number().integer().min(0, 'Clicks cannot be negative').nullable(),
-  impressions: yup.number().integer().min(0, 'Impressions cannot be negative').nullable(),
-  source: yup.string().oneOf(['manual', 'api'], 'Invalid source').default('manual'),
-  meta_campaign_id: yup.string().nullable(),
-});
-
-// Payment schedule validation schema
-export const paymentScheduleSchema = yup.object().shape({
-  installment_number: yup.number().integer().min(1, 'Installment number must be at least 1').required(),
-  amount_due: yup.number().min(0, 'Amount due cannot be negative').required(),
-  due_date: yup.date().required('Due date is required'),
-});
-
-// Analytics filter validation schema
-export const analyticsFilterSchema = yup.object().shape({
-  clientId: yup.string().uuid().nullable(),
-  userId: yup.string().uuid().nullable(),
-  dateFrom: yup.date().nullable(),
-  dateTo: yup.date().nullable().min(yup.ref('dateFrom'), 'End date must be after start date'),
-  trafficSource: yup.string().oneOf(['organic', 'paid_ads'], 'Invalid traffic source').nullable(),
-  enhancedOutcome: yup.string().nullable(),
-});
-
-// Call filter validation schema
-export const enhancedCallFilterSchema = yup.object().shape({
-  clientId: yup.string().uuid().nullable(),
-  userId: yup.string().uuid().nullable(),
-  dateFrom: yup.date().nullable(),
-  dateTo: yup.date().nullable().min(yup.ref('dateFrom'), 'End date must be after start date'),
-  trafficSource: yup.string().oneOf(['organic', 'paid_ads'], 'Invalid traffic source').nullable(),
-  enhancedOutcome: yup.string().nullable(),
-  limit: yup.number().integer().min(1, 'Limit must be at least 1').max(1000, 'Limit cannot exceed 1000').default(100),
-  offset: yup.number().integer().min(0, 'Offset cannot be negative').default(0),
-});
+// Field-specific validation schemas for real-time validation
+export const fieldValidationSchemas = {
+  prospect_name: yup.string().min(2, 'Prospect name must be at least 2 characters').required('Prospect name is required'),
+  prospect_email: yup.string().email('Invalid email format').optional().nullable(),
+  prospect_phone: yup.string().optional().nullable(),
+  call_duration: yup.number().integer('Call duration must be an integer').min(0, 'Call duration cannot be negative').optional().nullable(),
+  closer_first_name: yup.string().min(1, 'Closer first name is required').required('Closer first name is required'),
+  closer_last_name: yup.string().min(1, 'Closer last name is required').required('Closer last name is required'),
+  customer_full_name: yup.string().min(2, 'Customer full name must be at least 2 characters').optional().nullable(),
+  customer_email: yup.string().email('Invalid customer email format').optional().nullable(),
+  calls_taken: yup.number().integer('Calls taken must be an integer').min(1, 'Calls taken must be at least 1').max(100, 'Calls taken cannot exceed 100'),
+  setter_first_name: yup.string().min(1, 'Setter first name is required').required('Setter first name is required'),
+  setter_last_name: yup.string().min(1, 'Setter last name is required').required('Setter last name is required'),
+  cash_collected_upfront: yup.number().min(0, 'Cash collected upfront cannot be negative').max(1000000, 'Cash collected upfront cannot exceed $1,000,000').optional().nullable(),
+  total_amount_owed: yup.number().min(0, 'Total amount owed cannot be negative').max(1000000, 'Total amount owed cannot exceed $1,000,000').optional().nullable(),
+  prospect_notes: yup.string().max(2000, 'Prospect notes cannot exceed 2000 characters').optional().nullable(),
+};
 
 // Validation helper functions
-export const validateCreateEnhancedCall = async (data: any) => {
+export const validateEnhancedCallField = async (fieldName: string, value: any, formData?: any): Promise<string | null> => {
   try {
-    const validatedData = await createEnhancedCallSchema.validate(data, { abortEarly: false });
-    return { isValid: true, data: validatedData, errors: [] };
-  } catch (error) {
-    if (error instanceof yup.ValidationError) {
-      const errors = error.inner.map(err => ({
-        field: err.path,
-        message: err.message,
-      }));
-      return { isValid: false, data: null, errors };
+    if (fieldValidationSchemas[fieldName as keyof typeof fieldValidationSchemas]) {
+      await fieldValidationSchemas[fieldName as keyof typeof fieldValidationSchemas].validate(value);
     }
-    return { isValid: false, data: null, errors: [{ field: 'general', message: 'Validation failed' }] };
+    
+    // Additional cross-field validation
+    if (fieldName === 'total_amount_owed' && formData?.cash_collected_upfront) {
+      if (value && formData.cash_collected_upfront && value < formData.cash_collected_upfront) {
+        return 'Total amount cannot be less than cash collected upfront';
+      }
+    }
+    
+    if (fieldName === 'cash_collected_upfront' && formData?.total_amount_owed) {
+      if (value && formData.total_amount_owed && value > formData.total_amount_owed) {
+        return 'Cash collected upfront cannot be greater than total amount owed';
+      }
+    }
+    
+    return null;
+  } catch (error: any) {
+    return error.message;
   }
 };
 
-export const validateCreateAdSpend = async (data: any) => {
-  try {
-    const validatedData = await createAdSpendSchema.validate(data, { abortEarly: false });
-    return { isValid: true, data: validatedData, errors: [] };
-  } catch (error) {
-    if (error instanceof yup.ValidationError) {
-      const errors = error.inner.map(err => ({
-        field: err.path,
-        message: err.message,
-      }));
-      return { isValid: false, data: null, errors };
+// Business logic validation
+export const validateBusinessLogic = (formData: any): string[] => {
+  const errors: string[] = [];
+  
+  // Payment logic validation
+  if (formData.enhanced_call_outcome === 'deposit' || formData.enhanced_call_outcome === 'closed_paid_in_full') {
+    if (!formData.initial_payment_collected_on) {
+      errors.push('Payment date is required for deposit or closed deals');
     }
-    return { isValid: false, data: null, errors: [{ field: 'general', message: 'Validation failed' }] };
+    if (!formData.customer_full_name) {
+      errors.push('Customer name is required for deposit or closed deals');
+    }
+    if (!formData.customer_email) {
+      errors.push('Customer email is required for deposit or closed deals');
+    }
+    if (!formData.cash_collected_upfront || formData.cash_collected_upfront === 0) {
+      errors.push('Cash collected is required for deposit or closed deals');
+    }
+    if (!formData.total_amount_owed || formData.total_amount_owed === 0) {
+      errors.push('Total amount is required for deposit or closed deals');
+    }
   }
+  
+  // Amount consistency validation
+  if (formData.cash_collected_upfront && formData.total_amount_owed) {
+    if (formData.cash_collected_upfront > formData.total_amount_owed) {
+      errors.push('Cash collected upfront cannot be greater than total amount owed');
+    }
+  }
+  
+  // Date validation
+  if (formData.initial_payment_collected_on && new Date(formData.initial_payment_collected_on) > new Date()) {
+    errors.push('Payment date cannot be in the future');
+  }
+  
+  if (formData.scheduled_at && formData.completed_at) {
+    if (new Date(formData.completed_at) < new Date(formData.scheduled_at)) {
+      errors.push('Completed date cannot be before scheduled date');
+    }
+  }
+  
+  return errors;
 };
 
-export const validateAnalyticsFilter = async (data: any) => {
-  try {
-    const validatedData = await analyticsFilterSchema.validate(data, { abortEarly: false });
-    return { isValid: true, data: validatedData, errors: [] };
-  } catch (error) {
-    if (error instanceof yup.ValidationError) {
-      const errors = error.inner.map(err => ({
-        field: err.path,
-        message: err.message,
-      }));
-      return { isValid: false, data: null, errors };
-    }
-    return { isValid: false, data: null, errors: [{ field: 'general', message: 'Validation failed' }] };
-  }
-};
-
-export const validateEnhancedCallFilter = async (data: any) => {
-  try {
-    const validatedData = await enhancedCallFilterSchema.validate(data, { abortEarly: false });
-    return { isValid: true, data: validatedData, errors: [] };
-  } catch (error) {
-    if (error instanceof yup.ValidationError) {
-      const errors = error.inner.map(err => ({
-        field: err.path,
-        message: err.message,
-      }));
-      return { isValid: false, data: null, errors };
-    }
-    return { isValid: false, data: null, errors: [{ field: 'general', message: 'Validation failed' }] };
-  }
-};
-
-// Helper function to validate payment schedule
-export const validatePaymentSchedule = async (data: any[]) => {
-  try {
-    const validatedData = await yup.array().of(paymentScheduleSchema).validate(data, { abortEarly: false });
-    return { isValid: true, data: validatedData, errors: [] };
-  } catch (error) {
-    if (error instanceof yup.ValidationError) {
-      const errors = error.inner.map(err => ({
-        field: err.path,
-        message: err.message,
-      }));
-      return { isValid: false, data: null, errors };
-    }
-    return { isValid: false, data: null, errors: [{ field: 'general', message: 'Validation failed' }] };
-  }
-};
+// Export validation functions
+export const validateEnhancedCallLogging = (data: any) => enhancedCallLoggingSchema.validate(data, { abortEarly: false });
+export const validateEnhancedCallLoggingSync = (data: any) => enhancedCallLoggingSchema.validateSync(data, { abortEarly: false });

@@ -1,3 +1,6 @@
+/* Import enhanced form styles */
+@import '../styles/enhanced-form.css';
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;

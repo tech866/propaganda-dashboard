@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { withAuth, User } from '@/middleware/auth';
 import { createNotFoundError, createValidationError, withErrorHandling } from '@/middleware/errors';
-import { CallService, UpdateCallData } from '@/lib/services/callService';
+import { SalesCallService, UpdateSalesCallData } from '@/lib/services/salesCallService';
 import { validateUpdateCall } from '@/lib/validation';
 
 // GET /api/calls/[id] - Get a specific call by ID
@@ -12,7 +12,7 @@ const getCallById = withErrorHandling(async (
 ) => {
   const { id } = await params;
 
-  const call = await CallService.getCallById(id, user);
+  const call = await SalesCallService.getSalesCallById(id, user);
 
   if (!call) {
     throw createNotFoundError(`Call with ID ${id}`);
@@ -45,9 +45,10 @@ const updateCall = withErrorHandling(async (
 
   const validatedData = validation.data!;
 
-  // Create update data object with validated data
-  const updateData: UpdateCallData = {};
+      // Create update data object with validated data
+      const updateData: UpdateSalesCallData = {};
   
+  // Basic fields
   if (validatedData.prospect_name !== undefined) updateData.prospect_name = validatedData.prospect_name;
   if (validatedData.prospect_email !== undefined) updateData.prospect_email = validatedData.prospect_email;
   if (validatedData.prospect_phone !== undefined) updateData.prospect_phone = validatedData.prospect_phone;
@@ -59,8 +60,24 @@ const updateCall = withErrorHandling(async (
   if (validatedData.call_duration !== undefined) updateData.call_duration = validatedData.call_duration;
   if (validatedData.scheduled_at !== undefined) updateData.scheduled_at = validatedData.scheduled_at;
   if (validatedData.completed_at !== undefined) updateData.completed_at = validatedData.completed_at;
+  
+  // Enhanced call logging form fields
+  if (validatedData.closer_first_name !== undefined) updateData.closer_first_name = validatedData.closer_first_name;
+  if (validatedData.closer_last_name !== undefined) updateData.closer_last_name = validatedData.closer_last_name;
+  if (validatedData.source_of_set_appointment !== undefined) updateData.source_of_set_appointment = validatedData.source_of_set_appointment;
+  if (validatedData.enhanced_call_outcome !== undefined) updateData.enhanced_call_outcome = validatedData.enhanced_call_outcome;
+  if (validatedData.initial_payment_collected_on !== undefined) updateData.initial_payment_collected_on = validatedData.initial_payment_collected_on;
+  if (validatedData.customer_full_name !== undefined) updateData.customer_full_name = validatedData.customer_full_name;
+  if (validatedData.customer_email !== undefined) updateData.customer_email = validatedData.customer_email;
+  if (validatedData.calls_taken !== undefined) updateData.calls_taken = validatedData.calls_taken;
+  if (validatedData.setter_first_name !== undefined) updateData.setter_first_name = validatedData.setter_first_name;
+  if (validatedData.setter_last_name !== undefined) updateData.setter_last_name = validatedData.setter_last_name;
+  if (validatedData.cash_collected_upfront !== undefined) updateData.cash_collected_upfront = validatedData.cash_collected_upfront;
+  if (validatedData.total_amount_owed !== undefined) updateData.total_amount_owed = validatedData.total_amount_owed;
+  if (validatedData.prospect_notes !== undefined) updateData.prospect_notes = validatedData.prospect_notes;
+  if (validatedData.lead_source !== undefined) updateData.lead_source = validatedData.lead_source;
 
-  const updatedCall = await CallService.updateCall(id, updateData, user);
+      const updatedCall = await SalesCallService.updateSalesCall(id, updateData, user);
 
   if (!updatedCall) {
     throw createNotFoundError(`Call with ID ${id}`);
@@ -84,7 +101,7 @@ const deleteCall = withErrorHandling(async (
 ) => {
   const { id } = await params;
 
-  const deleted = await CallService.deleteCall(id, user);
+  const deleted = await SalesCallService.deleteSalesCall(id, user);
 
   if (!deleted) {
     throw createNotFoundError(`Call with ID ${id}`);

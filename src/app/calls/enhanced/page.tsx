@@ -1,5 +1,5 @@
-import EnhancedCallForm from '@/components/calls/EnhancedCallForm';
+import EnhancedCallLoggingForm from '@/components/calls/EnhancedCallLoggingForm';
 
 export default function EnhancedCallLoggingPage() {
-  return <EnhancedCallForm />;
+  return <EnhancedCallLoggingForm />;
 }

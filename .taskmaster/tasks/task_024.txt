@@ -1,0 +1,73 @@
+# Task ID: 24
+# Title: Enhance Call Logging Form with Comprehensive Field Updates and Modern Styling
+# Status: pending
+# Dependencies: 6, 20, 22
+# Priority: high
+# Description: Create a comprehensive call logging form that integrates with Supabase and includes all required fields for proper data collection.
+# Details:
+1. **Form Structure**: Implement a form that includes all specified fields: First Name, Last Name, Source of Set Appointment, Call Outcome, Initial Payment Collected On, Customer Full Name, Customer Email, Calls Taken, Setter First Name, Setter Last Name, How Much Cash Collected Upfront, How Much Owed In Total, Prospect Notes, and Lead Source. 2. **Styling**: Use Tailwind CSS to apply a modern dark theme with glassmorphism effects. Ensure the form is responsive and accessible, with proper labels and focus states. 3. **Validation**: Implement real-time form validation using a library like Formik or React Hook Form, providing immediate feedback for required fields. 4. **Supabase Integration**: Connect the form to Supabase for data persistence, ensuring that form submissions are correctly handled and stored in the database. 5. **Calculations**: Add functionality to calculate metrics such as close rate and show rate based on the input data. 6. **Testing**: Ensure that the form behaves correctly across different devices and screen sizes, and that all validation and submission processes work as intended.
+
+# Test Strategy:
+1. Verify that all form fields are present and correctly labeled. 2. Test the responsiveness of the form on various devices. 3. Check that real-time validation works for all required fields, providing appropriate feedback. 4. Submit the form with valid and invalid data to ensure proper handling and error messages. 5. Confirm that data is correctly saved to Supabase and that calculations for metrics are accurate. 6. Conduct accessibility testing to ensure compliance with WCAG standards.
+
+# Subtasks:
+## 1. Update Database Schema [pending]
+### Dependencies: None
+### Description: Modify the database schema in Supabase to include all new fields required for the call logging form.
+### Details:
+Add fields: First Name, Last Name, Source of Set Appointment, Call Outcome, Initial Payment Collected On, Customer Full Name, Customer Email, Calls Taken, Setter First Name, Setter Last Name, How Much Cash Collected Upfront, How Much Owed In Total, Prospect Notes, and Lead Source to the existing table.
+
+## 2. Verify Supabase Connection [pending]
+### Dependencies: None
+### Description: Ensure that the Supabase connection is properly configured and operational for the application.
+### Details:
+Test the connection to Supabase by performing a simple read operation to confirm that the application can communicate with the database.
+
+## 3. Restructure Form Component [pending]
+### Dependencies: None
+### Description: Refactor the existing form component to accommodate the new fields and ensure proper layout.
+### Details:
+Implement a new form structure that includes all specified fields and ensures proper labeling and accessibility.
+
+## 4. Implement Field Validation [pending]
+### Dependencies: 24.3
+### Description: Add real-time validation for the form fields using a library like Formik or React Hook Form.
+### Details:
+Ensure that all required fields provide immediate feedback for validation errors and are user-friendly.
+
+## 5. Apply Modern Styling [pending]
+### Dependencies: 24.3
+### Description: Use Tailwind CSS to style the form with a modern dark theme and glassmorphism effects.
+### Details:
+Ensure the form is responsive and accessible, with proper focus states and visual feedback.
+
+## 6. Update API Endpoints for New Fields [pending]
+### Dependencies: 24.1
+### Description: Modify existing API endpoints to handle the new form fields and ensure proper data validation on the server side.
+### Details:
+Update the call logging API endpoints to accept and validate all new fields including first name, last name, source of set appointment, call outcome, payment information, and lead source. Ensure proper error handling and data sanitization.
+
+## 7. Implement Metrics Calculation Logic [pending]
+### Dependencies: 24.6
+### Description: Create calculation functions for close rate, show rate, AOV (Average Order Value), and ROAS (Return on Ad Spend) based on the form data.
+### Details:
+Implement backend calculation functions that process the call logging data to compute key performance metrics. Include proper error handling and data validation for calculations.
+
+## 8. Research and Apply Tailwind CSS Best Practices [pending]
+### Dependencies: 24.5
+### Description: Research current best practices for modern form styling with Tailwind CSS and apply them to create a premium-looking form.
+### Details:
+Research the latest Tailwind CSS form styling patterns, dark theme implementations, and accessibility best practices. Apply glassmorphism effects, proper spacing, and modern visual hierarchy to the form.
+
+## 9. Connect Supabase MCP and Test Integration [pending]
+### Dependencies: 24.2, 24.6
+### Description: Verify Supabase MCP connection and test the complete data flow from form submission to database storage.
+### Details:
+Ensure the Supabase MCP is properly connected and test the complete integration including form submission, data validation, database storage, and retrieval. Verify API keys are configured correctly.
+
+## 10. Conduct Comprehensive Integration Testing [pending]
+### Dependencies: 24.7, 24.8, 24.9
+### Description: Perform end-to-end testing of the enhanced call logging form including all new fields, validation, styling, and database integration.
+### Details:
+Test the complete form functionality including field validation, form submission, data persistence, metrics calculations, and UI responsiveness. Ensure all requirements from the screenshots are met.
+

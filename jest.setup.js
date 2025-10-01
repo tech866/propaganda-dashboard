@@ -6,7 +6,7 @@
 import '@testing-library/jest-dom'
 
 // Setup Next.js mocks
-import './__tests__/setup/nextjs-setup'
+import './src/__tests__/setup/nextjs-setup'
 
 // Mock console methods to reduce noise during tests
 const originalError = console.error;

@@ -1,0 +1,43 @@
+# Task ID: 22
+# Title: Migrate from Local PostgreSQL to Supabase Cloud Database
+# Status: pending
+# Dependencies: 4, 3
+# Priority: high
+# Description: Plan and execute the migration of the local PostgreSQL database to Supabase, ensuring all data, schema, and configurations are correctly transitioned.
+# Details:
+1. **Database Migration Strategy**: Develop a comprehensive plan for migrating from local PostgreSQL to Supabase, including data export/import procedures using tools like pg_dump and Supabase's import functionality. 2. **Supabase Schema Setup**: Create the database schema in Supabase, replicating the existing PostgreSQL structure with all necessary tables, relationships, and constraints. Use Supabase's dashboard or SQL editor for this task. 3. **Environment Configuration**: Update all application configurations to connect to the Supabase database instead of the local PostgreSQL instance. This includes modifying environment variables and connection strings. 4. **Data Migration**: Execute the data migration process, ensuring that all existing data is accurately transferred to Supabase. Validate data integrity post-migration. 5. **API Updates**: Refactor all API routes and services to utilize the Supabase client for database interactions instead of the local PostgreSQL connections. 6. **Authentication Migration**: If applicable, migrate from local JWT authentication to Supabase Auth, or update existing authentication mechanisms to work with Supabase. 7. **Testing & Validation**: Conduct thorough testing of all database operations with Supabase, ensuring that all CRUD operations function as expected. 8. **Documentation Updates**: Revise all project documentation to reflect the transition to Supabase, including setup instructions and usage guidelines.
+
+# Test Strategy:
+1. Verify that the Supabase database schema matches the original PostgreSQL schema by comparing table structures and relationships. 2. Test all API endpoints to ensure they function correctly with the new Supabase client, checking for proper data retrieval and manipulation. 3. Validate that all existing data has been migrated accurately by running queries to compare data counts and specific records between the local and Supabase databases. 4. Ensure that authentication works as expected, testing user login and role-based access control. 5. Review documentation for accuracy and completeness regarding the new Supabase setup.
+
+# Subtasks:
+## 1. Develop Migration Strategy [pending]
+### Dependencies: None
+### Description: Create a detailed plan for migrating the local PostgreSQL database to Supabase, including data export and import procedures.
+### Details:
+Utilize tools like pg_dump for data export and Supabase's import functionality for data import. Document the entire process.
+
+## 2. Setup Supabase Schema [pending]
+### Dependencies: 22.1
+### Description: Replicate the existing PostgreSQL database schema in Supabase, including all necessary tables and relationships.
+### Details:
+Use Supabase's dashboard or SQL editor to create tables, define relationships, and set constraints as per the original schema.
+
+## 3. Configure Environment Variables [pending]
+### Dependencies: 22.2
+### Description: Update application configurations to connect to the Supabase database instead of the local PostgreSQL instance.
+### Details:
+Modify environment variables and connection strings in the application to point to the new Supabase database.
+
+## 4. Execute Data Migration [pending]
+### Dependencies: 22.3
+### Description: Perform the actual data migration from the local PostgreSQL database to Supabase.
+### Details:
+Ensure all existing data is accurately transferred and validate data integrity post-migration.
+
+## 5. Refactor API for Supabase [pending]
+### Dependencies: 22.4
+### Description: Update all API routes and services to use the Supabase client for database interactions.
+### Details:
+Ensure that all API endpoints function correctly with the new Supabase client, replacing local PostgreSQL connections.
+

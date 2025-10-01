@@ -8,7 +8,7 @@ import {
   validateRequiredFields,
   withErrorHandling 
 } from '@/middleware/errors';
-import { CallService, CreateCallData } from '@/lib/services/callService';
+import { SalesCallService, CreateSalesCallData } from '@/lib/services/salesCallService';
 import { validateCreateCall, validateCallFilter } from '@/lib/validation';
 
 // GET /api/calls - Get all calls (with optional filtering)
@@ -45,7 +45,7 @@ const getCalls = withErrorHandling(async (request: NextRequest, user: User) => {
   }
 
   // Get calls from database
-  const calls = await CallService.getCalls(user, {
+  const calls = await SalesCallService.getSalesCalls(user, {
     clientId: requestedClientId || undefined,
     userId: userId || undefined,
     dateFrom: dateFrom || undefined,
@@ -90,7 +90,7 @@ const createCall = withErrorHandling(async (request: NextRequest, user: User) =>
   }
 
   // Create call data object with validated data
-  const callData: CreateCallData = {
+  const callData: CreateSalesCallData = {
     client_id: validatedData.client_id,
     prospect_name: validatedData.prospect_name,
     prospect_email: validatedData.prospect_email,
@@ -103,10 +103,25 @@ const createCall = withErrorHandling(async (request: NextRequest, user: User) =>
     call_duration: validatedData.call_duration,
     scheduled_at: validatedData.scheduled_at,
     completed_at: validatedData.completed_at,
+    // Enhanced call logging form fields
+    closer_first_name: validatedData.closer_first_name,
+    closer_last_name: validatedData.closer_last_name,
+    source_of_set_appointment: validatedData.source_of_set_appointment,
+    enhanced_call_outcome: validatedData.enhanced_call_outcome,
+    initial_payment_collected_on: validatedData.initial_payment_collected_on,
+    customer_full_name: validatedData.customer_full_name,
+    customer_email: validatedData.customer_email,
+    calls_taken: validatedData.calls_taken,
+    setter_first_name: validatedData.setter_first_name,
+    setter_last_name: validatedData.setter_last_name,
+    cash_collected_upfront: validatedData.cash_collected_upfront,
+    total_amount_owed: validatedData.total_amount_owed,
+    prospect_notes: validatedData.prospect_notes,
+    lead_source: validatedData.lead_source,
   };
 
   // Create call in database
-  const newCall = await CallService.createCall(callData, user);
+  const newCall = await SalesCallService.createSalesCall(callData, user);
 
   return NextResponse.json(
     {

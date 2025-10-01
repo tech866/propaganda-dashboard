@@ -1,0 +1,212 @@
+/* Enhanced Form Styles - Tailwind CSS Best Practices */
+
+/* Custom CSS Variables for consistent theming */
+:root {
+  --form-border-radius: 0.75rem;
+  --form-transition-duration: 200ms;
+  --form-shadow-intensity: 0.1;
+}
+
+/* Enhanced input styles with better focus states */
+.input-modern {
+  @apply w-full px-4 py-3 bg-slate-800/50 border border-slate-600/50 rounded-xl;
+  @apply text-white placeholder-gray-400;
+  @apply transition-all duration-200 ease-in-out;
+  @apply focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500;
+  @apply hover:border-slate-500/70;
+  @apply backdrop-blur-sm;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+.input-modern:focus {
+  box-shadow: 
+    0 4px 6px -1px rgba(0, 0, 0, 0.1), 
+    0 2px 4px -1px rgba(0, 0, 0, 0.06),
+    0 0 0 3px rgba(59, 130, 246, 0.1);
+  transform: translateY(-1px);
+}
+
+.input-modern:hover:not(:focus) {
+  transform: translateY(-0.5px);
+  box-shadow: 
+    0 6px 8px -1px rgba(0, 0, 0, 0.15), 
+    0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+/* Enhanced select styling */
+.input-modern[type="select"],
+select.input-modern {
+  @apply cursor-pointer;
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
+  background-position: right 0.75rem center;
+  background-repeat: no-repeat;
+  background-size: 1.5em 1.5em;
+  padding-right: 2.5rem;
+}
+
+/* Enhanced textarea styling */
+textarea.input-modern {
+  @apply resize-none;
+  min-height: 6rem;
+  line-height: 1.5;
+}
+
+/* Form field group styling */
+.form-field-group {
+  @apply space-y-4;
+}
+
+.form-field-group .form-field {
+  @apply transition-all duration-200 ease-in-out;
+}
+
+.form-field-group .form-field:hover {
+  @apply transform scale-[1.01];
+}
+
+/* Enhanced card styling with glassmorphism */
+.glass-card {
+  @apply bg-white/5 backdrop-blur-xl border border-white/10;
+  @apply shadow-2xl transition-all duration-300 ease-in-out;
+  @apply hover:shadow-blue-500/10 hover:border-white/20;
+  box-shadow: 
+    0 25px 50px -12px rgba(0, 0, 0, 0.25),
+    0 0 0 1px rgba(255, 255, 255, 0.05);
+}
+
+.glass-card:hover {
+  box-shadow: 
+    0 25px 50px -12px rgba(0, 0, 0, 0.25),
+    0 0 0 1px rgba(255, 255, 255, 0.1),
+    0 0 20px rgba(59, 130, 246, 0.1);
+}
+
+/* Enhanced button styling */
+.btn-enhanced {
+  @apply relative overflow-hidden;
+  @apply transition-all duration-300 ease-in-out;
+  @apply focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-slate-900;
+}
+
+.btn-enhanced::before {
+  content: '';
+  @apply absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent;
+  @apply transform -skew-x-12 -translate-x-full;
+  @apply transition-transform duration-700 ease-in-out;
+}
+
+.btn-enhanced:hover::before {
+  @apply translate-x-full;
+}
+
+.btn-enhanced:active {
+  @apply transform scale-95;
+}
+
+/* Enhanced focus ring for better accessibility */
+.focus-ring {
+  @apply focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:ring-offset-2 focus:ring-offset-slate-900;
+}
+
+/* Loading state animations */
+@keyframes shimmer {
+  0% {
+    background-position: -200px 0;
+  }
+  100% {
+    background-position: calc(200px + 100%) 0;
+  }
+}
+
+.loading-shimmer {
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+  background-size: 200px 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+/* Enhanced validation states */
+.validation-success {
+  @apply border-green-500 bg-green-500/5;
+  @apply focus:ring-green-500/50 focus:border-green-500;
+}
+
+.validation-error {
+  @apply border-red-500 bg-red-500/5;
+  @apply focus:ring-red-500/50 focus:border-red-500;
+}
+
+.validation-warning {
+  @apply border-amber-500 bg-amber-500/5;
+  @apply focus:ring-amber-500/50 focus:border-amber-500;
+}
+
+/* Enhanced responsive design utilities */
+@media (max-width: 640px) {
+  .input-modern {
+    @apply px-3 py-2.5 text-sm;
+  }
+  
+  .glass-card {
+    @apply mx-2;
+  }
+}
+
+@media (min-width: 1024px) {
+  .input-modern {
+    @apply px-5 py-4;
+  }
+}
+
+/* Dark mode enhancements */
+@media (prefers-color-scheme: dark) {
+  .input-modern {
+    @apply bg-slate-800/70 border-slate-600/60;
+  }
+  
+  .glass-card {
+    @apply bg-white/5 border-white/10;
+  }
+}
+
+/* Reduced motion preferences */
+@media (prefers-reduced-motion: reduce) {
+  .input-modern,
+  .glass-card,
+  .btn-enhanced {
+    @apply transition-none;
+  }
+  
+  .btn-enhanced::before {
+    @apply hidden;
+  }
+  
+  .loading-shimmer {
+    animation: none;
+  }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .input-modern {
+    @apply border-2 border-white/80 bg-slate-900;
+  }
+  
+  .glass-card {
+    @apply border-2 border-white/60 bg-slate-900/90;
+  }
+}
+
+/* Print styles */
+@media print {
+  .glass-card {
+    @apply bg-white border border-gray-300 shadow-none;
+  }
+  
+  .input-modern {
+    @apply bg-white border border-gray-300 text-black;
+  }
+  
+  .btn-enhanced {
+    @apply bg-gray-200 border border-gray-400 text-black;
+  }
+}
