@@ -4,11 +4,13 @@ import { headers } from 'next/headers';
 import { WebhookEvent } from '@clerk/nextjs/server';
 import { createClient } from '@supabase/supabase-js';
 
-// Initialize Supabase client
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
+// Initialize Supabase client only if environment variables are available
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+const supabase = supabaseUrl && supabaseServiceKey 
+  ? createClient(supabaseUrl, supabaseServiceKey)
+  : null;
 
 export async function POST(req: NextRequest) {
   // Get the headers
@@ -75,6 +77,11 @@ export async function POST(req: NextRequest) {
 }
 
 async function handleUserSync(userData: any) {
+  if (!supabase) {
+    console.warn('Supabase client not configured, skipping user sync');
+    return;
+  }
+
   const { id: clerkUserId, email_addresses, first_name, last_name, public_metadata } = userData;
   
   const email = email_addresses?.[0]?.email_address;
@@ -107,6 +114,11 @@ async function handleUserSync(userData: any) {
 }
 
 async function handleUserDeletion(userData: any) {
+  if (!supabase) {
+    console.warn('Supabase client not configured, skipping user deletion');
+    return;
+  }
+
   const { id: clerkUserId } = userData;
   
   try {
