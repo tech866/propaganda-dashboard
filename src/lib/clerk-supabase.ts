@@ -1,11 +1,13 @@
 import { createClient } from '@supabase/supabase-js';
 import { auth } from '@clerk/nextjs/server';
 
-// Initialize Supabase client
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
+// Initialize Supabase client only if environment variables are available
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+const supabase = supabaseUrl && supabaseServiceKey 
+  ? createClient(supabaseUrl, supabaseServiceKey)
+  : null;
 
 export interface UserWithClerk {
   id: string;
@@ -27,6 +29,11 @@ export interface UserWithClerk {
  * Get user data from Supabase using Clerk user ID
  */
 export async function getUserFromSupabase(clerkUserId: string): Promise<UserWithClerk | null> {
+  if (!supabase) {
+    console.warn('Supabase client not configured');
+    return null;
+  }
+
   try {
     const { data, error } = await supabase
       .from('users_with_clerk')
@@ -106,6 +113,11 @@ export function canAccessClient(user: UserWithClerk | null, clientId: string): b
  * Update user's last login timestamp
  */
 export async function updateLastLogin(clerkUserId: string): Promise<void> {
+  if (!supabase) {
+    console.warn('Supabase client not configured');
+    return;
+  }
+
   try {
     const { error } = await supabase
       .from('users')
