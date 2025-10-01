@@ -1336,11 +1336,80 @@
             "testStrategy": "Test all API endpoints to ensure they operate as expected with the Supabase database."
           }
         ]
+      },
+      {
+        "id": 23,
+        "title": "Investigate and Fix Application Errors on Vercel and Localhost",
+        "description": "Debug and resolve the client-side exception and internal server error preventing the application from loading correctly on both Vercel and localhost.",
+        "details": "1. **Error Reproduction**: Attempt to reproduce the errors on both Vercel and localhost environments. Document the steps taken and any error messages received. 2. **Client-Side Debugging**: Use browser developer tools to inspect the console for client-side errors. Check for issues related to the recent changes made to Supabase and Clerk configurations. Ensure that all necessary environment variables are correctly set in both environments. 3. **Server-Side Debugging**: Review server logs for the internal server error on localhost. Identify any stack traces or error messages that can provide insight into the issue. 4. **Configuration Review**: Examine the recent changes made to the Supabase and Clerk configurations. Verify that all conditional logic is functioning as intended and that no required environment variables are missing. 5. **Testing**: After making changes, retest the application in both environments to ensure that the errors have been resolved and that the application loads correctly. 6. **Documentation**: Document the findings, changes made, and any lessons learned during the debugging process for future reference.",
+        "testStrategy": "1. Verify that the application loads correctly on both Vercel and localhost without any errors. 2. Check the browser console for any client-side errors and ensure they are resolved. 3. Review server logs on localhost to confirm that the internal server error no longer occurs. 4. Test all functionalities impacted by the recent changes to ensure they work as expected. 5. Conduct a regression test to ensure that no other parts of the application are affected by the changes made during debugging.",
+        "status": "pending",
+        "dependencies": [
+          13,
+          22
+        ],
+        "priority": "medium",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Reproduce Errors on Vercel",
+            "description": "Attempt to reproduce the application errors in the Vercel environment. Document the steps taken and any error messages received.",
+            "dependencies": [],
+            "details": "Access the Vercel deployment and follow the steps to trigger the errors. Take screenshots of any error messages.\n<info added on 2025-10-01T03:24:07.879Z>\n**Vercel Error Investigation Results:**\n\n✅ **Homepage Working**: The main landing page (/) loads correctly with HTTP 200\n❌ **Auth Routes Failing**: `/auth/signin` returns HTTP 500 Internal Server Error\n❌ **Client-Side Error**: The \"Application error: a client-side exception\" occurs when users try to navigate to auth pages\n\n**Root Cause Identified**: The issue is server-side errors in the authentication routes, likely related to the conditional Clerk configuration we implemented. The homepage works because it doesn't require authentication, but any auth-related pages are failing.\n\n**Next Steps**: Need to investigate the auth route implementations and fix the server-side errors causing the 500 responses.\n</info added on 2025-10-01T03:24:07.879Z>",
+            "status": "done",
+            "testStrategy": ""
+          },
+          {
+            "id": 2,
+            "title": "Reproduce Errors on Localhost",
+            "description": "Attempt to reproduce the application errors in the localhost environment. Document the steps taken and any error messages received.",
+            "dependencies": [],
+            "details": "Run the application locally and follow the steps to trigger the errors. Take screenshots of any error messages.\n<info added on 2025-10-01T03:29:42.200Z>\n**Localhost Error Investigation Results:**\n\n✅ **Homepage Working**: The main landing page (/) loads correctly with HTTP 200\n✅ **Auth Routes Working**: `/auth/signin` returns HTTP 200 OK on localhost\n✅ **Server Running**: Development server is running properly on port 3000\n\n**Key Finding**: Localhost is working fine, but Vercel production is failing. This indicates an environment-specific issue, likely related to:\n1. Missing environment variables in Vercel production\n2. Different behavior of conditional Clerk/Supabase configurations in production vs development\n3. Build-time vs runtime configuration differences\n\n**Root Cause**: The issue is specifically with the Vercel production environment, not the application code itself.\n</info added on 2025-10-01T03:29:42.200Z>",
+            "status": "done",
+            "testStrategy": ""
+          },
+          {
+            "id": 3,
+            "title": "Perform Client-Side Debugging",
+            "description": "Use browser developer tools to inspect the console for client-side errors and check for issues related to Supabase and Clerk configurations.",
+            "dependencies": [],
+            "details": "Open the browser console and look for any error messages. Verify that all necessary environment variables are set correctly.",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 4,
+            "title": "Conduct Server-Side Debugging",
+            "description": "Review server logs for the internal server error on localhost and identify any stack traces or error messages.",
+            "dependencies": [],
+            "details": "Access the server logs on localhost and look for any relevant error messages or stack traces that can provide insight into the issue.",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 5,
+            "title": "Review Configurations",
+            "description": "Examine the recent changes made to the Supabase and Clerk configurations to ensure all conditional logic is functioning as intended.",
+            "dependencies": [],
+            "details": "Check the configuration files for any missing environment variables or incorrect settings that could be causing the errors.",
+            "status": "in-progress",
+            "testStrategy": ""
+          },
+          {
+            "id": 6,
+            "title": "Document Findings",
+            "description": "Document the findings, changes made, and any lessons learned during the debugging process for future reference.",
+            "dependencies": [],
+            "details": "Create a report summarizing the debugging process, including steps taken, errors encountered, and resolutions applied.",
+            "status": "pending",
+            "testStrategy": ""
+          }
+        ]
       }
     ],
     "metadata": {
       "created": "2025-09-28T00:23:29.094Z",
-      "updated": "2025-09-30T03:42:09.324Z",
+      "updated": "2025-10-01T03:29:50.564Z",
       "description": "Tasks for master context"
     }
   }

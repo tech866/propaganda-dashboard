@@ -1,0 +1,21 @@
+{
+	"meta": {
+		"generatedAt": "2025-10-01T03:08:10.851Z",
+		"tasksAnalyzed": 1,
+		"totalTasks": 23,
+		"analysisCount": 1,
+		"thresholdScore": 5,
+		"projectName": "Taskmaster",
+		"usedResearch": true
+	},
+	"complexityAnalysis": [
+		{
+			"taskId": 23,
+			"taskTitle": "Investigate and Fix Application Errors on Vercel and Localhost",
+			"complexityScore": 7,
+			"recommendedSubtasks": 6,
+			"expansionPrompt": "Break down the debugging process into distinct subtasks: 1. Reproduce errors on Vercel, 2. Reproduce errors on localhost, 3. Perform client-side debugging, 4. Conduct server-side debugging, 5. Review configurations, 6. Document findings.",
+			"reasoning": "This task involves multiple layers of debugging across different environments, requiring a systematic approach to identify and resolve issues. Each step can be complex and may require separate focus."
+		}
+	]
+}

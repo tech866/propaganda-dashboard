@@ -1,6 +1,34 @@
 import { SignUp } from '@clerk/nextjs';
 
+// Check if Clerk is configured
+const isClerkConfigured = process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY && 
+  !process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY.includes('placeholder') &&
+  process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY.length > 20;
+
 export default function RegisterPage() {
+  // If Clerk is not configured, show a fallback message
+  if (!isClerkConfigured) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
+        <div className="w-full max-w-md">
+          <div className="text-center mb-8">
+            <h2 className="text-3xl font-extrabold text-white">
+              Registration Not Available
+            </h2>
+            <p className="mt-2 text-sm text-gray-300">
+              Please configure Clerk authentication to enable registration
+            </p>
+          </div>
+          <div className="bg-slate-800/50 backdrop-blur-sm border border-slate-700 rounded-lg p-6">
+            <p className="text-gray-300 text-center">
+              Contact your administrator to set up authentication.
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
       <div className="w-full max-w-md">
