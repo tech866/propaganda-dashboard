@@ -5,6 +5,11 @@ import { useUser, useOrganization } from '@clerk/nextjs';
 import { supabase } from '@/lib/supabase';
 import { UserRole } from '@/lib/clerk';
 
+// Check if Clerk is configured
+const isClerkConfigured = process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY && 
+  !process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY.includes('placeholder') &&
+  process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY.length > 20;
+
 // Agency data interface
 export interface Agency {
   id: string;

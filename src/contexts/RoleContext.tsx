@@ -5,6 +5,11 @@ import { useUser, useOrganization } from '@clerk/nextjs';
 import { UserRole } from '@/lib/clerk';
 import { getUserFromSupabase, UserWithClerk } from '@/lib/clerk-supabase';
 
+// Check if Clerk is configured
+const isClerkConfigured = process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY && 
+  !process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY.includes('placeholder') &&
+  process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY.length > 20;
+
 // Define the role context interface
 interface RoleContextType {
   user: {
@@ -99,9 +104,16 @@ export function RoleProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<RoleContextType['user']>(null);
   const [isLoading, setIsLoading] = useState(true);
   
-  // Use Clerk hooks
-  const { user: clerkUser, isLoaded: userLoaded } = useUser();
-  const { organization, isLoaded: orgLoaded } = useOrganization();
+  // Use Clerk hooks only if configured
+  const clerkHooks = isClerkConfigured ? {
+    user: useUser(),
+    organization: useOrganization()
+  } : null;
+  
+  const clerkUser = clerkHooks?.user?.user;
+  const userLoaded = clerkHooks?.user?.isLoaded ?? true;
+  const organization = clerkHooks?.organization?.organization;
+  const orgLoaded = clerkHooks?.organization?.isLoaded ?? true;
 
   // Mock user for development when Clerk is not configured
   React.useEffect(() => {
