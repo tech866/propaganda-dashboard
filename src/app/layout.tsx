@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
-import { ClerkProvider } from '@clerk/nextjs';
+import { ClerkProviderWrapper } from "@/components/providers/ClerkProvider";
 import { RoleProvider } from "@/contexts/RoleContext";
 import { AgencyProvider } from "@/contexts/AgencyContext";
 import { ThemeProvider } from "@/components/theme-provider";
@@ -23,7 +23,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <ClerkProvider>
+    <ClerkProviderWrapper>
       <html lang="en" suppressHydrationWarning>
         <body className={`${inter.variable} font-sans antialiased bg-background text-foreground`}>
           <ThemeProvider
@@ -42,6 +42,6 @@ export default function RootLayout({
           </ThemeProvider>
         </body>
       </html>
-    </ClerkProvider>
+    </ClerkProviderWrapper>
   );
 }
