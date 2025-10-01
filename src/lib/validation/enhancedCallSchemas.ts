@@ -212,6 +212,45 @@ export const validateBusinessLogic = (formData: any): string[] => {
   return errors;
 };
 
+// Additional validation schemas for API routes
+export const validateCreateEnhancedCall = (data: any) => enhancedCallLoggingSchema.validate(data, { abortEarly: false });
+export const validateEnhancedCallFilter = (data: any) => {
+  const filterSchema = yup.object().shape({
+    clientId: yup.string().matches(uuidRegex, 'Client ID must be a valid UUID').optional(),
+    userId: yup.string().matches(uuidRegex, 'User ID must be a valid UUID').optional(),
+    dateFrom: yup.date().optional(),
+    dateTo: yup.date().optional(),
+    outcome: yup.string().optional(),
+    leadSource: yup.string().oneOf(['organic', 'ads']).optional(),
+    limit: yup.number().integer().min(1).max(100).default(10),
+    offset: yup.number().integer().min(0).default(0),
+  });
+  return filterSchema.validate(data, { abortEarly: false });
+};
+
+export const validateAnalyticsFilter = (data: any) => {
+  const analyticsSchema = yup.object().shape({
+    clientId: yup.string().matches(uuidRegex, 'Client ID must be a valid UUID').optional(),
+    userId: yup.string().matches(uuidRegex, 'User ID must be a valid UUID').optional(),
+    dateFrom: yup.date().optional(),
+    dateTo: yup.date().optional(),
+    groupBy: yup.string().oneOf(['day', 'week', 'month', 'year']).default('month'),
+  });
+  return analyticsSchema.validate(data, { abortEarly: false });
+};
+
+export const validateCreateAdSpend = (data: any) => {
+  const adSpendSchema = yup.object().shape({
+    client_id: yup.string().matches(uuidRegex, 'Client ID must be a valid UUID').required(),
+    platform: yup.string().oneOf(['facebook', 'instagram', 'google', 'tiktok']).required(),
+    campaign_name: yup.string().min(1, 'Campaign name is required').required(),
+    amount: yup.number().min(0, 'Amount cannot be negative').required(),
+    date: yup.date().max(new Date(), 'Date cannot be in the future').required(),
+    currency: yup.string().oneOf(['USD', 'EUR', 'GBP']).default('USD'),
+  });
+  return adSpendSchema.validate(data, { abortEarly: false });
+};
+
 // Export validation functions
 export const validateEnhancedCallLogging = (data: any) => enhancedCallLoggingSchema.validate(data, { abortEarly: false });
 export const validateEnhancedCallLoggingSync = (data: any) => enhancedCallLoggingSchema.validateSync(data, { abortEarly: false });
