@@ -46,7 +46,7 @@ export function AgencyProvider({ children }: { children: React.ReactNode }) {
   
   // Mock agency for development
   React.useEffect(() => {
-    if (process.env.NODE_ENV === 'development' && process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY?.includes('placeholder')) {
+    if (process.env.NODE_ENV === 'development') {
       setAgency({
         id: 'dev-agency-1',
         name: 'Development Agency',
@@ -76,6 +76,13 @@ export function AgencyProvider({ children }: { children: React.ReactNode }) {
     try {
       setIsLoading(true);
       setError(null);
+
+      // Check if Supabase is configured
+      if (!supabase) {
+        console.log('Supabase not configured, skipping agency fetch');
+        setIsLoading(false);
+        return;
+      }
 
       const { data, error: fetchError } = await supabase
         .from('agencies')

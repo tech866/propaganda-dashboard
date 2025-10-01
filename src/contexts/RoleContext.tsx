@@ -3,6 +3,7 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { useUser, useOrganization } from '@clerk/nextjs';
 import { UserRole } from '@/lib/clerk';
+import { getUserFromSupabase, UserWithClerk } from '@/lib/clerk-supabase';
 
 // Define the role context interface
 interface RoleContextType {
@@ -95,14 +96,17 @@ const ROLE_HIERARCHY: Record<UserRole, number> = {
 
 // Role provider component
 export function RoleProvider({ children }: { children: React.ReactNode }) {
-  // Temporarily disable Clerk hooks for development
-  // TODO: Re-enable when proper Clerk keys are configured
   const [user, setUser] = useState<RoleContextType['user']>(null);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   
-  // Mock user for development
+  // Use Clerk hooks
+  const { user: clerkUser, isLoaded: userLoaded } = useUser();
+  const { organization, isLoaded: orgLoaded } = useOrganization();
+
+  // Mock user for development when Clerk is not configured
   React.useEffect(() => {
-    if (process.env.NODE_ENV === 'development' && process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY?.includes('placeholder')) {
+    if (process.env.NODE_ENV === 'development') {
+      console.log('Setting up mock user for development...');
       setUser({
         id: 'dev-user-1',
         email: 'dev@example.com',
@@ -114,38 +118,34 @@ export function RoleProvider({ children }: { children: React.ReactNode }) {
       return;
     }
   }, []);
-  
-  // Original Clerk implementation (commented out for development)
-  // const { user: clerkUser, isLoaded: userLoaded } = useUser();
-  // const { organization, isLoaded: orgLoaded } = useOrganization();
 
-  // Original Clerk useEffect (commented out for development)
-  // useEffect(() => {
-  //   if (!userLoaded || !orgLoaded) {
-  //     setIsLoading(true);
-  //     return;
-  //   }
+  // Clerk integration
+  useEffect(() => {
+    if (!userLoaded || !orgLoaded) {
+      setIsLoading(true);
+      return;
+    }
 
-  //   if (!clerkUser) {
-  //     setUser(null);
-  //     setIsLoading(false);
-  //     return;
-  //   }
+    if (!clerkUser) {
+      setUser(null);
+      setIsLoading(false);
+      return;
+    }
 
-  //   // Get role from Clerk user metadata
-  //   const role = (clerkUser.publicMetadata?.role as UserRole) || 'agency_user';
-  //   const agencyId = organization?.id || '';
+    // Get role from Clerk user metadata
+    const role = (clerkUser.publicMetadata?.role as UserRole) || 'agency_user';
+    const agencyId = organization?.id || '';
 
-  //   setUser({
-  //     id: clerkUser.id,
-  //     email: clerkUser.primaryEmailAddress?.emailAddress || '',
-  //     name: clerkUser.fullName || '',
-  //     role: role,
-  //     clientId: agencyId
-  //   });
+    setUser({
+      id: clerkUser.id,
+      email: clerkUser.primaryEmailAddress?.emailAddress || '',
+      name: clerkUser.fullName || '',
+      role: role,
+      clientId: agencyId
+    });
 
-  //   setIsLoading(false);
-  // }, [clerkUser, userLoaded, organization, orgLoaded]);
+    setIsLoading(false);
+  }, [clerkUser, userLoaded, organization, orgLoaded]);
 
   // Check if user has a specific role
   const hasRole = (role: UserRole): boolean => {

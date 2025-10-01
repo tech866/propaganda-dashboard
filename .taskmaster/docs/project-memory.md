@@ -26,6 +26,30 @@
 - **Close Rate:** Wins / (Shows or Qualified calls)
 - **Loss Reasons:** Categorized reasons for unsuccessful conversions
 
+## 🔄 MANDATORY TASKMASTER WORKFLOW RULE
+
+**CRITICAL: Every development task MUST follow the Taskmaster workflow**
+
+### Required Workflow for ALL Development Requests:
+1. **Research First**: `task-master research "[request]" --tree --files=src/`
+2. **Create/Update Task**: `task-master add-task --prompt="[description]" --research`
+3. **Analyze Complexity**: `task-master analyze-complexity --research`
+4. **Expand Subtasks**: `task-master expand --id=[id] --research --force`
+5. **Implement Systematically**: Follow subtask breakdown
+6. **Update Memory Bank**: `task-master update-subtask --id=[id] --prompt="[progress]"`
+7. **Complete Tasks**: `task-master set-status --id=[id] --status=done`
+
+### Required API Keys:
+- **OpenAI API Key**: For research model (GPT-4o-mini)
+- **Perplexity API Key**: For research-backed operations
+- **Anthropic API Key**: For main model (Claude 3.5 Sonnet)
+
+### Cursor Integration:
+- **Rule File**: `.cursor/rules/taskmaster_workflow.mdc`
+- **Commands**: `.cursor/commands/taskmaster-workflow.md`
+- **Settings**: `.cursor/settings.json` with taskmaster tools allowlist
+- **MCP Config**: `.cursor/mcp.json` with API keys
+
 ## 🎯 Current Project Status
 
 ### ✅ Completed Tasks (ALL 15 TASKS COMPLETED + V0 DESIGN IMPLEMENTATION)

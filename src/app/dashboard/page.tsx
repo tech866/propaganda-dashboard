@@ -7,31 +7,20 @@ import EnhancedDashboard from '@/components/dashboard/EnhancedDashboard';
 
 export default function Dashboard() {
   const router = useRouter();
-  const [isLoading, setIsLoading] = useState(true);
-
-  useEffect(() => {
-    // Development mode - bypass authentication
-    if (process.env.NODE_ENV === 'development' && process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY?.includes('placeholder')) {
-      setIsLoading(false);
-      return;
-    }
-
-    // Production mode - would use Clerk authentication
-    // For now, just set loading to false
-    setIsLoading(false);
-  }, []);
-
-  if (isLoading) {
+  
+  // Bypass all loading states for development
+  if (process.env.NODE_ENV === 'development') {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-slate-900">
-        <div className="text-white">Loading...</div>
-      </div>
+      <ModernDashboardLayout>
+        <EnhancedDashboard />
+      </ModernDashboardLayout>
     );
   }
 
+  // Production mode would have proper loading states
   return (
-    <ModernDashboardLayout>
-      <EnhancedDashboard />
-    </ModernDashboardLayout>
+    <div className="min-h-screen flex items-center justify-center bg-slate-900">
+      <div className="text-white">Loading...</div>
+    </div>
   );
 }

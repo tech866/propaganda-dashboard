@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useSession } from 'next-auth/react';
+import { useAuth } from '@/hooks/useAuth';
 import { useRouter } from 'next/navigation';
 import { useFormValidation } from '@/hooks/useFormValidation';
 import { createUserSchema } from '@/lib/validation/clientSchemas';
@@ -18,7 +18,7 @@ interface UserFormData {
 }
 
 export default function NewUser() {
-  const { data: session, status } = useSession();
+  const { user, isLoaded } = useAuth();
   const router = useRouter();
   
   const [formData, setFormData] = useState<UserFormData>({
@@ -36,17 +36,17 @@ export default function NewUser() {
   const { validate, getFieldError, hasFieldError, clearErrors } = useFormValidation(createUserSchema);
 
   useEffect(() => {
-    if (status === 'unauthenticated') {
+    if (isLoaded && !user) {
       router.push('/auth/signin');
-    } else if (session?.user?.role !== 'admin' && session?.user?.role !== 'ceo') {
+    } else if (user && user.publicMetadata?.role !== 'admin' && user.publicMetadata?.role !== 'ceo') {
       router.push('/dashboard');
-    } else if (session?.user?.clientId) {
+    } else if (user?.publicMetadata?.agency_id) {
       setFormData(prev => ({
         ...prev,
-        clientId: session.user.clientId
+        clientId: user.publicMetadata.agency_id as string
       }));
     }
-  }, [session, status, router]);
+  }, [user, isLoaded, router]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -91,7 +91,7 @@ export default function NewUser() {
       }
 
       setSuccess(true);
-      setFormData({ email: '', password: '', name: '', role: 'sales', clientId: session?.user?.clientId || '' });
+      setFormData({ email: '', password: '', name: '', role: 'sales', clientId: user?.publicMetadata?.agency_id as string || '' });
       
       // Redirect to users list after successful creation
       setTimeout(() => {
@@ -105,7 +105,7 @@ export default function NewUser() {
     }
   };
 
-  if (status === 'loading') {
+  if (!isLoaded) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
@@ -190,7 +190,7 @@ export default function NewUser() {
                 <option value="">Select role</option>
                 <option value="sales">Sales</option>
                 <option value="admin">Admin</option>
-                {session?.user?.role === 'ceo' && (
+                {user?.publicMetadata?.role === 'ceo' && (
                   <option value="ceo">CEO</option>
                 )}
               </FormField>

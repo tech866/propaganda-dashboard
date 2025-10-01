@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useSession } from 'next-auth/react';
+import { useAuth } from '@/hooks/useAuth';
 import { useRouter } from 'next/navigation';
 import { useFormValidation } from '@/hooks/useFormValidation';
 import FormContainer from '@/components/forms/FormContainer';
@@ -42,7 +42,7 @@ const predefinedCategories = [
 ];
 
 export default function NewLossReason() {
-  const { data: session, status } = useSession();
+  const { user, isLoaded } = useAuth();
   const router = useRouter();
   
   const [formData, setFormData] = useState<LossReasonFormData>({
@@ -58,12 +58,12 @@ export default function NewLossReason() {
   const { validate, getFieldError, hasFieldError, clearErrors } = useFormValidation(lossReasonSchema);
 
   useEffect(() => {
-    if (status === 'unauthenticated') {
+    if (isLoaded && !user) {
       router.push('/auth/signin');
-    } else if (session?.user?.role !== 'admin' && session?.user?.role !== 'ceo') {
+    } else if (user && user.publicMetadata?.role !== 'admin' && user.publicMetadata?.role !== 'ceo') {
       router.push('/dashboard');
     }
-  }, [session, status, router]);
+  }, [user, isLoaded, router]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -112,7 +112,7 @@ export default function NewLossReason() {
     }
   };
 
-  if (status === 'loading') {
+  if (!isLoaded) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">

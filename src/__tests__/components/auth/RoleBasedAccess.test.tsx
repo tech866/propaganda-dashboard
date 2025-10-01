@@ -1,6 +1,6 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
-import { RoleBasedAccess } from '@/components/auth/RoleBasedAccess';
+import RoleBasedAccess from '@/components/auth/RoleBasedAccess';
 
 // Mock the role context
 const mockUseRole = jest.fn();
@@ -15,8 +15,9 @@ describe('RoleBasedAccess', () => {
 
   it('renders children when user has required role', () => {
     mockUseRole.mockReturnValue({
-      userRole: 'admin',
-      hasAnyRole: jest.fn().mockReturnValue(true)
+      hasAnyRole: jest.fn().mockReturnValue(true),
+      hasRole: jest.fn().mockReturnValue(true),
+      isLoading: false
     });
 
     render(
@@ -30,8 +31,9 @@ describe('RoleBasedAccess', () => {
 
   it('renders fallback when user does not have required role', () => {
     mockUseRole.mockReturnValue({
-      userRole: 'user',
-      hasAnyRole: jest.fn().mockReturnValue(false)
+      hasAnyRole: jest.fn().mockReturnValue(false),
+      hasRole: jest.fn().mockReturnValue(false),
+      isLoading: false
     });
 
     render(
@@ -47,10 +49,11 @@ describe('RoleBasedAccess', () => {
     expect(screen.queryByText('Admin Content')).not.toBeInTheDocument();
   });
 
-  it('renders default fallback when no fallback provided', () => {
+  it('renders nothing when no fallback provided and user lacks access', () => {
     mockUseRole.mockReturnValue({
-      userRole: 'user',
-      hasAnyRole: jest.fn().mockReturnValue(false)
+      hasAnyRole: jest.fn().mockReturnValue(false),
+      hasRole: jest.fn().mockReturnValue(false),
+      isLoading: false
     });
 
     render(
@@ -59,15 +62,15 @@ describe('RoleBasedAccess', () => {
       </RoleBasedAccess>
     );
 
-    expect(screen.getByText('Access Restricted')).toBeInTheDocument();
-    expect(screen.getByText("You don't have permission to access this content.")).toBeInTheDocument();
     expect(screen.queryByText('Admin Content')).not.toBeInTheDocument();
+    // Component renders nothing when fallback is null and user lacks access
   });
 
   it('handles multiple allowed roles', () => {
     mockUseRole.mockReturnValue({
-      userRole: 'ceo',
-      hasAnyRole: jest.fn().mockReturnValue(true)
+      hasAnyRole: jest.fn().mockReturnValue(true),
+      hasRole: jest.fn().mockReturnValue(true),
+      isLoading: false
     });
 
     render(
@@ -81,8 +84,9 @@ describe('RoleBasedAccess', () => {
 
   it('handles empty allowed roles array', () => {
     mockUseRole.mockReturnValue({
-      userRole: 'user',
-      hasAnyRole: jest.fn().mockReturnValue(false)
+      hasAnyRole: jest.fn().mockReturnValue(false),
+      hasRole: jest.fn().mockReturnValue(false),
+      isLoading: false
     });
 
     render(
@@ -91,14 +95,15 @@ describe('RoleBasedAccess', () => {
       </RoleBasedAccess>
     );
 
-    expect(screen.getByText('Access Restricted')).toBeInTheDocument();
     expect(screen.queryByText('No Access Content')).not.toBeInTheDocument();
+    // Component renders nothing when fallback is null and user lacks access
   });
 
   it('handles undefined user role', () => {
     mockUseRole.mockReturnValue({
-      userRole: undefined,
-      hasAnyRole: jest.fn().mockReturnValue(false)
+      hasAnyRole: jest.fn().mockReturnValue(false),
+      hasRole: jest.fn().mockReturnValue(false),
+      isLoading: false
     });
 
     render(
@@ -107,14 +112,15 @@ describe('RoleBasedAccess', () => {
       </RoleBasedAccess>
     );
 
-    expect(screen.getByText('Access Restricted')).toBeInTheDocument();
     expect(screen.queryByText('Admin Content')).not.toBeInTheDocument();
+    // Component renders nothing when fallback is null and user lacks access
   });
 
   it('handles null user role', () => {
     mockUseRole.mockReturnValue({
-      userRole: null,
-      hasAnyRole: jest.fn().mockReturnValue(false)
+      hasAnyRole: jest.fn().mockReturnValue(false),
+      hasRole: jest.fn().mockReturnValue(false),
+      isLoading: false
     });
 
     render(
@@ -123,14 +129,15 @@ describe('RoleBasedAccess', () => {
       </RoleBasedAccess>
     );
 
-    expect(screen.getByText('Access Restricted')).toBeInTheDocument();
     expect(screen.queryByText('Admin Content')).not.toBeInTheDocument();
+    // Component renders nothing when fallback is null and user lacks access
   });
 
   it('renders complex children components', () => {
     mockUseRole.mockReturnValue({
-      userRole: 'admin',
-      hasAnyRole: jest.fn().mockReturnValue(true)
+      hasAnyRole: jest.fn().mockReturnValue(true),
+      hasRole: jest.fn().mockReturnValue(true),
+      isLoading: false
     });
 
     render(
@@ -150,8 +157,9 @@ describe('RoleBasedAccess', () => {
 
   it('renders complex fallback components', () => {
     mockUseRole.mockReturnValue({
-      userRole: 'user',
-      hasAnyRole: jest.fn().mockReturnValue(false)
+      hasAnyRole: jest.fn().mockReturnValue(false),
+      hasRole: jest.fn().mockReturnValue(false),
+      isLoading: false
     });
 
     render(

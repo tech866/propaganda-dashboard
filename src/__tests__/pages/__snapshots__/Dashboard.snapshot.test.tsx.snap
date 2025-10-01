@@ -1,0 +1,61 @@
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+
+exports[`Dashboard Page Snapshot matches snapshot for CEO user 1`] = `
+<div
+  data-testid="dashboard-layout"
+>
+  <div
+    data-testid="enhanced-dashboard"
+  >
+    Enhanced Dashboard
+  </div>
+</div>
+`;
+
+exports[`Dashboard Page Snapshot matches snapshot for authenticated admin user 1`] = `
+<div
+  data-testid="dashboard-layout"
+>
+  <div
+    data-testid="enhanced-dashboard"
+  >
+    Enhanced Dashboard
+  </div>
+</div>
+`;
+
+exports[`Dashboard Page Snapshot matches snapshot for loading state 1`] = `
+<div
+  data-testid="dashboard-layout"
+>
+  <div
+    data-testid="enhanced-dashboard"
+  >
+    Enhanced Dashboard
+  </div>
+</div>
+`;
+
+exports[`Dashboard Page Snapshot matches snapshot for unauthenticated user 1`] = `
+<div
+  data-testid="dashboard-layout"
+>
+  <div
+    data-testid="enhanced-dashboard"
+  >
+    Enhanced Dashboard
+  </div>
+</div>
+`;
+
+exports[`Dashboard Page Snapshot matches snapshot for unauthorized user 1`] = `
+<div
+  data-testid="dashboard-layout"
+>
+  <div
+    data-testid="enhanced-dashboard"
+  >
+    Enhanced Dashboard
+  </div>
+</div>
+`;

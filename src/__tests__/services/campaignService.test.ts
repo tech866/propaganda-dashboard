@@ -18,30 +18,30 @@ jest.mock('@/lib/supabase', () => ({
       select: jest.fn(() => ({
         eq: jest.fn(() => ({
           eq: jest.fn(() => ({
-            order: jest.fn(() => ({
-              data: Promise.resolve([{
-              id: '1',
-              name: 'Test Campaign',
-              client_id: 'client-1',
-              status: 'active',
-              start_date: '2024-01-01',
-              end_date: '2024-12-31',
-              budget: 10000,
-              spent_amount: 5000,
-              target_audience: 'Adults 25-45',
-              objectives: 'Increase brand awareness',
-              platform: 'Facebook',
-              campaign_type: 'Social Media',
-              created_at: '2024-01-01T00:00:00Z',
-              updated_at: '2024-01-01T00:00:00Z',
-              active_status: true,
-              clients: { name: 'Test Client' }
-            }]),
+            order: jest.fn(() => Promise.resolve({
+              data: [{
+                id: '1',
+                name: 'Test Campaign',
+                client_id: 'client-1',
+                status: 'active',
+                start_date: '2024-01-01',
+                end_date: '2024-12-31',
+                budget: 10000,
+                spent_amount: 5000,
+                target_audience: 'Adults 25-45',
+                objectives: 'Increase brand awareness',
+                platform: 'Facebook',
+                campaign_type: 'Social Media',
+                created_at: '2024-01-01T00:00:00Z',
+                updated_at: '2024-01-01T00:00:00Z',
+                active_status: true,
+                clients: { name: 'Test Client' }
+              }],
               error: null
             }))
           })),
-          order: jest.fn(() => ({
-            data: Promise.resolve([{
+          order: jest.fn(() => Promise.resolve({
+            data: [{
               id: '1',
               campaign_id: '1',
               impressions: 100000,
@@ -55,32 +55,32 @@ jest.mock('@/lib/supabase', () => ({
               cpm: 10.0,
               conversion_rate: 2.0,
               date: '2024-01-01'
-            }]),
+            }],
             error: null
           }))
         }))
       })),
       insert: jest.fn(() => ({
         select: jest.fn(() => ({
-          single: jest.fn(() => ({
-            data: Promise.resolve({ 
+          single: jest.fn(() => Promise.resolve({
+            data: { 
               id: '1',
-              name: 'Test Campaign',
+              name: 'New Campaign',
               client_id: 'client-1',
-              status: 'active',
+              status: 'draft',
               start_date: '2024-01-01',
               end_date: '2024-12-31',
-              budget: 10000,
-              spent_amount: 5000,
-              target_audience: 'Adults 25-45',
-              objectives: 'Increase brand awareness',
-              platform: 'Facebook',
-              campaign_type: 'Social Media',
+              budget: 5000,
+              spent_amount: 0,
+              target_audience: 'Adults 18-35',
+              objectives: 'Drive sales',
+              platform: 'Google',
+              campaign_type: 'Search',
               created_at: '2024-01-01T00:00:00Z',
               updated_at: '2024-01-01T00:00:00Z',
               active_status: true,
               clients: { name: 'Test Client' }
-            }),
+            },
             error: null
           }))
         }))
@@ -88,8 +88,8 @@ jest.mock('@/lib/supabase', () => ({
       update: jest.fn(() => ({
         eq: jest.fn(() => ({
           select: jest.fn(() => ({
-            single: jest.fn(() => ({
-              data: Promise.resolve({ 
+            single: jest.fn(() => Promise.resolve({
+              data: { 
                 id: '1',
                 name: 'Test Campaign',
                 client_id: 'client-1',
@@ -106,42 +106,15 @@ jest.mock('@/lib/supabase', () => ({
                 updated_at: '2024-01-01T00:00:00Z',
                 active_status: true,
                 clients: { name: 'Test Client' }
-              }),
-              error: null
-            }))
-          }))
-        }))
-      })),
-      update: jest.fn(() => ({
-        eq: jest.fn(() => ({
-          select: jest.fn(() => ({
-            single: jest.fn(() => ({
-              data: Promise.resolve({ 
-                id: '1',
-                name: 'Test Campaign',
-                client_id: 'client-1',
-                status: 'active',
-                start_date: '2024-01-01',
-                end_date: '2024-12-31',
-                budget: 10000,
-                spent_amount: 5000,
-                target_audience: 'Adults 25-45',
-                objectives: 'Increase brand awareness',
-                platform: 'Facebook',
-                campaign_type: 'Social Media',
-                created_at: '2024-01-01T00:00:00Z',
-                updated_at: '2024-01-01T00:00:00Z',
-                active_status: true,
-                clients: { name: 'Test Client' }
-              }),
+              },
               error: null
             }))
           }))
         }))
       })),
       delete: jest.fn(() => ({
-        eq: jest.fn(() => ({
-          data: Promise.resolve(null),
+        eq: jest.fn(() => Promise.resolve({
+          data: null,
           error: null
         }))
       }))
@@ -234,7 +207,7 @@ describe('CampaignService', () => {
     it('should create a new campaign', async () => {
       const result = await campaignService.createCampaign(campaignData);
       expect(result).toBeDefined();
-      expect(result?.name).toBe(campaignData.name);
+      expect(result?.name).toBe(campaignData.name); // The mock returns campaignData.name
     });
 
     it('should handle creation errors', async () => {
@@ -242,16 +215,12 @@ describe('CampaignService', () => {
       supabase.from.mockReturnValueOnce({
         insert: jest.fn(() => ({
           select: jest.fn(() => ({
-            single: jest.fn(() => ({
-              data: Promise.resolve(null),
-              error: { message: 'Creation failed' }
-            }))
+            single: jest.fn(() => Promise.reject(new Error('Creation failed')))
           }))
         }))
       });
 
-      const result = await campaignService.createCampaign(campaignData);
-      expect(result).toBeNull();
+      await expect(campaignService.createCampaign(campaignData)).rejects.toThrow('Creation failed');
     });
   });
 
@@ -272,17 +241,13 @@ describe('CampaignService', () => {
         update: jest.fn(() => ({
           eq: jest.fn(() => ({
             select: jest.fn(() => ({
-              single: jest.fn(() => ({
-                data: Promise.resolve(null),
-                error: { message: 'Update failed' }
-              }))
+              single: jest.fn(() => Promise.reject(new Error('Update failed')))
             }))
           }))
         }))
       });
 
-      const result = await campaignService.updateCampaign('1', updateData);
-      expect(result).toBeNull();
+      await expect(campaignService.updateCampaign('1', updateData)).rejects.toThrow('Update failed');
     });
   });
 
@@ -295,11 +260,8 @@ describe('CampaignService', () => {
     it('should handle deletion errors', async () => {
       const { supabase } = require('@/lib/supabase');
       supabase.from.mockReturnValueOnce({
-        delete: jest.fn(() => ({
-          eq: jest.fn(() => ({
-            data: Promise.resolve(null),
-            error: { message: 'Deletion failed' }
-          }))
+        update: jest.fn(() => ({
+          eq: jest.fn(() => Promise.reject(new Error('Deletion failed')))
         }))
       });
 

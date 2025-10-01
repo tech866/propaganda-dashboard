@@ -1,6 +1,6 @@
 'use client';
 
-import { useSession } from 'next-auth/react';
+import { useAuth } from '@/hooks/useAuth';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
@@ -17,19 +17,19 @@ interface Call {
 }
 
 export default function CallsPage() {
-  const { data: session, status } = useSession();
+  const { user, isLoaded } = useAuth();
   const router = useRouter();
   const [calls, setCalls] = useState<Call[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (status === 'unauthenticated') {
+    if (isLoaded && !user) {
       router.push('/auth/signin');
     }
-  }, [status, router]);
+  }, [isLoaded, user, router]);
 
   useEffect(() => {
-    if (session) {
+    if (user) {
       fetch('/api/calls')
         .then(res => res.json())
         .then(data => {
@@ -41,9 +41,9 @@ export default function CallsPage() {
           setLoading(false);
         });
     }
-  }, [session]);
+  }, [user]);
 
-  if (status === 'loading' || loading) {
+  if (!isLoaded || loading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
@@ -54,7 +54,7 @@ export default function CallsPage() {
     );
   }
 
-  if (!session) {
+  if (!user) {
     return null;
   }
 
@@ -85,16 +85,22 @@ export default function CallsPage() {
             <div className="flex items-center space-x-4">
               <h1 className="text-2xl font-bold text-gray-900">Call Logs</h1>
               <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-purple-100 text-purple-800">
-                {session.user?.role?.toUpperCase()}
+                {user.publicMetadata?.role?.toString().toUpperCase() || 'USER'}
               </span>
             </div>
             <div className="flex items-center space-x-4">
-              <span className="text-sm text-gray-600">Welcome, {session.user?.name}</span>
+              <span className="text-sm text-gray-600">Welcome, {user.fullName || user.firstName}</span>
               <Link
                 href="/calls/new"
                 className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors"
               >
                 Log New Call
+              </Link>
+              <Link
+                href="/calls/enhanced"
+                className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors"
+              >
+                Enhanced Call Logging
               </Link>
             </div>
           </div>
@@ -114,7 +120,16 @@ export default function CallsPage() {
             <Link href="/calls/new" className="text-gray-500 hover:text-gray-700 pb-3 px-1 text-sm font-medium">
               Log Call
             </Link>
-            {session.user?.role === 'admin' && (
+            <Link href="/calls/enhanced" className="text-gray-500 hover:text-gray-700 pb-3 px-1 text-sm font-medium">
+              Enhanced Logging
+            </Link>
+            <Link href="/analytics" className="text-gray-500 hover:text-gray-700 pb-3 px-1 text-sm font-medium">
+              Analytics
+            </Link>
+            <Link href="/ad-spend" className="text-gray-500 hover:text-gray-700 pb-3 px-1 text-sm font-medium">
+              Ad Spend
+            </Link>
+            {user.publicMetadata?.role === 'admin' && (
               <Link href="/admin/users/new" className="text-gray-500 hover:text-gray-700 pb-3 px-1 text-sm font-medium">
                 Manage Users
               </Link>

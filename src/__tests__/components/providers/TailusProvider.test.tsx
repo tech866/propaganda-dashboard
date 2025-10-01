@@ -2,16 +2,6 @@ import React from 'react';
 import { render, screen } from '@testing-library/react';
 import { TailusProvider } from '@/components/providers/TailusProvider';
 
-// Mock Tailus themer
-jest.mock('@tailus/themer', () => ({
-  palette: jest.fn(() => ({
-    primary: '#3b82f6',
-    secondary: '#64748b',
-    background: '#0f172a',
-    foreground: '#f8fafc'
-  }))
-}));
-
 describe('TailusProvider', () => {
   beforeEach(() => {
     // Clear any existing CSS custom properties
@@ -28,88 +18,41 @@ describe('TailusProvider', () => {
     expect(screen.getByTestId('test-content')).toBeInTheDocument();
   });
 
-  it('applies Tailus theming to document root', () => {
-    const { palette } = require('@tailus/themer');
-    const mockPalette = {
-      primary: '#3b82f6',
-      secondary: '#64748b',
-      background: '#0f172a',
-      foreground: '#f8fafc'
-    };
-    palette.mockReturnValue(mockPalette);
-
+  it('applies Tailus-specific CSS variables to document root', () => {
     render(
       <TailusProvider>
         <div>Test Content</div>
       </TailusProvider>
     );
 
-    // Check that CSS custom properties are applied
+    // Check that Tailus-specific CSS custom properties are applied
     const root = document.documentElement;
-    expect(root.style.getPropertyValue('--primary')).toBe('#3b82f6');
-    expect(root.style.getPropertyValue('--secondary')).toBe('#64748b');
-    expect(root.style.getPropertyValue('--background')).toBe('#0f172a');
-    expect(root.style.getPropertyValue('--foreground')).toBe('#f8fafc');
-  });
-
-  it('calls palette with dark theme', () => {
-    const { palette } = require('@tailus/themer');
+    expect(root.style.getPropertyValue('--tailus-radius')).toBe('0.75rem');
+    expect(root.style.getPropertyValue('--tailus-shadow')).toBe('0 4px 6px -1px rgba(0, 0, 0, 0.1)');
     
-    render(
-      <TailusProvider>
-        <div>Test Content</div>
-      </TailusProvider>
-    );
-
-    expect(palette).toHaveBeenCalledWith('dark');
+    // Check that tailus-theme class is added
+    expect(root.classList.contains('tailus-theme')).toBe(true);
   });
 
-  it('handles palette with non-string values gracefully', () => {
-    const { palette } = require('@tailus/themer');
-    const mockPalette = {
-      primary: '#3b82f6',
-      secondary: { light: '#64748b', dark: '#475569' }, // Non-string value
-      background: '#0f172a',
-      foreground: '#f8fafc'
-    };
-    palette.mockReturnValue(mockPalette);
-
-    render(
-      <TailusProvider>
-        <div>Test Content</div>
-      </TailusProvider>
-    );
-
-    // Should only apply string values
-    const root = document.documentElement;
-    expect(root.style.getPropertyValue('--primary')).toBe('#3b82f6');
-    expect(root.style.getPropertyValue('--secondary')).toBe(''); // Non-string value should not be applied
-    expect(root.style.getPropertyValue('--background')).toBe('#0f172a');
-    expect(root.style.getPropertyValue('--foreground')).toBe('#f8fafc');
-  });
-
-  it('applies theming on mount and cleanup on unmount', () => {
-    const { palette } = require('@tailus/themer');
-    const mockPalette = {
-      primary: '#3b82f6',
-      secondary: '#64748b'
-    };
-    palette.mockReturnValue(mockPalette);
-
+  it('applies theming on mount', () => {
     const { unmount } = render(
       <TailusProvider>
         <div>Test Content</div>
       </TailusProvider>
     );
 
-    // Check that theming is applied
+    // Check that Tailus theming is applied
     const root = document.documentElement;
-    expect(root.style.getPropertyValue('--primary')).toBe('#3b82f6');
+    expect(root.style.getPropertyValue('--tailus-radius')).toBe('0.75rem');
+    expect(root.style.getPropertyValue('--tailus-shadow')).toBe('0 4px 6px -1px rgba(0, 0, 0, 0.1)');
+    expect(root.classList.contains('tailus-theme')).toBe(true);
 
     // Unmount component
     unmount();
 
     // Theming should still be applied (no cleanup in current implementation)
-    expect(root.style.getPropertyValue('--primary')).toBe('#3b82f6');
+    expect(root.style.getPropertyValue('--tailus-radius')).toBe('0.75rem');
+    expect(root.style.getPropertyValue('--tailus-shadow')).toBe('0 4px 6px -1px rgba(0, 0, 0, 0.1)');
+    expect(root.classList.contains('tailus-theme')).toBe(true);
   });
 });

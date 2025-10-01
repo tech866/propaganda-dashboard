@@ -9,54 +9,15 @@ import {
   type ClientFormData
 } from '@/lib/services/clientService';
 
-// Mock Supabase
-jest.mock('@/lib/supabase', () => ({
-  supabase: {
-    from: jest.fn(() => ({
-      select: jest.fn(() => ({
-        eq: jest.fn(() => ({
-          order: jest.fn(() => ({
-            data: Promise.resolve([]),
-            error: null
-          }))
-        }))
-      })),
-      insert: jest.fn(() => ({
-        select: jest.fn(() => ({
-          single: jest.fn(() => ({
-            data: Promise.resolve(mockClient),
-            error: null
-          }))
-        }))
-      })),
-      update: jest.fn(() => ({
-        eq: jest.fn(() => ({
-          select: jest.fn(() => ({
-            single: jest.fn(() => ({
-              data: Promise.resolve(mockClient),
-              error: null
-            }))
-          }))
-        }))
-      })),
-      delete: jest.fn(() => ({
-        eq: jest.fn(() => ({
-          data: Promise.resolve(null),
-          error: null
-        }))
-      }))
-    }))
-  }
-}));
-
-const mockClient: Client = {
+// Define mock data before the mock
+const mockClientData = {
   id: '1',
   name: 'Test Client',
   email: 'test@example.com',
   phone: '+1234567890',
   company: 'Test Company',
   industry: 'Technology',
-  status: 'active',
+  status: 'active' as const,
   monthly_budget: 10000,
   contact_person: 'John Doe',
   billing_address: '123 Test St',
@@ -68,8 +29,62 @@ const mockClient: Client = {
   contract_end_date: '2024-12-31',
   notes: 'Test notes',
   created_at: '2024-01-01T00:00:00Z',
-  updated_at: '2024-01-01T00:00:00Z'
+  updated_at: '2024-01-01T00:00:00Z',
+  agency_id: 'test-agency-id',
+  active_status: true
 };
+
+// Mock Supabase
+jest.mock('@/lib/supabase', () => ({
+  supabase: {
+    from: jest.fn(() => ({
+      select: jest.fn(() => ({
+        eq: jest.fn(() => ({
+          eq: jest.fn(() => ({
+            order: jest.fn(() => Promise.resolve({
+              data: [],
+              error: null
+            }))
+          })),
+          order: jest.fn(() => Promise.resolve({
+            data: [],
+            error: null
+          }))
+        }))
+      })),
+      insert: jest.fn(() => ({
+        select: jest.fn(() => ({
+          single: jest.fn(() => Promise.resolve({
+            data: { ...mockClientData, name: 'New Client' },
+            error: null
+          }))
+        }))
+      })),
+      update: jest.fn(() => ({
+        eq: jest.fn(() => ({
+          eq: jest.fn(() => ({
+            select: jest.fn(() => ({
+              single: jest.fn(() => Promise.resolve({
+                data: mockClientData,
+                error: null
+              }))
+            }))
+          }))
+        }))
+      })),
+      delete: jest.fn(() => ({
+        eq: jest.fn(() => ({
+          eq: jest.fn(() => Promise.resolve({
+            data: null,
+            error: null
+          }))
+        }))
+      }))
+    }))
+  }
+}));
+
+const mockClient: Client = mockClientData as Client;
 
 describe('ClientService', () => {
   let clientService: ClientService;
@@ -131,19 +146,19 @@ describe('ClientService', () => {
 
     it('should handle creation errors', async () => {
       const mockSupabase = require('@/lib/supabase').supabase;
-      mockSupabase.from.mockReturnValueOnce({
-        insert: jest.fn(() => ({
-          select: jest.fn(() => ({
-            single: jest.fn(() => ({
-              data: Promise.resolve(null),
-              error: { message: 'Creation failed' }
-            }))
-          }))
+      
+      // Mock the insert method to throw an error
+      const mockInsert = jest.fn(() => ({
+        select: jest.fn(() => ({
+          single: jest.fn(() => Promise.reject(new Error('Creation failed')))
         }))
+      }));
+      
+      mockSupabase.from.mockReturnValueOnce({
+        insert: mockInsert
       });
 
-      const result = await clientService.createClient(clientData);
-      expect(result).toBeNull();
+      await expect(clientService.createClient(clientData)).rejects.toThrow('Creation failed');
     });
   });
 
@@ -160,21 +175,23 @@ describe('ClientService', () => {
 
     it('should handle update errors', async () => {
       const mockSupabase = require('@/lib/supabase').supabase;
-      mockSupabase.from.mockReturnValueOnce({
-        update: jest.fn(() => ({
+      
+      // Mock the update method to throw an error
+      const mockUpdate = jest.fn(() => ({
+        eq: jest.fn(() => ({
           eq: jest.fn(() => ({
             select: jest.fn(() => ({
-              single: jest.fn(() => ({
-                data: Promise.resolve(null),
-                error: { message: 'Update failed' }
-              }))
+              single: jest.fn(() => Promise.reject(new Error('Update failed')))
             }))
           }))
         }))
+      }));
+      
+      mockSupabase.from.mockReturnValueOnce({
+        update: mockUpdate
       });
 
-      const result = await clientService.updateClient('1', updateData);
-      expect(result).toBeNull();
+      await expect(clientService.updateClient('1', updateData)).rejects.toThrow('Update failed');
     });
   });
 
@@ -187,10 +204,12 @@ describe('ClientService', () => {
     it('should handle deletion errors', async () => {
       const mockSupabase = require('@/lib/supabase').supabase;
       mockSupabase.from.mockReturnValueOnce({
-        delete: jest.fn(() => ({
+        update: jest.fn(() => ({
           eq: jest.fn(() => ({
-            data: Promise.resolve(null),
-            error: { message: 'Deletion failed' }
+            eq: jest.fn(() => ({
+              data: Promise.resolve(null),
+              error: { message: 'Deletion failed' }
+            }))
           }))
         }))
       });
@@ -222,8 +241,9 @@ describe('Utility Functions', () => {
     it('should return correct colors for different statuses', () => {
       expect(getClientStatusColor('active')).toContain('green');
       expect(getClientStatusColor('inactive')).toContain('gray');
-      expect(getClientStatusColor('prospect')).toContain('blue');
-      expect(getClientStatusColor('churned')).toContain('red');
+      expect(getClientStatusColor('pending')).toContain('yellow');
+      expect(getClientStatusColor('suspended')).toContain('red');
+      expect(getClientStatusColor('unknown')).toContain('gray'); // default case
     });
   });
 
@@ -231,8 +251,9 @@ describe('Utility Functions', () => {
     it('should return correct icons for different statuses', () => {
       expect(getClientStatusIcon('active')).toBe('✅');
       expect(getClientStatusIcon('inactive')).toBe('⏸️');
-      expect(getClientStatusIcon('prospect')).toBe('🔍');
-      expect(getClientStatusIcon('churned')).toBe('❌');
+      expect(getClientStatusIcon('pending')).toBe('⏳');
+      expect(getClientStatusIcon('suspended')).toBe('🚫');
+      expect(getClientStatusIcon('unknown')).toBe('❓'); // default case
     });
   });
 

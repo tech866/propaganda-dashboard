@@ -99,13 +99,6 @@ const navigationItems: MobileNavigationItem[] = [
     icon: BarChart3,
     requiredRoles: ['admin', 'ceo'],
     description: 'View detailed reports and analytics'
-  },
-  {
-    name: 'Settings',
-    href: '/settings',
-    icon: Settings,
-    requiredRoles: ['ceo'],
-    description: 'System settings and configuration'
   }
 ];
 
@@ -158,9 +151,6 @@ export default function MobileNavigation({ className = '' }: MobileNavigationPro
   const adminItems = accessibleItems.filter(item => 
     ['Manage Users', 'Audit Logs', 'Reports'].includes(item.name)
   );
-  const settingsItems = accessibleItems.filter(item => 
-    ['Settings'].includes(item.name)
-  );
 
   return (
     <div className={cn("lg:hidden", className)}>
@@ -209,25 +199,6 @@ export default function MobileNavigation({ className = '' }: MobileNavigationPro
                 {adminItems.length > 0 && (
                   <NavigationGroup title="Administration">
                     {adminItems.map((item) => {
-                      const Icon = item.icon;
-                      return (
-                        <NavigationItem
-                          key={item.name}
-                          icon={<Icon className="h-4 w-4" />}
-                          label={item.name}
-                          isActive={isActive(item.href)}
-                          href={item.href}
-                          badge={item.badge}
-                          onClick={() => setOpen(false)}
-                        />
-                      );
-                    })}
-                  </NavigationGroup>
-                )}
-
-                {settingsItems.length > 0 && (
-                  <NavigationGroup title="Settings">
-                    {settingsItems.map((item) => {
                       const Icon = item.icon;
                       return (
                         <NavigationItem

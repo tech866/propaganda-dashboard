@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { useSession, signOut } from 'next-auth/react';
+import { useAuth } from '@/hooks/useAuth';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useRole } from '@/contexts/RoleContext';
@@ -53,7 +53,7 @@ const navigationItems = [
 ];
 
 export default function DarkDashboardLayout({ children, className }: DarkDashboardLayoutProps) {
-  const { data: session } = useSession();
+  const { user } = useAuth();
   const pathname = usePathname();
   const { hasAnyRole } = useRole();
 

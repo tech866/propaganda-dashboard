@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useSession } from 'next-auth/react';
+import { useAuth } from '@/hooks/useAuth';
 import { useRouter } from 'next/navigation';
 import { useRole } from '@/contexts/RoleContext';
 import DashboardNavigation from '@/components/navigation/DashboardNavigation';
@@ -33,9 +33,9 @@ interface LossReason {
 }
 
 export default function LossReasonsManagement() {
-  const { data: session, status } = useSession();
+  const { user, isLoaded } = useAuth();
   const router = useRouter();
-  const { user, hasAnyRole, canManageLossReasons } = useRole();
+  const { hasAnyRole, canManageLossReasons } = useRole();
   
   const [lossReasons, setLossReasons] = useState<LossReason[]>([]);
   const [loading, setLoading] = useState(true);
@@ -45,12 +45,12 @@ export default function LossReasonsManagement() {
   const [statusFilter, setStatusFilter] = useState<string>('all');
 
   useEffect(() => {
-    if (status === 'unauthenticated') {
+    if (isLoaded && !user) {
       router.push('/auth/signin');
-    } else if (!hasAnyRole(['admin', 'ceo'])) {
+    } else if (user && !hasAnyRole(['admin', 'ceo'])) {
       router.push('/dashboard');
     }
-  }, [status, router, hasAnyRole]);
+  }, [isLoaded, user, router, hasAnyRole]);
 
   useEffect(() => {
     if (hasAnyRole(['admin', 'ceo'])) {
@@ -165,7 +165,7 @@ export default function LossReasonsManagement() {
   // Get unique categories for filter
   const categories = Array.from(new Set(lossReasons.map(reason => reason.category)));
 
-  if (status === 'loading') {
+  if (!isLoaded) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">

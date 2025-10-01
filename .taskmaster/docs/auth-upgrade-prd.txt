@@ -1,0 +1,75 @@
+# Authentication Upgrade PRD
+## Next.js 15 + Clerk + Supabase + Tailus UI Integration
+
+### Project Overview
+Upgrade the existing propaganda dashboard application to replace mock development authentication with Clerk's official authentication system, integrated with Supabase for role-based access control.
+
+### Current State
+- Next.js 15 App Router application
+- Mock development login form in place
+- Supabase database with existing schema
+- Tailus UI components
+- Existing test suite with Jest + React Testing Library
+- Role-based access control partially implemented
+
+### Goals
+1. Replace mock authentication with Clerk's official authentication modal
+2. Integrate Clerk with Supabase for seamless user management
+3. Implement proper route protection using Clerk middleware
+4. Maintain role-based access control (ADMIN, USER, PROFESSIONAL)
+5. Ensure all existing tests pass
+6. Provide production-ready authentication flow
+
+### Technical Requirements
+
+#### Authentication System
+- Use Clerk's `<SignIn />` and `<SignUp />` modal components
+- Implement proper Clerk provider setup in layout.tsx
+- Create dedicated sign-in and sign-up pages using App Router
+- Configure environment variables for Clerk integration
+- Redirect successful authentication to dashboard
+
+#### Route Protection
+- Implement Clerk middleware for route protection
+- Protect dashboard and admin routes
+- Allow public access to home page and auth pages
+- Handle unauthorized access with proper redirects
+
+#### Database Integration
+- Sync Clerk user IDs with Supabase users table
+- Maintain role-based access control
+- Update database schema if needed for role management
+- Ensure user metadata is properly stored
+
+#### Testing Requirements
+- Test Clerk modal rendering and functionality
+- Test login/logout flow
+- Test route protection and redirects
+- Test role-based access restrictions
+- Maintain existing test coverage
+- Add snapshot tests for authentication components
+
+### Success Criteria
+- Mock login form completely removed
+- Clerk authentication modals working properly
+- All routes properly protected
+- Role-based access control functioning
+- All tests passing
+- Production-ready authentication flow
+
+### Dependencies
+- Clerk account and API keys
+- Supabase project with existing schema
+- Next.js 15 App Router
+- Existing test infrastructure
+
+### Deliverables
+1. Updated layout.tsx with ClerkProvider
+2. New sign-in and sign-up pages with Clerk modals
+3. Middleware configuration for route protection
+4. Updated Supabase schema for role integration
+5. Comprehensive test suite for authentication
+6. Documentation for authentication flow
+
+### Timeline
+This is a critical upgrade that should be completed in phases to ensure system stability and maintain existing functionality.

@@ -1,0 +1,122 @@
+# Call Logging and Analytics System - Product Requirements Document
+
+## Overview
+Implement a comprehensive call logging and analytics system for closers to track sales calls, calculate performance metrics, and analyze ROI from advertising spend.
+
+## Core Functionality Requirements
+
+### 1. Call Logging Form
+The system must allow closers to log calls with the following data fields:
+
+#### Closer Information
+- First name of the closer (logged-in user)
+- Last name of the closer (logged-in user)
+
+#### Customer Information
+- Customer first name
+- Customer last name
+- Customer company name
+- Customer email address
+- Customer full name (computed field)
+
+#### Call Details
+- Source: Appointment type (SDR call or non-SDR booked call)
+- Traffic source: Organic or Paid ads
+- Call outcome: 
+  - No show
+  - No close
+  - Canceled
+  - Disqualified
+  - Rescheduled
+  - Payment plan deposit
+  - Close paid in full
+  - Follow call scheduled
+- Offer pitched during the call
+- Setter information (first name, last name)
+- Call date/time
+
+#### Payment Information
+- Cash collected upfront
+- Total amount owed
+- Number of payment installments
+- Expected payment date for each installment
+- Payment completion status
+- Prospect notes
+- CRM update status
+
+### 2. Analytics and Calculations
+For each client and overall, calculate:
+
+#### Performance Metrics
+- Close rate: (Number of closed deals / Total calls) * 100
+- Show rate: (Number of calls where customer showed up / Total scheduled calls) * 100
+- Cash collected: Sum of all upfront payments
+- Total revenue: Sum of all deal values
+
+#### ROI Metrics
+- ROAS (Return on Ad Spend): Revenue from paid ads / Ad spend amount
+- Cost per acquisition (CPA): Ad spend / Number of customers acquired
+- Revenue per lead: Total revenue / Total leads
+
+### 3. Ad Spend Integration
+- Manual entry option for ad spend amounts
+- Meta API integration for automatic ad spend data retrieval
+- Date range selection for ad spend data
+- Campaign-level ad spend tracking
+
+### 4. Data Management
+- Real-time data validation
+- Database schema optimization for performance
+- Data export capabilities
+- Historical data retention
+
+## Technical Requirements
+
+### Database Schema
+- Calls table with all required fields
+- Proper indexing for performance
+- Foreign key relationships
+- Audit trail for data changes
+
+### User Interface
+- Clean, intuitive form design
+- Real-time validation
+- Mobile-responsive design
+- Fast loading times
+- Error handling and user feedback
+
+### API Endpoints
+- POST /api/calls - Create new call log
+- GET /api/calls - Retrieve call logs with filtering
+- GET /api/analytics - Get calculated metrics
+- POST /api/ad-spend - Add/update ad spend data
+- GET /api/ad-spend - Retrieve ad spend data
+
+### Security
+- Role-based access control
+- Data validation and sanitization
+- Audit logging for all changes
+- Secure API endpoints
+
+## Success Criteria
+1. Closers can successfully log all call details
+2. Analytics calculations are accurate and real-time
+3. ROAS calculations work with both manual and API data
+4. System handles high volume of data efficiently
+5. UI is intuitive and requires minimal training
+6. Data integrity is maintained across all operations
+
+## Dependencies
+- Existing authentication system (Clerk)
+- Database setup (Supabase)
+- Meta API access for ad spend data
+- Current UI component library
+
+## Timeline
+This is a major feature that should be broken down into manageable phases:
+1. Database schema design and implementation
+2. Basic call logging form and API
+3. Analytics calculations and display
+4. Ad spend integration (manual and API)
+5. UI/UX improvements and testing
+6. Performance optimization and deployment

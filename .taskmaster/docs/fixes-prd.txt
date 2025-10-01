@@ -1,0 +1,78 @@
+# Propaganda Dashboard Fixes - Product Requirements Document
+
+## Overview
+Fix critical issues with the Propaganda Dashboard application including Clerk authentication setup, Tailwind CSS styling problems, and test optimization to ensure the application works properly locally and all tests pass efficiently.
+
+## Current Issues Identified
+
+### 1. Clerk Authentication Issues
+- Clerk is not properly configured (using placeholder keys)
+- Application crashes when trying to load pages
+- Missing proper environment variable setup
+- Authentication flow not working locally
+
+### 2. Tailwind CSS Styling Issues
+- UI formatting and colors are off
+- Styling inconsistencies across components
+- Dark mode theming not working properly
+- Component styling conflicts
+
+### 3. Testing Performance Issues
+- Tests are taking too long to run
+- Some tests have console errors that need to be cleaned up
+- Test execution could be optimized for faster feedback
+
+## Requirements
+
+### Clerk Authentication Fixes
+1. Set up proper Clerk environment variables
+2. Configure Clerk authentication flow correctly
+3. Ensure all pages load without crashes
+4. Implement proper fallback for development mode
+5. Fix authentication state management
+
+### Tailwind CSS Styling Fixes
+1. Fix color scheme and theming issues
+2. Ensure consistent styling across all components
+3. Fix dark mode implementation
+4. Resolve any CSS conflicts
+5. Optimize Tailwind configuration
+
+### Testing Optimization
+1. Clean up console errors in tests
+2. Optimize test execution time
+3. Ensure all tests pass consistently
+4. Implement parallel test execution where possible
+5. Fix any failing test cases
+
+## Technical Specifications
+
+### Environment Setup
+- Use proper Clerk API keys (not placeholders)
+- Configure environment variables correctly
+- Set up development vs production configurations
+
+### Styling Requirements
+- Maintain dark theme consistency
+- Use proper Tailwind CSS classes
+- Ensure responsive design works
+- Fix any CSS variable issues
+
+### Testing Requirements
+- All tests must pass
+- Tests should run in under 10 seconds
+- No console errors during test execution
+- Proper test isolation and cleanup
+
+## Success Criteria
+1. Application runs locally without crashes
+2. All pages load correctly with proper styling
+3. Authentication works in development mode
+4. All tests pass consistently
+5. Test execution time is optimized
+6. No console errors in production or development
+
+## Implementation Priority
+1. High: Fix Clerk authentication (blocks all functionality)
+2. High: Fix Tailwind CSS styling (affects user experience)
+3. Medium: Optimize testing (improves development workflow)

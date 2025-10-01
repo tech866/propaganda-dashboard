@@ -143,3 +143,4 @@ Once you've completed the setup:
 
 The Supabase MCP integration will make database operations much more intuitive and allow for natural language database interactions!
 
+

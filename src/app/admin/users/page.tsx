@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useSession } from 'next-auth/react';
+import { useAuth } from '@/hooks/useAuth';
 import { useRouter } from 'next/navigation';
 import { useRole, RoleGuard, PermissionGuard } from '@/contexts/RoleContext';
 import DashboardNavigation from '@/components/navigation/DashboardNavigation';
@@ -25,9 +25,9 @@ interface User {
 }
 
 export default function UsersManagement() {
-  const { data: session, status } = useSession();
+  const { user, isLoaded } = useAuth();
   const router = useRouter();
-  const { user, hasAnyRole, canManageUsers } = useRole();
+  const { hasAnyRole, canManageUsers } = useRole();
   
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
@@ -37,12 +37,12 @@ export default function UsersManagement() {
   const [statusFilter, setStatusFilter] = useState<string>('all');
 
   useEffect(() => {
-    if (status === 'unauthenticated') {
+    if (isLoaded && !user) {
       router.push('/auth/signin');
-    } else if (!hasAnyRole(['admin', 'ceo'])) {
+    } else if (user && !hasAnyRole(['admin', 'ceo'])) {
       router.push('/dashboard');
     }
-  }, [status, router, hasAnyRole]);
+  }, [isLoaded, user, router, hasAnyRole]);
 
   useEffect(() => {
     if (hasAnyRole(['admin', 'ceo'])) {
@@ -129,7 +129,7 @@ export default function UsersManagement() {
     return matchesSearch && matchesRole && matchesStatus;
   });
 
-  if (status === 'loading') {
+  if (!isLoaded) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
         <div className="text-center">

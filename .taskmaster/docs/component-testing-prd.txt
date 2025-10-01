@@ -1,0 +1,82 @@
+# Component Testing & Fixes PRD
+
+## Project Overview
+Next.js 15 (App Router) + Clerk + Tailus UI propaganda dashboard application that needs comprehensive component identification, fixes, and testing.
+
+## Goals
+- Identify all main page components of the app
+- Apply fixes so components work properly with Clerk (`useUser` inside <ClerkProvider>) and Tailus
+- Write tests for each main component
+- Run tests and confirm they all pass
+
+## Technical Stack
+- Next.js 15 with App Router
+- Clerk for authentication
+- Tailus UI for components
+- Jest + React Testing Library for testing
+- TypeScript
+
+## Constraints
+- Do not break ClerkProvider or routing
+- Keep dark/light mode, accessibility, and responsiveness intact
+- Refactor incrementally, not all at once
+- Use Jest + React Testing Library for tests
+- Follow Next.js App Router conventions
+
+## Main Tasks
+
+### Task 1: Component Identification
+Scan the app to identify all main page components:
+- Layout components (Sidebar, Header, Navigation)
+- Page components (Dashboard, Clients, Campaigns, etc.)
+- Feature sections (Stats, Filters, Tables, Settings)
+- UI components (Cards, Buttons, Forms, etc.)
+
+### Task 2: Core Wrapper Fixes
+- Ensure `src/app/layout.tsx` wraps the app in `<ClerkProvider>` and Tailus provider
+- Confirm that every component using `useUser` is safely inside a provider
+- Fix any provider-related issues
+
+### Task 3: Tailus UI Integration
+- Convert Sidebar to Tailus `Sidebar`, `SidebarItem`, `SidebarGroup`
+- Convert Header to Tailus `Navbar`, `Avatar`, `Badge`, `IconButton`
+- Convert Stats to Tailus `Card` or `StatCard` in responsive `Grid`
+- Convert Filters/Export to Tailus `DatePicker`, `Button`, `Dropdown`
+- Convert Tables to Tailus `Table` for Client Performance & Recent Campaigns
+- Convert Switches to Tailus `Switch`
+
+### Task 4: Component Testing
+Create comprehensive test files for each main component:
+- Layout.test.tsx - Confirms app renders inside ClerkProvider without errors
+- ModernDashboardLayout.test.tsx - Tests user states (loading, authenticated, unauthenticated)
+- Sidebar.test.tsx - Renders nav items, highlights active route
+- Header.test.tsx - Shows avatar, badge, and action icons
+- Stats.test.tsx - Displays values for campaigns, clients, users, plan
+- Filters.test.tsx - Dropdown and export buttons work
+- Tables.test.tsx - Client and campaign rows render correctly
+- Switch.test.tsx - Switch toggles and updates aria-checked
+
+### Task 5: Snapshot Testing
+- Add snapshot tests for Dashboard page and ModernDashboardLayout
+- Ensure UI regressions are caught
+
+### Task 6: Test Execution
+- Run the full test suite
+- Fix any failing tests until all pass
+- Ensure 100% test coverage for main components
+
+## Success Criteria
+- All main components identified and documented
+- All components work properly with Clerk authentication
+- All components use Tailus UI consistently
+- Comprehensive test suite with 100% passing tests
+- No breaking changes to existing functionality
+- Maintained accessibility and responsiveness
+
+## Deliverables
+- List of identified components with descriptions
+- Updated layout.tsx with proper provider wrapping
+- Refactored components using Tailus UI
+- Complete test suite for all main components
+- Passing test suite with good coverage
+- Documentation of changes made

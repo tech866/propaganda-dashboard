@@ -1,0 +1,33 @@
+# Urgent Fixes for Propaganda Dashboard
+
+## Problem Statement
+The Propaganda Dashboard application is currently broken locally with the following critical issues:
+1. Clerk authentication is not working (using placeholder keys)
+2. UI styling is broken with Tailwind CSS issues
+3. Tests are slow and have console errors
+
+## Requirements
+
+### Task 1: Fix Clerk Authentication
+- Replace placeholder Clerk API keys with proper configuration
+- Ensure authentication works in development mode
+- Fix any authentication-related crashes
+- Implement proper fallback for development
+
+### Task 2: Fix Tailwind CSS Styling
+- Fix color scheme and theming issues
+- Ensure dark mode works properly
+- Fix styling inconsistencies across components
+- Resolve CSS conflicts
+
+### Task 3: Optimize Testing
+- Clean up console errors in tests
+- Optimize test execution time
+- Ensure all tests pass consistently
+- Fix any failing test cases
+
+## Success Criteria
+- Application runs locally without crashes
+- All pages load with proper styling
+- Authentication works in development
+- All tests pass quickly without errors

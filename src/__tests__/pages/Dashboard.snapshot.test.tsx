@@ -4,6 +4,20 @@ import Dashboard from '@/app/dashboard/page';
 import { useRole } from '@/contexts/RoleContext';
 import { useAgency } from '@/contexts/AgencyContext';
 
+// Mock Next.js router
+jest.mock('next/navigation', () => ({
+  useRouter: () => ({
+    push: jest.fn(),
+    replace: jest.fn(),
+    prefetch: jest.fn(),
+    back: jest.fn(),
+    forward: jest.fn(),
+    refresh: jest.fn(),
+  }),
+  usePathname: () => '/dashboard',
+  useSearchParams: () => new URLSearchParams(),
+}));
+
 // Mock the contexts
 jest.mock('@/contexts/RoleContext', () => ({
   useRole: jest.fn()

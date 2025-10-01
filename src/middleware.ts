@@ -1,11 +1,5 @@
-/**
- * Next.js Middleware
- * Propaganda Dashboard - Clerk authentication middleware
- * Note: Full audit logging is handled in API routes to avoid Edge Runtime issues
- */
-
 import { clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server';
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 
 // Define protected routes
 const isProtectedRoute = createRouteMatcher([
@@ -17,44 +11,29 @@ const isProtectedRoute = createRouteMatcher([
   '/performance(.*)'
 ]);
 
-// Temporarily disable Clerk middleware for development
-// TODO: Re-enable when proper Clerk keys are configured
-export default function middleware(req: NextRequest) {
-  // Basic request logging
-  const skipPaths = [
-    '/_next/',
-    '/favicon.ico',
-    '/api/health',
-    '/api/webhooks/clerk'
-  ];
-  
-  const shouldSkip = skipPaths.some(path => req.nextUrl.pathname.startsWith(path));
-  
-  if (!shouldSkip) {
-    // Log basic request information
-    console.log('Request:', {
-      method: req.method,
-      endpoint: req.nextUrl.pathname,
-      userId: null,
-      agencyId: null,
-      ipAddress: req.headers.get('x-forwarded-for')?.split(',')[0] || req.ip || null,
-      timestamp: new Date().toISOString()
-    });
+export default clerkMiddleware((auth, req) => {
+  // Protect routes
+  if (isProtectedRoute(req)) {
+    // Check if we're in development mode and allow mock user
+    if (process.env.NODE_ENV === 'development') {
+      // Allow development access - mock user will be used
+      return NextResponse.next();
+    }
+    
+    const { userId } = auth();
+    
+    if (!userId) {
+      // Redirect to sign-in page if not authenticated
+      return NextResponse.redirect(new URL('/auth/signin', req.url));
+    }
   }
-  
-  return NextResponse.next();
-}
+});
 
-// Configure which paths the middleware should run on
 export const config = {
   matcher: [
-    /*
-     * Match all request paths except for the ones starting with:
-     * - api (API routes)
-     * - _next/static (static files)
-     * - _next/image (image optimization files)
-     * - favicon.ico (favicon file)
-     */
-    '/((?!_next/static|_next/image|favicon.ico).*)',
+    // Skip Next.js internals and all static files, unless found in search params
+    '/((?!_next|[^?]*\\.(?:html?|css|js(?!on)|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest)).*)',
+    // Always run for API routes
+    '/(api|trpc)(.*)',
   ],
 };

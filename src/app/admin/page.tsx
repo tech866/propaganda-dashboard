@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useSession } from 'next-auth/react';
+import { useAuth } from '@/hooks/useAuth';
 import { useRouter } from 'next/navigation';
 import { useRole, RoleGuard, PermissionGuard } from '@/contexts/RoleContext';
 import DashboardNavigation from '@/components/navigation/DashboardNavigation';
@@ -12,19 +12,19 @@ import { Badge } from '@/components/ui/badge';
 import { Users, FileText, Settings, Shield, BarChart3, Activity } from 'lucide-react';
 
 export default function AdminDashboard() {
-  const { data: session, status } = useSession();
+  const { user, isLoaded } = useAuth();
   const router = useRouter();
-  const { user, hasAnyRole, canManageUsers } = useRole();
+  const { hasAnyRole, canManageUsers } = useRole();
 
   useEffect(() => {
-    if (status === 'unauthenticated') {
+    if (isLoaded && !user) {
       router.push('/auth/signin');
-    } else if (!hasAnyRole(['admin', 'ceo'])) {
+    } else if (user && !hasAnyRole(['admin', 'ceo'])) {
       router.push('/dashboard');
     }
-  }, [status, router, hasAnyRole]);
+  }, [isLoaded, user, router, hasAnyRole]);
 
-  if (status === 'loading') {
+  if (!isLoaded) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
         <div className="text-center">

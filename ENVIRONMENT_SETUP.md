@@ -36,3 +36,4 @@ DATABASE_URL=your_database_url
 - The `SUPABASE_SERVICE_ROLE_KEY` has admin privileges - keep it secure
 - Use different keys for development and production
 
+

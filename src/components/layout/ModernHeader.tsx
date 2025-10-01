@@ -4,7 +4,7 @@ import { useRouter } from 'next/navigation';
 import { useRole } from '@/contexts/RoleContext';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { avatar, fallback } from '@tailus/themer';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -72,10 +72,10 @@ export default function ModernHeader({ className = '' }: ModernHeaderProps) {
             <MobileNavigation />
             <div className="hidden sm:flex items-center space-x-3">
               <Badge 
-                variant={getRoleVariant(roleUser?.role) as any}
+                variant={getRoleVariant(user?.publicMetadata?.role) as any}
                 className="font-medium px-3 py-1"
               >
-                {roleUser?.role?.toUpperCase()}
+                {user?.publicMetadata?.role?.toUpperCase()}
               </Badge>
             </div>
           </div>
@@ -92,11 +92,11 @@ export default function ModernHeader({ className = '' }: ModernHeaderProps) {
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" className="relative h-9 w-9 rounded-full hover-modern-subtle">
-                  <div className={avatar()}>
-                    <div className={fallback()}>
-                      {user?.name?.split(' ').map(n => n[0]).join('').toUpperCase() || 'U'}
-                    </div>
-                  </div>
+                  <Avatar className="h-9 w-9">
+                    <AvatarFallback className="text-sm font-medium">
+                      {getInitials(user?.name)}
+                    </AvatarFallback>
+                  </Avatar>
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent className="w-64 glass-premium" align="end" forceMount>

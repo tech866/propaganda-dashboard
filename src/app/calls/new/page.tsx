@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useSession } from 'next-auth/react';
+import { useAuth } from '@/hooks/useAuth';
 import { useRouter } from 'next/navigation';
 import { useFormValidation } from '@/hooks/useFormValidation';
 import { createCallSchema } from '@/lib/validation/clientSchemas';
@@ -25,7 +25,7 @@ interface CallFormData {
 }
 
 export default function NewCall() {
-  const { data: session, status } = useSession();
+  const { user, isLoaded } = useAuth();
   const router = useRouter();
   
   const [formData, setFormData] = useState<CallFormData>({
@@ -50,15 +50,15 @@ export default function NewCall() {
   const { validate, getFieldError, hasFieldError, clearErrors } = useFormValidation(createCallSchema);
 
   useEffect(() => {
-    if (status === 'unauthenticated') {
+    if (isLoaded && !user) {
       router.push('/auth/signin');
-    } else if (session?.user?.clientId) {
+    } else if (user?.publicMetadata?.agency_id) {
       setFormData(prev => ({
         ...prev,
-        client_id: session.user.clientId
+        client_id: user.publicMetadata.agency_id
       }));
     }
-  }, [session, status, router]);
+  }, [user, isLoaded, router]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -128,7 +128,7 @@ export default function NewCall() {
     }
   };
 
-  if (status === 'loading') {
+  if (!isLoaded || loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">

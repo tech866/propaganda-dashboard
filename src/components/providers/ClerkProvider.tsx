@@ -5,7 +5,7 @@ import { ReactNode } from 'react';
 
 // Clerk configuration
 const clerkConfig = {
-  publishableKey: process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY!,
+  publishableKey: process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY,
   signInUrl: process.env.NEXT_PUBLIC_CLERK_SIGN_IN_URL || '/auth/signin',
   signUpUrl: process.env.NEXT_PUBLIC_CLERK_SIGN_UP_URL || '/auth/register',
   afterSignInUrl: process.env.NEXT_PUBLIC_CLERK_AFTER_SIGN_IN_URL || '/dashboard',
