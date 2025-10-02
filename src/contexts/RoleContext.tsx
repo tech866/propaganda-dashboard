@@ -133,6 +133,11 @@ export function RoleProvider({ children }: { children: React.ReactNode }) {
 
   // Clerk integration
   useEffect(() => {
+    // Only run Clerk integration if Clerk is configured
+    if (!isClerkConfigured) {
+      return;
+    }
+
     if (!userLoaded || !orgLoaded) {
       setIsLoading(true);
       return;
@@ -157,7 +162,7 @@ export function RoleProvider({ children }: { children: React.ReactNode }) {
     });
 
     setIsLoading(false);
-  }, [clerkUser, userLoaded, organization, orgLoaded]);
+  }, [clerkUser, userLoaded, organization, orgLoaded, isClerkConfigured]);
 
   // Check if user has a specific role
   const hasRole = (role: UserRole): boolean => {

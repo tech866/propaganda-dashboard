@@ -43,15 +43,24 @@ const AgencyContext = createContext<AgencyContextType | undefined>(undefined);
 
 // Agency provider component
 export function AgencyProvider({ children }: { children: React.ReactNode }) {
-  // Temporarily disable Clerk hooks for development
-  // TODO: Re-enable when proper Clerk keys are configured
   const [agency, setAgency] = useState<Agency | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   
-  // Mock agency for development
+  // Use Clerk hooks only if configured
+  const clerkHooks = isClerkConfigured ? {
+    user: useUser(),
+    organization: useOrganization()
+  } : null;
+  
+  const user = clerkHooks?.user?.user;
+  const userLoaded = clerkHooks?.user?.isLoaded ?? true;
+  const organization = clerkHooks?.organization?.organization;
+  const orgLoaded = clerkHooks?.organization?.isLoaded ?? true;
+  
+  // Mock agency for development when Clerk is not configured
   React.useEffect(() => {
-    if (process.env.NODE_ENV === 'development') {
+    if (process.env.NODE_ENV === 'development' && !isClerkConfigured) {
       setAgency({
         id: 'dev-agency-1',
         name: 'Development Agency',
@@ -70,11 +79,7 @@ export function AgencyProvider({ children }: { children: React.ReactNode }) {
       setIsLoading(false);
       return;
     }
-  }, []);
-  
-  // Original Clerk implementation (commented out for development)
-  // const { user, isLoaded: userLoaded } = useUser();
-  // const { organization, isLoaded: orgLoaded } = useOrganization();
+  }, [isClerkConfigured]);
 
   // Fetch agency data from Supabase
   const fetchAgency = async (agencyId: string) => {
@@ -117,27 +122,32 @@ export function AgencyProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
-  // Original Clerk useEffect (commented out for development)
-  // useEffect(() => {
-  //   if (!userLoaded || !orgLoaded) {
-  //     setIsLoading(true);
-  //     return;
-  //   }
+  // Clerk integration for production
+  useEffect(() => {
+    // Only run Clerk integration if Clerk is configured
+    if (!isClerkConfigured) {
+      return;
+    }
 
-  //   if (!user || !organization) {
-  //     setAgency(null);
-  //     setIsLoading(false);
-  //     return;
-  //   }
+    if (!userLoaded || !orgLoaded) {
+      setIsLoading(true);
+      return;
+    }
 
-  //   // Fetch agency data from Supabase using organization ID
-  //   fetchAgency(organization.id);
-  // }, [user, userLoaded, organization, orgLoaded]);
+    if (!user || !organization) {
+      setAgency(null);
+      setIsLoading(false);
+      return;
+    }
 
-  // Mock permission checks for development
-  const canManageAgency = true; // Admin user in development
-  const canViewFinancial = true; // Admin user in development
-  const canManageUsers = true; // Admin user in development
+    // Fetch agency data from Supabase using organization ID
+    fetchAgency(organization.id);
+  }, [user, userLoaded, organization, orgLoaded, isClerkConfigured]);
+
+  // Permission checks based on user role
+  const canManageAgency = user?.publicMetadata?.role === 'admin' || user?.publicMetadata?.role === 'ceo';
+  const canViewFinancial = user?.publicMetadata?.role === 'admin' || user?.publicMetadata?.role === 'ceo';
+  const canManageUsers = user?.publicMetadata?.role === 'admin' || user?.publicMetadata?.role === 'ceo';
 
   const value: AgencyContextType = {
     agency,
