@@ -14,10 +14,8 @@ const clerkConfig = {
 
 // Clerk provider wrapper component
 export function ClerkProviderWrapper({ children }: { children: ReactNode }) {
-  // Check if Clerk is properly configured
-  const isClerkConfigured = clerkConfig.publishableKey && 
-    !clerkConfig.publishableKey.includes('placeholder') &&
-    clerkConfig.publishableKey.length > 20;
+  // Check if Clerk is properly configured - simplified for production
+  const isClerkConfigured = !!clerkConfig.publishableKey;
 
   // If Clerk is not configured, render children without Clerk provider
   if (!isClerkConfigured) {
