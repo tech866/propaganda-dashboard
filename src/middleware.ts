@@ -12,7 +12,20 @@ const isProtectedRoute = createRouteMatcher([
   '/performance(.*)'
 ]);
 
+// Define public routes that should not be protected
+const isPublicRoute = createRouteMatcher([
+  '/',
+  '/auth/signin(.*)',
+  '/auth/register(.*)',
+  '/api/webhooks(.*)'
+]);
+
 export default clerkMiddleware(async (auth, req) => {
+  // Skip middleware for public routes
+  if (isPublicRoute(req)) {
+    return NextResponse.next();
+  }
+
   // Apply admin middleware first for admin routes
   const adminResponse = await adminMiddleware(req);
   if (adminResponse) {
@@ -27,19 +40,17 @@ export default clerkMiddleware(async (auth, req) => {
 
   // Protect routes
   if (isProtectedRoute(req)) {
-    // Check if we're in development mode and allow mock user
-    if (process.env.NODE_ENV === 'development') {
-      // Allow development access - mock user will be used
-      return NextResponse.next();
-    }
-    
     const { userId } = await auth();
     
     if (!userId) {
       // Redirect to sign-in page if not authenticated
-      return NextResponse.redirect(new URL('/auth/signin', req.url));
+      const signInUrl = new URL('/auth/signin', req.url);
+      signInUrl.searchParams.set('redirect_url', req.url);
+      return NextResponse.redirect(signInUrl);
     }
   }
+
+  return NextResponse.next();
 });
 
 export const config = {

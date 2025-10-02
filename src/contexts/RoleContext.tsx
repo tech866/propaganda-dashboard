@@ -142,12 +142,13 @@ export function RoleProvider({ children }: { children: React.ReactNode }) {
     // Only run Clerk integration if Clerk is configured
     if (!isClerkConfigured) {
       console.log('Clerk not configured, skipping integration');
+      setIsLoading(false);
       return;
     }
 
-    // Add timeout fallback to prevent infinite loading
+    // Add timeout fallback to prevent infinite loading (reduced to 5 seconds)
     const timeoutId = setTimeout(() => {
-      console.log('Clerk loading timeout - providing fallback user');
+      console.warn('Clerk loading timeout - providing fallback user');
       setUser({
         id: 'fallback-user-1',
         email: 'user@example.com',
@@ -156,7 +157,7 @@ export function RoleProvider({ children }: { children: React.ReactNode }) {
         clientId: 'fallback-agency-1'
       });
       setIsLoading(false);
-    }, 10000); // 10 second timeout
+    }, 5000); // 5 second timeout
 
     if (!userLoaded || !orgLoaded) {
       console.log('Clerk hooks not loaded yet, setting loading to true');
