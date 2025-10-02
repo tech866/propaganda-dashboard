@@ -4,14 +4,14 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { useRouter } from 'next/navigation';
 import { useRole, RoleGuard, PermissionGuard } from '@/contexts/RoleContext';
-import DashboardNavigation from '@/components/navigation/DashboardNavigation';
+import ModernDashboardLayout from '@/components/layout/ModernDashboardLayout';
 import Link from 'next/link';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Users, UserPlus, Search, RefreshCw, Shield, Edit, Trash2 } from 'lucide-react';
+import { Users, UserPlus, Search, RefreshCw, Shield, Edit, Trash2, ArrowLeft } from 'lucide-react';
 
 interface User {
   id: string;
@@ -165,27 +165,33 @@ export default function UsersManagement() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      {/* Navigation */}
-      <DashboardNavigation />
-
+    <ModernDashboardLayout>
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
         <div className="mb-8">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-3">
-              <div className="w-12 h-12 bg-gradient-to-br from-primary to-secondary rounded-xl flex items-center justify-center">
-                <Users className="w-6 h-6 text-primary-foreground" />
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
+            <div className="flex items-center space-x-4">
+              <Button 
+                variant="ghost" 
+                size="icon" 
+                onClick={() => router.push('/admin')} 
+                className="text-white hover:bg-white/10 transition-all duration-200 hover:scale-110"
+                title="Back to Admin Dashboard"
+              >
+                <ArrowLeft className="h-6 w-6" />
+              </Button>
+              <div className="w-16 h-16 bg-gradient-to-br from-blue-600 via-purple-600 to-blue-800 rounded-2xl flex items-center justify-center shadow-2xl shadow-blue-500/25">
+                <Users className="w-8 h-8 text-white" />
               </div>
               <div>
-                <h1 className="text-display">User Management</h1>
-                <p className="text-body-lg text-muted-foreground">
-                  Manage user accounts, roles, and permissions
-                </p>
+                <h1 className="text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-500">
+                  User Management
+                </h1>
+                <p className="text-lg text-gray-400 mt-2">Manage user accounts, roles, and permissions</p>
               </div>
             </div>
-            <Button asChild>
+            <Button asChild className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white border-0 shadow-lg shadow-blue-500/25 hover:shadow-blue-500/40 transition-all duration-200 hover:scale-105">
               <Link href="/admin/users/new">
                 <UserPlus className="w-4 h-4 mr-2" />
                 Create New User
@@ -195,36 +201,42 @@ export default function UsersManagement() {
         </div>
 
         {/* Filters */}
-        <Card className="mb-6">
-          <CardHeader>
-            <CardTitle className="text-h4">Filters</CardTitle>
-            <CardDescription>Search and filter users by various criteria</CardDescription>
+        <Card className="mb-6 bg-white/5 backdrop-blur-xl border border-white/10 shadow-2xl">
+          <CardHeader className="space-y-2">
+            <div className="flex items-center space-x-2">
+              <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></div>
+              <Badge className="bg-blue-500/20 text-blue-300 border-blue-500/50">Filters & Controls</Badge>
+            </div>
+            <CardTitle className="text-h4 text-white">Search and Filter Users</CardTitle>
+            <CardDescription className="text-gray-400">Filter users by various criteria to find what you're looking for</CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
               <div className="space-y-2">
-                <label className="text-sm font-medium text-foreground">
-                  Search Users
+                <label className="text-sm font-medium text-gray-300 flex items-center space-x-2">
+                  <Search className="w-4 h-4" />
+                  <span>Search Users</span>
                 </label>
                 <div className="relative">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
                   <Input
                     type="text"
                     placeholder="Search by name or email..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    className="pl-10"
+                    className="pl-10 bg-white/5 backdrop-blur-sm border-white/20 text-white placeholder:text-gray-400 focus:border-blue-500/50 focus:ring-blue-500/20"
                   />
                 </div>
               </div>
               <div className="space-y-2">
-                <label className="text-sm font-medium text-foreground">
-                  Filter by Role
+                <label className="text-sm font-medium text-gray-300 flex items-center space-x-2">
+                  <Shield className="w-4 h-4" />
+                  <span>Filter by Role</span>
                 </label>
                 <select
                   value={roleFilter}
                   onChange={(e) => setRoleFilter(e.target.value)}
-                  className="input-modern w-full"
+                  className="w-full h-10 px-3 bg-white/5 backdrop-blur-sm border border-white/20 rounded-lg text-white focus:border-blue-500/50 focus:ring-blue-500/20 focus:outline-none"
                 >
                   <option value="all">All Roles</option>
                   <option value="sales">Sales</option>
@@ -233,13 +245,14 @@ export default function UsersManagement() {
                 </select>
               </div>
               <div className="space-y-2">
-                <label className="text-sm font-medium text-foreground">
-                  Filter by Status
+                <label className="text-sm font-medium text-gray-300 flex items-center space-x-2">
+                  <Users className="w-4 h-4" />
+                  <span>Filter by Status</span>
                 </label>
                 <select
                   value={statusFilter}
                   onChange={(e) => setStatusFilter(e.target.value)}
-                  className="input-modern w-full"
+                  className="w-full h-10 px-3 bg-white/5 backdrop-blur-sm border border-white/20 rounded-lg text-white focus:border-blue-500/50 focus:ring-blue-500/20 focus:outline-none"
                 >
                   <option value="all">All Status</option>
                   <option value="active">Active</option>
@@ -249,8 +262,8 @@ export default function UsersManagement() {
               <div className="flex items-end">
                 <Button
                   onClick={fetchUsers}
-                  variant="secondary"
-                  className="w-full"
+                  variant="outline"
+                  className="w-full bg-white/5 backdrop-blur-sm border-white/20 hover:bg-white/10 text-white transition-all duration-200 hover:scale-105"
                 >
                   <RefreshCw className="w-4 h-4 mr-2" />
                   Refresh
@@ -270,10 +283,14 @@ export default function UsersManagement() {
         )}
 
         {/* Users Table */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-h4">Users</CardTitle>
-            <CardDescription>Manage user accounts and their permissions</CardDescription>
+        <Card className="bg-white/5 backdrop-blur-xl border border-white/10 shadow-2xl">
+          <CardHeader className="space-y-2">
+            <div className="flex items-center space-x-2">
+              <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+              <Badge className="bg-green-500/20 text-green-300 border-green-500/50">Data Analysis</Badge>
+            </div>
+            <CardTitle className="text-h4 text-white">Users</CardTitle>
+            <CardDescription className="text-gray-400">Manage user accounts and their permissions</CardDescription>
           </CardHeader>
           <CardContent>
             {loading ? (
@@ -287,25 +304,25 @@ export default function UsersManagement() {
                 <p className="text-muted-foreground">No users found matching your criteria.</p>
               </div>
             ) : (
-              <div className="overflow-x-auto">
+              <div className="overflow-x-auto rounded-xl border border-slate-700/50 bg-slate-800/30 backdrop-blur-sm">
                 <Table>
                   <TableHeader>
-                    <TableRow>
-                      <TableHead>User</TableHead>
-                      <TableHead>Role</TableHead>
-                      <TableHead>Client ID</TableHead>
-                      <TableHead>Status</TableHead>
-                      <TableHead>Created</TableHead>
-                      <TableHead>Actions</TableHead>
+                    <TableRow className="border-slate-700/50 hover:bg-slate-700/30">
+                      <TableHead className="text-gray-300 font-semibold">User</TableHead>
+                      <TableHead className="text-gray-300 font-semibold">Role</TableHead>
+                      <TableHead className="text-gray-300 font-semibold">Client ID</TableHead>
+                      <TableHead className="text-gray-300 font-semibold">Status</TableHead>
+                      <TableHead className="text-gray-300 font-semibold">Created</TableHead>
+                      <TableHead className="text-gray-300 font-semibold">Actions</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
                     {filteredUsers.map((user) => (
-                      <TableRow key={user.id}>
+                      <TableRow key={user.id} className="border-slate-700/50 hover:bg-slate-700/30 transition-colors duration-200">
                         <TableCell>
                           <div>
-                            <div className="font-medium text-foreground">{user.name}</div>
-                            <div className="text-sm text-muted-foreground">{user.email}</div>
+                            <div className="font-medium text-white">{user.name}</div>
+                            <div className="text-sm text-gray-400">{user.email}</div>
                           </div>
                         </TableCell>
                         <TableCell>
@@ -315,11 +332,12 @@ export default function UsersManagement() {
                               user.role === 'admin' ? 'secondary' :
                               'success'
                             }
+                            className="font-medium"
                           >
                             {user.role.charAt(0).toUpperCase() + user.role.slice(1)}
                           </Badge>
                         </TableCell>
-                        <TableCell className="text-muted-foreground">
+                        <TableCell className="text-gray-400 font-mono text-sm">
                           {user.clientId}
                         </TableCell>
                         <TableCell>
@@ -327,16 +345,17 @@ export default function UsersManagement() {
                             variant={user.isActive ? "success" : "destructive"}
                             size="sm"
                             onClick={() => handleToggleUserStatus(user.id, user.isActive)}
+                            className="font-medium"
                           >
                             {user.isActive ? 'Active' : 'Inactive'}
                           </Button>
                         </TableCell>
-                        <TableCell className="text-muted-foreground">
+                        <TableCell className="text-gray-400">
                           {new Date(user.createdAt).toLocaleDateString()}
                         </TableCell>
                         <TableCell>
                           <div className="flex space-x-2">
-                            <Button asChild variant="ghost" size="sm">
+                            <Button asChild variant="ghost" size="sm" className="text-blue-400 hover:text-blue-300 hover:bg-blue-500/10">
                               <Link href={`/admin/users/${user.id}/edit`}>
                                 <Edit className="w-4 h-4 mr-1" />
                                 Edit
@@ -346,7 +365,7 @@ export default function UsersManagement() {
                               variant="ghost"
                               size="sm"
                               onClick={() => handleDeleteUser(user.id)}
-                              className="text-destructive hover:text-destructive"
+                              className="text-red-400 hover:text-red-300 hover:bg-red-500/10"
                             >
                               <Trash2 className="w-4 h-4 mr-1" />
                               Delete
@@ -363,10 +382,20 @@ export default function UsersManagement() {
         </Card>
 
         {/* Summary */}
-        <div className="mt-6 text-sm text-muted-foreground">
-          Showing {filteredUsers.length} of {users.length} users
-        </div>
+        <Card className="mt-6 bg-white/5 backdrop-blur-xl border border-white/10 shadow-2xl">
+          <CardContent className="p-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-2">
+                <div className="w-2 h-2 bg-purple-500 rounded-full animate-pulse"></div>
+                <span className="text-sm text-gray-400">Showing <span className="text-white font-medium">{filteredUsers.length}</span> of <span className="text-white font-medium">{users.length}</span> users</span>
+              </div>
+              <Badge className="bg-purple-500/20 text-purple-300 border-purple-500/50">
+                {filteredUsers.length === users.length ? 'All Users' : 'Filtered Results'}
+              </Badge>
+            </div>
+          </CardContent>
+        </Card>
       </main>
-    </div>
+    </ModernDashboardLayout>
   );
 }

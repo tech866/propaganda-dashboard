@@ -1,6 +1,6 @@
 # Task ID: 22
 # Title: Migrate from Local PostgreSQL to Supabase Cloud Database
-# Status: pending
+# Status: in-progress
 # Dependencies: 4, 3
 # Priority: high
 # Description: Plan and execute the migration of the local PostgreSQL database to Supabase, ensuring all data, schema, and configurations are correctly transitioned.
@@ -15,29 +15,101 @@
 ### Dependencies: None
 ### Description: Create a detailed plan for migrating the local PostgreSQL database to Supabase, including data export and import procedures.
 ### Details:
-Utilize tools like pg_dump for data export and Supabase's import functionality for data import. Document the entire process.
+Utilize tools like pg_dump for exporting data and Supabase's import functionality for importing it into the cloud database.
 
-## 2. Setup Supabase Schema [pending]
+## 2. Set Up Supabase Schema [pending]
 ### Dependencies: 22.1
-### Description: Replicate the existing PostgreSQL database schema in Supabase, including all necessary tables and relationships.
+### Description: Replicate the existing PostgreSQL schema in Supabase, ensuring all tables, relationships, and constraints are accurately created.
 ### Details:
-Use Supabase's dashboard or SQL editor to create tables, define relationships, and set constraints as per the original schema.
+Use Supabase's dashboard or SQL editor to create the necessary database structure.
 
 ## 3. Configure Environment Variables [pending]
 ### Dependencies: 22.2
 ### Description: Update application configurations to connect to the Supabase database instead of the local PostgreSQL instance.
 ### Details:
-Modify environment variables and connection strings in the application to point to the new Supabase database.
+Modify environment variables and connection strings in the application settings.
 
 ## 4. Execute Data Migration [pending]
-### Dependencies: 22.3
-### Description: Perform the actual data migration from the local PostgreSQL database to Supabase.
+### Dependencies: 22.2, 22.3
+### Description: Perform the data migration process, ensuring all existing data is accurately transferred to Supabase.
 ### Details:
-Ensure all existing data is accurately transferred and validate data integrity post-migration.
+Use the migration strategy to export data from PostgreSQL and import it into Supabase, validating data integrity post-migration.
 
 ## 5. Refactor API for Supabase [pending]
-### Dependencies: 22.4
-### Description: Update all API routes and services to use the Supabase client for database interactions.
+### Dependencies: 22.3, 22.4
+### Description: Update all API routes and services to utilize the Supabase client for database interactions.
 ### Details:
-Ensure that all API endpoints function correctly with the new Supabase client, replacing local PostgreSQL connections.
+Ensure that all API calls are modified to work with the Supabase client instead of the local PostgreSQL connections.
+
+## 6. Analyze Current Database Structure [pending]
+### Dependencies: None
+### Description: Examine the existing PostgreSQL database to understand schema, tables, relationships, and data
+### Details:
+Document all tables, columns, indexes, constraints, and relationships in the current PostgreSQL database to create a comprehensive migration plan
+
+## 7. Set Up Supabase Project [pending]
+### Dependencies: None
+### Description: Create a new Supabase project and configure initial settings
+### Details:
+Create a new Supabase project, configure database settings, and obtain connection credentials for the migration
+
+## 8. Create Database Schema in Supabase [pending]
+### Dependencies: None
+### Description: Replicate the PostgreSQL schema in Supabase using SQL scripts
+### Details:
+Create all tables, indexes, constraints, and relationships in Supabase to match the existing PostgreSQL structure
+
+## 9. Export Data from PostgreSQL [pending]
+### Dependencies: None
+### Description: Use pg_dump to export all data from the local PostgreSQL database
+### Details:
+Create data dumps for all tables using pg_dump, ensuring data integrity and proper formatting for import into Supabase
+
+## 10. Import Data into Supabase [pending]
+### Dependencies: None
+### Description: Import the exported data into the Supabase database
+### Details:
+Use Supabase's import functionality or direct SQL execution to import all data from the PostgreSQL dumps
+
+## 11. Update Supabase Client Configuration [pending]
+### Dependencies: None
+### Description: Install and configure the Supabase client in the application
+### Details:
+Install @supabase/supabase-js, configure the client with connection credentials, and update environment variables
+
+## 12. Update Database Service Layer [pending]
+### Dependencies: None
+### Description: Refactor database service files to use Supabase client instead of PostgreSQL
+### Details:
+Update all database service files to use Supabase client methods for CRUD operations instead of direct PostgreSQL queries
+
+## 13. Update API Routes for Supabase [pending]
+### Dependencies: None
+### Description: Modify all API routes to use Supabase client instead of PostgreSQL connections
+### Details:
+Update all API route handlers to use Supabase client methods for database operations, ensuring proper error handling and data validation
+
+## 14. Configure Row Level Security (RLS) [pending]
+### Dependencies: None
+### Description: Set up Row Level Security policies in Supabase for data access control
+### Details:
+Configure RLS policies in Supabase to ensure proper data access control and security, matching the existing authentication and authorization requirements
+
+## 15. Test Database Operations [pending]
+### Dependencies: None
+### Description: Comprehensive testing of all database operations with Supabase
+### Details:
+Test all CRUD operations, API endpoints, and data integrity to ensure the migration was successful and all functionality works correctly
+
+## 16. Update Documentation [pending]
+### Dependencies: None
+### Description: Update all project documentation to reflect the Supabase migration
+### Details:
+Update README files, setup guides, and documentation to include Supabase configuration and usage instructions
+
+## 17. Update Documentation [pending]
+### Dependencies: None
+### Description: Update all project documentation to reflect the Supabase migration
+### Details:
+Update README files, setup guides, and documentation to include Supabase configuration and usage instructions
 

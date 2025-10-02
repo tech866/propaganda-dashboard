@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { useRouter } from 'next/navigation';
 import { useRole } from '@/contexts/RoleContext';
-import DashboardNavigation from '@/components/navigation/DashboardNavigation';
+import ModernDashboardLayout from '@/components/layout/ModernDashboardLayout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -18,7 +18,8 @@ import {
   Shield, 
   Edit, 
   Trash2,
-  AlertTriangle
+  AlertTriangle,
+  ArrowLeft
 } from 'lucide-react';
 import Link from 'next/link';
 
@@ -201,24 +202,32 @@ export default function LossReasonsManagement() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      <DashboardNavigation />
+    <ModernDashboardLayout>
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="space-y-6">
           {/* Header */}
-          <div className="flex justify-between items-center">
-            <div className="flex items-center space-x-3">
-              <div className="w-12 h-12 bg-gradient-to-br from-destructive to-destructive/80 rounded-xl flex items-center justify-center">
-                <FileText className="w-6 h-6 text-destructive-foreground" />
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
+            <div className="flex items-center space-x-4">
+              <Button 
+                variant="ghost" 
+                size="icon" 
+                onClick={() => router.push('/admin')} 
+                className="text-white hover:bg-white/10 transition-all duration-200 hover:scale-110"
+                title="Back to Admin Dashboard"
+              >
+                <ArrowLeft className="h-6 w-6" />
+              </Button>
+              <div className="w-16 h-16 bg-gradient-to-br from-red-600 via-red-700 to-red-800 rounded-2xl flex items-center justify-center shadow-2xl shadow-red-500/25">
+                <FileText className="w-8 h-8 text-white" />
               </div>
               <div>
-                <h1 className="text-display">Loss Reasons Management</h1>
-                <p className="text-body-lg text-muted-foreground">
-                  Configure and manage loss reason categories for call tracking
-                </p>
+                <h1 className="text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-red-400 to-red-300">
+                  Loss Reasons Management
+                </h1>
+                <p className="text-lg text-gray-400 mt-2">Configure and manage loss reason categories for call tracking</p>
               </div>
             </div>
-            <Button asChild>
+            <Button asChild className="bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white border-0 shadow-lg shadow-red-500/25 hover:shadow-red-500/40 transition-all duration-200 hover:scale-105">
               <Link href="/admin/loss-reasons/new">
                 <Plus className="mr-2 h-4 w-4" /> Add New Reason
               </Link>
@@ -386,6 +395,6 @@ export default function LossReasonsManagement() {
           </div>
         </div>
       </main>
-    </div>
+    </ModernDashboardLayout>
   );
 }

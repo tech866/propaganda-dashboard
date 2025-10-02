@@ -57,3 +57,4 @@ const getCallAnalytics = withErrorHandling(async (request: NextRequest, user: Us
 
 // Export the protected handler
 export const GET = withAuth(getCallAnalytics);
+

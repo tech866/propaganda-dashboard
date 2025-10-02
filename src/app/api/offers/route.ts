@@ -24,3 +24,4 @@ const getOffers = withErrorHandling(async (request: NextRequest, user: User) => 
 
 // Export the protected handler
 export const GET = withAuth(getOffers);
+

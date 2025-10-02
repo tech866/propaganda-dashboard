@@ -8,6 +8,7 @@ import { Switch } from '@/components/ui/switch';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Input } from '@/components/ui/input';
 import { Separator } from '@/components/ui/separator';
+import { Badge } from '@/components/ui/badge';
 import { 
   Bell, 
   Mail, 
@@ -88,7 +89,13 @@ export default function NotificationPreferencesSection({
   if (!settings) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+        <div className="text-center">
+          <div className="w-12 h-12 bg-gradient-to-br from-blue-600 via-purple-600 to-blue-800 rounded-xl flex items-center justify-center shadow-xl shadow-blue-500/25 mx-auto mb-4">
+            <Bell className="w-6 h-6 text-white animate-pulse" />
+          </div>
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-400 mx-auto mb-2"></div>
+          <p className="text-gray-300">Loading notification settings...</p>
+        </div>
       </div>
     );
   }
@@ -97,13 +104,19 @@ export default function NotificationPreferencesSection({
     <div className="space-y-6">
       <form onSubmit={handleSave} className="space-y-6">
         {/* Email Notifications */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center">
-              <Mail className="h-5 w-5 mr-2" />
+        <Card className="bg-white/5 backdrop-blur-xl border border-white/10 shadow-2xl hover:shadow-blue-500/10 transition-all duration-300">
+          <CardHeader className="pb-6">
+            <div className="flex items-center gap-3 mb-2">
+              <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse" aria-hidden="true"></div>
+              <Badge variant="outline" className="bg-blue-600/20 text-blue-300 border-blue-500/50 px-3 py-1 text-sm font-medium">
+                Email Notifications
+              </Badge>
+            </div>
+            <CardTitle className="text-2xl font-semibold text-white flex items-center gap-3">
+              <Mail className="h-6 w-6 text-blue-400" />
               Email Notifications
             </CardTitle>
-            <CardDescription>
+            <CardDescription className="text-gray-400 text-base">
               Configure your email notification preferences
             </CardDescription>
           </CardHeader>
@@ -225,13 +238,19 @@ export default function NotificationPreferencesSection({
         </Card>
 
         {/* Push Notifications */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center">
-              <Smartphone className="h-5 w-5 mr-2" />
+        <Card className="bg-white/5 backdrop-blur-xl border border-white/10 shadow-2xl hover:shadow-green-500/10 transition-all duration-300">
+          <CardHeader className="pb-6">
+            <div className="flex items-center gap-3 mb-2">
+              <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" aria-hidden="true"></div>
+              <Badge variant="outline" className="bg-green-600/20 text-green-300 border-green-500/50 px-3 py-1 text-sm font-medium">
+                Push Notifications
+              </Badge>
+            </div>
+            <CardTitle className="text-2xl font-semibold text-white flex items-center gap-3">
+              <Smartphone className="h-6 w-6 text-green-400" />
               Push Notifications
             </CardTitle>
-            <CardDescription>
+            <CardDescription className="text-gray-400 text-base">
               Configure your push notification preferences
             </CardDescription>
           </CardHeader>
@@ -334,13 +353,19 @@ export default function NotificationPreferencesSection({
         </Card>
 
         {/* SMS Notifications */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center">
-              <MessageSquare className="h-5 w-5 mr-2" />
+        <Card className="bg-white/5 backdrop-blur-xl border border-white/10 shadow-2xl hover:shadow-orange-500/10 transition-all duration-300">
+          <CardHeader className="pb-6">
+            <div className="flex items-center gap-3 mb-2">
+              <div className="w-2 h-2 bg-orange-500 rounded-full animate-pulse" aria-hidden="true"></div>
+              <Badge variant="outline" className="bg-orange-600/20 text-orange-300 border-orange-500/50 px-3 py-1 text-sm font-medium">
+                SMS Notifications
+              </Badge>
+            </div>
+            <CardTitle className="text-2xl font-semibold text-white flex items-center gap-3">
+              <MessageSquare className="h-6 w-6 text-orange-400" />
               SMS Notifications
             </CardTitle>
-            <CardDescription>
+            <CardDescription className="text-gray-400 text-base">
               Configure your SMS notification preferences
             </CardDescription>
           </CardHeader>
@@ -457,7 +482,11 @@ export default function NotificationPreferencesSection({
 
         {/* Save Button */}
         <div className="flex justify-end">
-          <Button type="submit" disabled={saving}>
+          <Button 
+            type="submit" 
+            disabled={saving}
+            className="bg-gradient-to-r from-blue-600 to-purple-600 text-white hover:from-blue-700 hover:to-purple-700 transition-all duration-200 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
             <Save className="h-4 w-4 mr-2" />
             {saving ? 'Saving...' : 'Save Notification Settings'}
           </Button>

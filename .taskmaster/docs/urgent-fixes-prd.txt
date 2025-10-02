@@ -31,3 +31,4 @@ The Propaganda Dashboard application is currently broken locally with the follow
 - All pages load with proper styling
 - Authentication works in development
 - All tests pass quickly without errors
+

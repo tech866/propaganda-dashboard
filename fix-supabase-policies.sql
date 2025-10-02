@@ -125,3 +125,4 @@ CREATE POLICY "Users can manage clients from their agency" ON clients
 
 COMMENT ON FUNCTION get_user_agency_id(UUID) IS 'Security definer function to get user agency_id without RLS recursion';
 COMMENT ON FUNCTION get_agency_id_from_clerk() IS 'Function to get agency_id from Clerk JWT token for RLS policies';
+

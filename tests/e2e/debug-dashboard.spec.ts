@@ -39,3 +39,4 @@ test.describe('Debug Dashboard', () => {
     await page.screenshot({ path: 'debug-dashboard.png', fullPage: true });
   });
 });
+

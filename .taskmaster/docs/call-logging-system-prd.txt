@@ -120,3 +120,4 @@ This is a major feature that should be broken down into manageable phases:
 4. Ad spend integration (manual and API)
 5. UI/UX improvements and testing
 6. Performance optimization and deployment
+

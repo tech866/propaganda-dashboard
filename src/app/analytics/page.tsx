@@ -3,3 +3,4 @@ import CallAnalyticsDashboard from '@/components/analytics/CallAnalyticsDashboar
 export default function AnalyticsPage() {
   return <CallAnalyticsDashboard />;
 }
+

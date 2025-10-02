@@ -12,3 +12,4 @@ global.NextResponse = {
   next: () => ({ status: 200 }),
   json: (data: any) => ({ status: 200, json: () => Promise.resolve(data) })
 } as any;
+

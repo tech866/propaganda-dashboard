@@ -135,3 +135,4 @@ const createEnhancedCall = withErrorHandling(async (request: NextRequest, user: 
 // Export the protected handlers
 export const GET = withAuth(getEnhancedCalls);
 export const POST = withAuth(createEnhancedCall);
+

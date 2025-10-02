@@ -101,3 +101,4 @@ const addAdSpend = withErrorHandling(async (request: NextRequest, user: User) =>
 // Export the protected handlers
 export const GET = withAuth(getAdSpend);
 export const POST = withAuth(addAdSpend);
+

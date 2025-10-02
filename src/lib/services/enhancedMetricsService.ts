@@ -1,4 +1,4 @@
-import { query } from '@/lib/database';
+import { supabase } from '@/lib/supabase';
 import { 
   calculateEnhancedMetrics,
   calculateEnhancedMetricsForDateRange,
@@ -83,67 +83,53 @@ export class EnhancedMetricsService {
 
     const { clientId, userId, dateFrom, dateTo, adSpend = 0 } = filters;
 
-    // Build WHERE clause based on filters
-    const whereConditions: string[] = [];
-    const queryParams: any[] = [];
-    let paramIndex = 1;
+    // Get enhanced call data with all new fields using Supabase
+    let callsQuery = supabase
+      .from('calls')
+      .select(`
+        id,
+        status,
+        outcome,
+        created_at,
+        completed_at,
+        loss_reason_id,
+        closer_first_name,
+        closer_last_name,
+        source_of_set_appointment,
+        enhanced_call_outcome,
+        initial_payment_collected_on,
+        customer_full_name,
+        customer_email,
+        calls_taken,
+        setter_first_name,
+        setter_last_name,
+        cash_collected_upfront,
+        total_amount_owed,
+        prospect_notes,
+        lead_source
+      `)
+      .order('created_at', { ascending: false });
 
+    // Apply filters
     if (clientId) {
-      whereConditions.push(`c.client_id = $${paramIndex}`);
-      queryParams.push(clientId);
-      paramIndex++;
+      callsQuery = callsQuery.eq('client_id', clientId);
     }
-
     if (userId) {
-      whereConditions.push(`c.user_id = $${paramIndex}`);
-      queryParams.push(userId);
-      paramIndex++;
+      callsQuery = callsQuery.eq('user_id', userId);
     }
-
     if (dateFrom) {
-      whereConditions.push(`c.created_at >= $${paramIndex}`);
-      queryParams.push(dateFrom);
-      paramIndex++;
+      callsQuery = callsQuery.gte('created_at', dateFrom);
     }
-
     if (dateTo) {
-      whereConditions.push(`c.created_at <= $${paramIndex}`);
-      queryParams.push(dateTo);
-      paramIndex++;
+      callsQuery = callsQuery.lte('created_at', dateTo);
     }
 
-    const whereClause = whereConditions.length > 0 ? `WHERE ${whereConditions.join(' AND ')}` : '';
-
-    // Get enhanced call data with all new fields
-    const callsQuery = `
-      SELECT 
-        c.id,
-        c.status,
-        c.outcome,
-        c.created_at,
-        c.completed_at,
-        c.loss_reason_id,
-        c.closer_first_name,
-        c.closer_last_name,
-        c.source_of_set_appointment,
-        c.enhanced_call_outcome,
-        c.initial_payment_collected_on,
-        c.customer_full_name,
-        c.customer_email,
-        c.calls_taken,
-        c.setter_first_name,
-        c.setter_last_name,
-        c.cash_collected_upfront,
-        c.total_amount_owed,
-        c.prospect_notes,
-        c.lead_source
-      FROM calls c
-      ${whereClause}
-      ORDER BY c.created_at DESC
-    `;
-
-    const callsResult = await query(callsQuery, queryParams);
-    const calls: EnhancedCallData[] = callsResult.rows.map(row => ({
+    const { data: callsResult, error: callsError } = await callsQuery;
+    
+    if (callsError) {
+      throw new Error(`Failed to fetch calls: ${callsError.message}`);
+    }
+    const calls: EnhancedCallData[] = (callsResult || []).map(row => ({
       id: row.id,
       status: row.status,
       outcome: row.outcome,

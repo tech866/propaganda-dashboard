@@ -324,3 +324,4 @@ COMMENT ON VIEW call_analytics IS 'Comprehensive analytics view for call perform
 -- =====================================================
 
 SELECT 'Enhanced call logging system added to Supabase successfully!' as status;
+

@@ -8,6 +8,7 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Separator } from '@/components/ui/separator';
+import { Badge } from '@/components/ui/badge';
 import { 
   User, 
   Mail, 
@@ -17,6 +18,7 @@ import {
   DollarSign,
   Eye,
   EyeOff,
+  Settings,
   Save,
   Upload,
   Camera
@@ -144,7 +146,13 @@ export default function UserProfileSection({
   if (!profile || !preferences) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+        <div className="text-center">
+          <div className="w-12 h-12 bg-gradient-to-br from-blue-600 via-purple-600 to-blue-800 rounded-xl flex items-center justify-center shadow-xl shadow-blue-500/25 mx-auto mb-4">
+            <User className="w-6 h-6 text-white animate-pulse" />
+          </div>
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-400 mx-auto mb-2"></div>
+          <p className="text-gray-300">Loading profile...</p>
+        </div>
       </div>
     );
   }
@@ -152,13 +160,19 @@ export default function UserProfileSection({
   return (
     <div className="space-y-6">
       {/* Profile Information */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center">
-            <User className="h-5 w-5 mr-2" />
+      <Card className="bg-white/5 backdrop-blur-xl border border-white/10 shadow-2xl hover:shadow-blue-500/10 transition-all duration-300">
+        <CardHeader className="pb-6">
+          <div className="flex items-center gap-3 mb-2">
+            <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse" aria-hidden="true"></div>
+            <Badge variant="outline" className="bg-blue-600/20 text-blue-300 border-blue-500/50 px-3 py-1 text-sm font-medium">
+              Profile Information
+            </Badge>
+          </div>
+          <CardTitle className="text-2xl font-semibold text-white flex items-center gap-3">
+            <User className="h-6 w-6 text-blue-400" />
             Profile Information
           </CardTitle>
-          <CardDescription>
+          <CardDescription className="text-gray-400 text-base">
             Update your personal information and contact details
           </CardDescription>
         </CardHeader>
@@ -308,7 +322,11 @@ export default function UserProfileSection({
             </div>
 
             <div className="flex justify-end">
-              <Button type="submit" disabled={saving}>
+              <Button 
+                type="submit" 
+                disabled={saving}
+                className="bg-gradient-to-r from-blue-600 to-purple-600 text-white hover:from-blue-700 hover:to-purple-700 transition-all duration-200 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
                 <Save className="h-4 w-4 mr-2" />
                 {saving ? 'Saving...' : 'Save Profile'}
               </Button>
@@ -318,13 +336,19 @@ export default function UserProfileSection({
       </Card>
 
       {/* Preferences */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center">
-            <Settings className="h-5 w-5 mr-2" />
+      <Card className="bg-white/5 backdrop-blur-xl border border-white/10 shadow-2xl hover:shadow-purple-500/10 transition-all duration-300">
+        <CardHeader className="pb-6">
+          <div className="flex items-center gap-3 mb-2">
+            <div className="w-2 h-2 bg-purple-500 rounded-full animate-pulse" aria-hidden="true"></div>
+            <Badge variant="outline" className="bg-purple-600/20 text-purple-300 border-purple-500/50 px-3 py-1 text-sm font-medium">
+              User Preferences
+            </Badge>
+          </div>
+          <CardTitle className="text-2xl font-semibold text-white flex items-center gap-3">
+            <Settings className="h-6 w-6 text-purple-400" />
             Preferences
           </CardTitle>
-          <CardDescription>
+          <CardDescription className="text-gray-400 text-base">
             Customize your dashboard and application preferences
           </CardDescription>
         </CardHeader>
@@ -414,7 +438,11 @@ export default function UserProfileSection({
             </div>
 
             <div className="flex justify-end">
-              <Button type="submit" disabled={saving}>
+              <Button 
+                type="submit" 
+                disabled={saving}
+                className="bg-gradient-to-r from-purple-600 to-blue-600 text-white hover:from-purple-700 hover:to-blue-700 transition-all duration-200 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
                 <Save className="h-4 w-4 mr-2" />
                 {saving ? 'Saving...' : 'Save Preferences'}
               </Button>

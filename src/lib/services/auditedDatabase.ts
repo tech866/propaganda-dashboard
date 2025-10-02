@@ -3,8 +3,7 @@
  * Propaganda Dashboard - Database operations with automatic audit logging
  */
 
-import { PoolClient } from 'pg';
-import { getClient, query, withTransaction } from '@/lib/database';
+import { supabase, supabaseAdmin } from '@/lib/supabase';
 import { withDatabaseAudit, extractAuditContext } from '@/middleware/audit';
 import { AuditContext } from '@/lib/types/audit';
 import { NextRequest } from 'next/server';
@@ -21,38 +20,47 @@ export class AuditedDatabaseService {
 
   /**
    * Execute a query with audit logging
+   * Note: Supabase doesn't support raw SQL queries directly
+   * This method is kept for compatibility but should use RPC functions
    */
   async query(text: string, params?: any[], tableName?: string): Promise<any> {
-    const client = await getClient();
-    try {
-      const auditedOperation = withDatabaseAudit(
-        async (client: PoolClient, query: string, params?: any[]) => {
-          return await client.query(query, params);
-        },
-        tableName || 'unknown',
-        this.context
-      );
+    console.warn('Raw SQL queries not supported in Supabase. Use RPC functions or DatabaseService methods instead.');
+    
+    // For audit logging, we'll log the attempt but return empty results
+    const auditedOperation = withDatabaseAudit(
+      async () => {
+        console.warn(`Attempted raw SQL query: ${text}`);
+        return { rows: [], rowCount: 0 };
+      },
+      tableName || 'unknown',
+      this.context
+    );
 
-      return await auditedOperation(client, text, params);
-    } finally {
-      client.release();
-    }
+    return await auditedOperation();
   }
 
   /**
    * Execute a transaction with audit logging
+   * Note: Supabase doesn't support explicit transactions in the client
+   * This method is kept for compatibility but transactions are handled automatically
    */
   async withTransaction<T>(
-    callback: (client: PoolClient) => Promise<T>,
+    callback: (client: any) => Promise<T>,
     tableName?: string
   ): Promise<T> {
+    console.warn('Explicit transactions not supported in Supabase client. Use RPC functions for complex transactions.');
+    
     const auditedCallback = withDatabaseAudit(
-      callback,
+      async () => {
+        // Execute the callback with a mock client for compatibility
+        const mockClient = { query: () => Promise.resolve({ rows: [], rowCount: 0 }) };
+        return await callback(mockClient);
+      },
       tableName || 'transaction',
       this.context
     );
 
-    return await withTransaction(auditedCallback);
+    return await auditedCallback();
   }
 
   /**

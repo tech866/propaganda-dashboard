@@ -2,103 +2,178 @@ import { NextRequest, NextResponse } from 'next/server';
 import { withAuth, User } from '@/middleware/auth';
 import { createValidationError, withErrorHandling } from '@/middleware/errors';
 import { validateCreateUser } from '@/lib/validation';
-import { getClient } from '@/lib/database';
+import { createServerSupabaseClient } from '@/lib/supabase-client';
+import { auth } from '@clerk/nextjs/server';
 
-// GET /api/users - Get all users (admin/ceo only)
+// GET /api/users - Get all users (RLS automatically filters based on role)
 const getUsers = withErrorHandling(async (request: NextRequest, user: User) => {
-  const client = await getClient();
-  
   try {
-    // Only admin and CEO can access user data
-    if (user.role === 'sales') {
+    // Get Clerk JWT token for RLS
+    const { getToken } = auth();
+    const token = await getToken({ template: 'supabase' });
+    
+    if (!token) {
       return NextResponse.json(
         {
           success: false,
-          message: 'Access denied'
+          message: 'Authentication required'
         },
-        { status: 403 }
+        { status: 401 }
       );
     }
 
-    let query = `
-      SELECT 
-        u.id,
-        u.email,
-        u.name,
-        u.role,
-        u.client_id as "clientId",
-        u.is_active as "isActive",
-        u.created_at as "createdAt"
-      FROM users u
-      JOIN clients c ON u.client_id = c.id
-    `;
+    // Create Supabase client with JWT token (RLS will automatically apply)
+    const supabase = createServerSupabaseClient(token);
     
-    const queryParams: string[] = [];
-    
-    // Admin can only see users from their client, CEO can see all
-    if (user.role === 'admin') {
-      query += ' WHERE u.client_id = $1';
-      queryParams.push(user.clientId);
+    // RLS policies will automatically filter data based on user's role and client_id
+    const { data: users, error } = await supabase
+      .from('users')
+      .select(`
+        id,
+        email,
+        name,
+        role,
+        client_id,
+        is_active,
+        created_at,
+        clients!inner(
+          id,
+          name
+        )
+      `)
+      .order('name', { ascending: true });
+
+    if (error) {
+      throw new Error(`Failed to fetch users: ${error.message}`);
     }
-    
-    query += ' ORDER BY u.name ASC';
-    
-    const result = await client.query(query, queryParams);
+
+    // Transform data to match expected format
+    const transformedUsers = (users || []).map(user => ({
+      id: user.id,
+      email: user.email,
+      name: user.name,
+      role: user.role,
+      clientId: user.client_id,
+      isActive: user.is_active,
+      createdAt: user.created_at,
+      clientName: user.clients?.name
+    }));
 
     return NextResponse.json(
       {
         success: true,
-        data: result.rows,
-        user: { id: user.id, role: user.role, clientId: user.clientId }
+        data: transformedUsers,
+        user: { id: user.id, role: user.role, clientId: user.clientId },
+        rls_enabled: true
       },
       { status: 200 }
     );
-  } finally {
-    client.release();
+  } catch (error) {
+    console.error('Error fetching users:', error);
+    return NextResponse.json(
+      {
+        success: false,
+        message: 'Failed to fetch users',
+        error: error instanceof Error ? error.message : 'Unknown error'
+      },
+      { status: 500 }
+    );
   }
 });
 
-// POST /api/users - Create a new user (admin only)
+// POST /api/users - Create a new user (RLS automatically enforces permissions)
 const createUser = withErrorHandling(async (request: NextRequest, user: User) => {
-  const body = await request.json();
-  
-  // Add clientId from authenticated user
-  const bodyWithClientId = {
-    ...body,
-    clientId: user.clientId
-  };
-  
-  // Validate request body using Yup schema
-  const validation = await validateCreateUser(bodyWithClientId);
-  
-  if (!validation.isValid) {
-    throw createValidationError('Validation failed', validation.errors);
+  try {
+    // Get Clerk JWT token for RLS
+    const { getToken } = auth();
+    const token = await getToken({ template: 'supabase' });
+    
+    if (!token) {
+      return NextResponse.json(
+        {
+          success: false,
+          message: 'Authentication required'
+        },
+        { status: 401 }
+      );
+    }
+
+    const body = await request.json();
+    
+    // Add clientId from authenticated user
+    const bodyWithClientId = {
+      ...body,
+      clientId: user.clientId
+    };
+    
+    // Validate request body using Yup schema
+    const validation = await validateCreateUser(bodyWithClientId);
+    
+    if (!validation.isValid) {
+      throw createValidationError('Validation failed', validation.errors);
+    }
+
+    const validatedData = validation.data!;
+
+    // Create Supabase client with JWT token (RLS will automatically enforce permissions)
+    const supabase = createServerSupabaseClient(token);
+    
+    // RLS policies will automatically prevent unauthorized user creation
+    const { data: newUser, error } = await supabase
+      .from('users')
+      .insert({
+        email: validatedData.email,
+        name: validatedData.name,
+        role: validatedData.role,
+        client_id: validatedData.clientId,
+        is_active: true
+      })
+      .select(`
+        id,
+        email,
+        name,
+        role,
+        client_id,
+        is_active,
+        created_at
+      `)
+      .single();
+
+    if (error) {
+      throw new Error(`Failed to create user: ${error.message}`);
+    }
+
+    // Transform data to match expected format
+    const transformedUser = {
+      id: newUser.id,
+      email: newUser.email,
+      name: newUser.name,
+      role: newUser.role,
+      clientId: newUser.client_id,
+      isActive: newUser.is_active,
+      createdAt: newUser.created_at
+    };
+
+    return NextResponse.json(
+      {
+        success: true,
+        message: 'User created successfully',
+        data: transformedUser,
+        rls_enabled: true
+      },
+      { status: 201 }
+    );
+  } catch (error) {
+    console.error('Error creating user:', error);
+    return NextResponse.json(
+      {
+        success: false,
+        message: 'Failed to create user',
+        error: error instanceof Error ? error.message : 'Unknown error'
+      },
+      { status: 500 }
+    );
   }
-
-  const validatedData = validation.data!;
-
-  // Validate client access - users can only be created for accessible clients
-  if (validatedData.clientId !== user.clientId && user.role !== 'ceo') {
-    throw createValidationError('Access denied to create user for this client');
-  }
-
-  // TODO: Implement database insert
-  // For now, return mock response
-  const newUser = {
-    id: Date.now().toString(),
-    ...validatedData,
-    isActive: true,
-    createdAt: new Date().toISOString()
-  };
-
-  return NextResponse.json(
-    {
-      success: true,
-      message: 'User created successfully',
-      data: newUser
-    },
-    { status: 201 }
-  );
 });
 
 // Export the protected handlers

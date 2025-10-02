@@ -12,7 +12,16 @@
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui",
     "test:e2e:headed": "playwright test --headed",
-    "test:all": "npm run test && npm run test:e2e"
+    "test:all": "npm run test && npm run test:e2e",
+    "export-data": "node scripts/export-data.js",
+    "export-data:json": "node scripts/export-data.js json",
+    "verify-import": "node scripts/verify-import.js",
+    "test-supabase": "node scripts/test-supabase-connection.js",
+    "test-database-services": "node scripts/test-database-services.js",
+    "test-api-routes": "node scripts/test-api-routes.js",
+    "test-rls": "node scripts/test-rls-policies.js",
+    "test-database-operations": "node scripts/test-database-operations.js",
+    "test-service-layer": "node scripts/test-service-layer-integration.js"
   },
   "dependencies": {
     "@clerk/nextjs": "^6.33.0",

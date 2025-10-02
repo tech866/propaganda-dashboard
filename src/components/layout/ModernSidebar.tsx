@@ -159,7 +159,7 @@ export default function ModernSidebar({ className = '' }: ModernSidebarProps) {
 
   // Group items by category
   const mainItems = accessibleItems.filter(item => 
-    ['Dashboard', 'Log Call', 'View Calls', 'Client Workspaces', 'Integrations', 'Performance', 'Client Management', 'Settings'].includes(item.name)
+    ['Dashboard', 'Log Call', 'View Calls', 'Client Workspaces', 'Integrations', 'Performance', 'Client Management'].includes(item.name)
   );
   const adminItems = accessibleItems.filter(item => 
     ['Manage Users', 'Audit Logs', 'Reports'].includes(item.name)

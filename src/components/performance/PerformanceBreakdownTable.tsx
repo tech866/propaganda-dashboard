@@ -22,7 +22,8 @@ import {
   Users,
   Building2,
   Target,
-  Calendar
+  Calendar,
+  BarChart3
 } from 'lucide-react';
 import { PerformanceBreakdown } from '@/lib/services/performanceService';
 
@@ -157,25 +158,35 @@ export function PerformanceBreakdownTable({
   return (
     <div className="space-y-6">
       {/* Dimension Selector */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Users className="h-5 w-5" />
+      <Card className="bg-white/5 backdrop-blur-xl border border-white/10 shadow-2xl hover:shadow-blue-500/10 transition-all duration-300">
+        <CardHeader className="pb-6">
+          <div className="flex items-center gap-3 mb-2">
+            <div className="w-2 h-2 bg-indigo-500 rounded-full animate-pulse" aria-hidden="true"></div>
+            <Badge variant="outline" className="bg-indigo-600/20 text-indigo-300 border-indigo-500/50 px-3 py-1 text-sm font-medium">
+              Performance Breakdown
+            </Badge>
+          </div>
+          <CardTitle className="text-2xl font-semibold text-white flex items-center gap-3">
+            <Users className="h-6 w-6 text-indigo-400" />
             Performance Breakdown
           </CardTitle>
-          <CardDescription>
+          <CardDescription className="text-gray-400 text-base">
             Analyze performance metrics by different dimensions
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="flex gap-2">
+          <div className="flex gap-3">
             {(['client', 'user', 'campaign', 'time'] as const).map((dim) => (
               <Button
                 key={dim}
                 variant={dimension === dim ? 'default' : 'outline'}
                 size="sm"
                 onClick={() => onDimensionChange(dim)}
-                className="flex items-center gap-2"
+                className={`flex items-center gap-2 transition-all duration-200 hover:scale-105 ${
+                  dimension === dim 
+                    ? 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-lg shadow-indigo-500/25' 
+                    : 'bg-slate-800/50 border-slate-600/50 text-gray-300 hover:bg-slate-700/50 hover:border-slate-500/70'
+                }`}
               >
                 {getDimensionIcon(dim)}
                 {getDimensionLabel(dim)}
@@ -186,130 +197,139 @@ export function PerformanceBreakdownTable({
       </Card>
 
       {/* Performance Table */}
-      <Card>
-        <CardHeader>
-          <CardTitle>
+      <Card className="bg-white/5 backdrop-blur-xl border border-white/10 shadow-2xl hover:shadow-blue-500/10 transition-all duration-300">
+        <CardHeader className="pb-6">
+          <div className="flex items-center gap-3 mb-2">
+            <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse" aria-hidden="true"></div>
+            <Badge variant="outline" className="bg-emerald-600/20 text-emerald-300 border-emerald-500/50 px-3 py-1 text-sm font-medium">
+              Data Analysis
+            </Badge>
+          </div>
+          <CardTitle className="text-2xl font-semibold text-white flex items-center gap-3">
+            <BarChart3 className="h-6 w-6 text-emerald-400" />
             {getDimensionLabel(dimension)} Performance Analysis
           </CardTitle>
-          <CardDescription>
+          <CardDescription className="text-gray-400 text-base">
             Detailed performance metrics sorted by {sortField} ({sortDirection})
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="rounded-md border">
+          <div className="rounded-xl border border-slate-700/50 bg-slate-800/30 backdrop-blur-sm">
             <Table>
               <TableHeader>
-                <TableRow>
-                  <TableHead className="w-[200px]">
+                <TableRow className="border-slate-700/50 hover:bg-slate-700/20">
+                  <TableHead className="w-[200px] text-gray-300">
                     <Button
                       variant="ghost"
                       size="sm"
                       onClick={() => handleSort('name')}
-                      className="h-auto p-0 font-semibold hover:bg-transparent"
+                      className="h-auto p-0 font-semibold hover:bg-transparent text-gray-300 hover:text-white transition-colors duration-200"
                     >
                       {getDimensionLabel(dimension)}
                       {getSortIcon('name')}
                     </Button>
                   </TableHead>
-                  <TableHead className="text-right">
+                  <TableHead className="text-right text-gray-300">
                     <Button
                       variant="ghost"
                       size="sm"
                       onClick={() => handleSort('revenue')}
-                      className="h-auto p-0 font-semibold hover:bg-transparent"
+                      className="h-auto p-0 font-semibold hover:bg-transparent text-gray-300 hover:text-white transition-colors duration-200"
                     >
                       Revenue
                       {getSortIcon('revenue')}
                     </Button>
                   </TableHead>
-                  <TableHead className="text-right">
+                  <TableHead className="text-right text-gray-300">
                     <Button
                       variant="ghost"
                       size="sm"
                       onClick={() => handleSort('adSpend')}
-                      className="h-auto p-0 font-semibold hover:bg-transparent"
+                      className="h-auto p-0 font-semibold hover:bg-transparent text-gray-300 hover:text-white transition-colors duration-200"
                     >
                       Ad Spend
                       {getSortIcon('adSpend')}
                     </Button>
                   </TableHead>
-                  <TableHead className="text-right">
+                  <TableHead className="text-right text-gray-300">
                     <Button
                       variant="ghost"
                       size="sm"
                       onClick={() => handleSort('profit')}
-                      className="h-auto p-0 font-semibold hover:bg-transparent"
+                      className="h-auto p-0 font-semibold hover:bg-transparent text-gray-300 hover:text-white transition-colors duration-200"
                     >
                       Profit
                       {getSortIcon('profit')}
                     </Button>
                   </TableHead>
-                  <TableHead className="text-right">
+                  <TableHead className="text-right text-gray-300">
                     <Button
                       variant="ghost"
                       size="sm"
                       onClick={() => handleSort('roas')}
-                      className="h-auto p-0 font-semibold hover:bg-transparent"
+                      className="h-auto p-0 font-semibold hover:bg-transparent text-gray-300 hover:text-white transition-colors duration-200"
                     >
                       ROAS
                       {getSortIcon('roas')}
                     </Button>
                   </TableHead>
-                  <TableHead className="text-right">
+                  <TableHead className="text-right text-gray-300">
                     <Button
                       variant="ghost"
                       size="sm"
                       onClick={() => handleSort('conversions')}
-                      className="h-auto p-0 font-semibold hover:bg-transparent"
+                      className="h-auto p-0 font-semibold hover:bg-transparent text-gray-300 hover:text-white transition-colors duration-200"
                     >
                       Conversions
                       {getSortIcon('conversions')}
                     </Button>
                   </TableHead>
-                  <TableHead className="text-right">
+                  <TableHead className="text-right text-gray-300">
                     <Button
                       variant="ghost"
                       size="sm"
                       onClick={() => handleSort('conversionRate')}
-                      className="h-auto p-0 font-semibold hover:bg-transparent"
+                      className="h-auto p-0 font-semibold hover:bg-transparent text-gray-300 hover:text-white transition-colors duration-200"
                     >
                       Conv. Rate
                       {getSortIcon('conversionRate')}
                     </Button>
                   </TableHead>
-                  <TableHead className="text-center">Trend</TableHead>
+                  <TableHead className="text-center text-gray-300">Trend</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {sortedData.map((item, index) => (
-                  <TableRow key={item.id} className="hover:bg-muted/50">
-                    <TableCell className="font-medium">
-                      <div className="flex items-center gap-2">
-                        {getDimensionIcon(dimension)}
+                  <TableRow key={item.id} className="border-slate-700/50 hover:bg-slate-700/20 transition-colors duration-200">
+                    <TableCell className="font-medium text-white">
+                      <div className="flex items-center gap-3">
+                        <div className="p-2 rounded-lg bg-gradient-to-br from-slate-700/50 to-slate-800/50">
+                          {getDimensionIcon(dimension)}
+                        </div>
                         {item.name}
                       </div>
                     </TableCell>
-                    <TableCell className="text-right font-mono">
+                    <TableCell className="text-right font-mono text-white">
                       {formatCurrency(item.revenue)}
                     </TableCell>
-                    <TableCell className="text-right font-mono">
+                    <TableCell className="text-right font-mono text-white">
                       {formatCurrency(item.adSpend)}
                     </TableCell>
                     <TableCell className="text-right font-mono">
-                      <span className={item.profit >= 0 ? 'text-green-600' : 'text-red-600'}>
+                      <span className={item.profit >= 0 ? 'text-green-400' : 'text-red-400'}>
                         {formatCurrency(item.profit)}
                       </span>
                     </TableCell>
                     <TableCell className="text-right font-mono">
-                      <span className={item.roas >= 2 ? 'text-green-600' : item.roas >= 1 ? 'text-yellow-600' : 'text-red-600'}>
+                      <span className={item.roas >= 2 ? 'text-green-400' : item.roas >= 1 ? 'text-yellow-400' : 'text-red-400'}>
                         {item.roas.toFixed(2)}x
                       </span>
                     </TableCell>
-                    <TableCell className="text-right font-mono">
+                    <TableCell className="text-right font-mono text-white">
                       {formatNumber(item.conversions)}
                     </TableCell>
                     <TableCell className="text-right font-mono">
-                      <span className={item.conversionRate >= 3 ? 'text-green-600' : item.conversionRate >= 2 ? 'text-yellow-600' : 'text-red-600'}>
+                      <span className={item.conversionRate >= 3 ? 'text-green-400' : item.conversionRate >= 2 ? 'text-yellow-400' : 'text-red-400'}>
                         {formatPercentage(item.conversionRate)}
                       </span>
                     </TableCell>
@@ -325,38 +345,47 @@ export function PerformanceBreakdownTable({
       </Card>
 
       {/* Summary Statistics */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Summary Statistics</CardTitle>
-          <CardDescription>
+      <Card className="bg-white/5 backdrop-blur-xl border border-white/10 shadow-2xl hover:shadow-blue-500/10 transition-all duration-300">
+        <CardHeader className="pb-6">
+          <div className="flex items-center gap-3 mb-2">
+            <div className="w-2 h-2 bg-teal-500 rounded-full animate-pulse" aria-hidden="true"></div>
+            <Badge variant="outline" className="bg-teal-600/20 text-teal-300 border-teal-500/50 px-3 py-1 text-sm font-medium">
+              Summary Statistics
+            </Badge>
+          </div>
+          <CardTitle className="text-2xl font-semibold text-white flex items-center gap-3">
+            <BarChart3 className="h-6 w-6 text-teal-400" />
+            Summary Statistics
+          </CardTitle>
+          <CardDescription className="text-gray-400 text-base">
             Aggregate performance metrics for all {getDimensionLabel(dimension).toLowerCase()}s
           </CardDescription>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-            <div className="text-center">
-              <div className="text-2xl font-bold text-green-600">
+            <div className="text-center p-6 bg-gradient-to-br from-green-500/10 to-green-600/5 rounded-xl border border-green-500/20 hover:border-green-500/40 transition-all duration-200 hover:scale-105">
+              <div className="text-2xl font-bold text-green-400">
                 {formatCurrency(data.reduce((sum, item) => sum + item.revenue, 0))}
               </div>
-              <div className="text-sm text-muted-foreground">Total Revenue</div>
+              <div className="text-sm text-gray-400">Total Revenue</div>
             </div>
-            <div className="text-center">
-              <div className="text-2xl font-bold text-blue-600">
+            <div className="text-center p-6 bg-gradient-to-br from-blue-500/10 to-blue-600/5 rounded-xl border border-blue-500/20 hover:border-blue-500/40 transition-all duration-200 hover:scale-105">
+              <div className="text-2xl font-bold text-blue-400">
                 {formatCurrency(data.reduce((sum, item) => sum + item.adSpend, 0))}
               </div>
-              <div className="text-sm text-muted-foreground">Total Ad Spend</div>
+              <div className="text-sm text-gray-400">Total Ad Spend</div>
             </div>
-            <div className="text-center">
-              <div className="text-2xl font-bold text-purple-600">
+            <div className="text-center p-6 bg-gradient-to-br from-purple-500/10 to-purple-600/5 rounded-xl border border-purple-500/20 hover:border-purple-500/40 transition-all duration-200 hover:scale-105">
+              <div className="text-2xl font-bold text-purple-400">
                 {formatCurrency(data.reduce((sum, item) => sum + item.profit, 0))}
               </div>
-              <div className="text-sm text-muted-foreground">Total Profit</div>
+              <div className="text-sm text-gray-400">Total Profit</div>
             </div>
-            <div className="text-center">
-              <div className="text-2xl font-bold text-orange-600">
+            <div className="text-center p-6 bg-gradient-to-br from-orange-500/10 to-orange-600/5 rounded-xl border border-orange-500/20 hover:border-orange-500/40 transition-all duration-200 hover:scale-105">
+              <div className="text-2xl font-bold text-orange-400">
                 {(data.reduce((sum, item) => sum + item.roas, 0) / data.length).toFixed(2)}x
               </div>
-              <div className="text-sm text-muted-foreground">Average ROAS</div>
+              <div className="text-sm text-gray-400">Average ROAS</div>
             </div>
           </div>
         </CardContent>

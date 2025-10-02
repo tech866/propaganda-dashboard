@@ -1,5 +1,6 @@
 import { clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server';
 import { NextResponse } from 'next/server';
+import { adminMiddleware, clientManagementMiddleware } from './middleware/admin';
 
 // Define protected routes
 const isProtectedRoute = createRouteMatcher([
@@ -11,7 +12,19 @@ const isProtectedRoute = createRouteMatcher([
   '/performance(.*)'
 ]);
 
-export default clerkMiddleware((auth, req) => {
+export default clerkMiddleware(async (auth, req) => {
+  // Apply admin middleware first for admin routes
+  const adminResponse = await adminMiddleware(req);
+  if (adminResponse) {
+    return adminResponse;
+  }
+
+  // Apply client management middleware for client routes
+  const clientResponse = await clientManagementMiddleware(req);
+  if (clientResponse) {
+    return clientResponse;
+  }
+
   // Protect routes
   if (isProtectedRoute(req)) {
     // Check if we're in development mode and allow mock user
@@ -20,7 +33,7 @@ export default clerkMiddleware((auth, req) => {
       return NextResponse.next();
     }
     
-    const { userId } = auth();
+    const { userId } = await auth();
     
     if (!userId) {
       // Redirect to sign-in page if not authenticated

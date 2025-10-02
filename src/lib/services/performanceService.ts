@@ -1,4 +1,5 @@
 import { db } from '@/lib/database';
+import { EnhancedMetricsService, EnhancedCalculationResult } from './enhancedMetricsService';
 
 export interface PerformanceMetrics {
   totalRevenue: number;
@@ -53,19 +54,31 @@ class PerformanceService {
   // Get overall performance metrics
   async getPerformanceMetrics(filters: PerformanceFilters): Promise<PerformanceMetrics> {
     try {
-      // For now, return mock data - replace with actual database queries
-      const mockData: PerformanceMetrics = {
-        totalRevenue: 125000,
-        totalAdSpend: 45000,
-        totalProfit: 80000,
-        roas: 2.78,
-        conversionRate: 3.2,
-        costPerLead: 45.50,
-        leadValue: 1250.00,
-        monthlyGrowth: 12.5
+      // Convert PerformanceFilters to EnhancedMetricsFilters
+      const enhancedFilters = {
+        clientId: filters.clientId,
+        userId: filters.userId,
+        dateFrom: filters.dateRange.start,
+        dateTo: filters.dateRange.end,
+        adSpend: 0 // Default to 0, can be enhanced later
       };
 
-      return mockData;
+      // Get real enhanced metrics from the database
+      const enhancedMetrics = await EnhancedMetricsService.getEnhancedMetrics(enhancedFilters);
+
+      // Convert enhanced metrics to PerformanceMetrics format
+      const performanceMetrics: PerformanceMetrics = {
+        totalRevenue: enhancedMetrics.revenue.totalRevenue,
+        totalAdSpend: enhancedMetrics.roas?.totalAdSpend || 0,
+        totalProfit: enhancedMetrics.revenue.totalRevenue - (enhancedMetrics.roas?.totalAdSpend || 0),
+        roas: enhancedMetrics.roas?.roas || 0,
+        conversionRate: enhancedMetrics.enhancedCloseRate.percentage,
+        costPerLead: enhancedMetrics.roas?.totalAdSpend ? enhancedMetrics.roas.totalAdSpend / enhancedMetrics.showRate.completedCalls : 0,
+        leadValue: enhancedMetrics.revenue.averageOrderValue,
+        monthlyGrowth: 0 // TODO: Calculate monthly growth from trend data
+      };
+
+      return performanceMetrics;
     } catch (error) {
       console.error('Error fetching performance metrics:', error);
       throw new Error('Failed to fetch performance metrics');
@@ -75,7 +88,9 @@ class PerformanceService {
   // Get trend data for charts
   async getTrendData(filters: PerformanceFilters): Promise<TrendData[]> {
     try {
-      // Mock trend data - replace with actual database queries
+      // For now, return mock trend data
+      // TODO: Implement real trend data calculation using EnhancedMetricsService
+      // This would require aggregating data by date ranges
       const mockTrendData: TrendData[] = [
         { date: '2024-01-01', revenue: 8500, adSpend: 3200, profit: 5300, conversions: 45, leads: 120 },
         { date: '2024-01-02', revenue: 9200, adSpend: 3400, profit: 5800, conversions: 52, leads: 135 },
@@ -96,18 +111,41 @@ class PerformanceService {
   // Get conversion funnel data
   async getConversionFunnelData(filters: PerformanceFilters): Promise<ConversionFunnelData[]> {
     try {
-      // Mock funnel data - replace with actual database queries
-      const mockFunnelData: ConversionFunnelData[] = [
-        { stage: 'Impressions', count: 100000, percentage: 100, dropOffRate: 0 },
-        { stage: 'Clicks', count: 3500, percentage: 3.5, dropOffRate: 96.5 },
-        { stage: 'Landing Page Views', count: 3200, percentage: 3.2, dropOffRate: 8.6 },
-        { stage: 'Form Starts', count: 800, percentage: 0.8, dropOffRate: 75 },
-        { stage: 'Form Completions', count: 240, percentage: 0.24, dropOffRate: 70 },
-        { stage: 'Qualified Leads', count: 180, percentage: 0.18, dropOffRate: 25 },
-        { stage: 'Conversions', count: 54, percentage: 0.054, dropOffRate: 70 }
+      // Convert PerformanceFilters to EnhancedMetricsFilters
+      const enhancedFilters = {
+        clientId: filters.clientId,
+        userId: filters.userId,
+        dateFrom: filters.dateRange.start,
+        dateTo: filters.dateRange.end,
+        adSpend: 0
+      };
+
+      // Get real enhanced metrics from the database
+      const enhancedMetrics = await EnhancedMetricsService.getEnhancedMetrics(enhancedFilters);
+
+      // Convert enhanced metrics to funnel data format
+      const funnelData: ConversionFunnelData[] = [
+        { 
+          stage: 'Total Calls', 
+          count: enhancedMetrics.showRate.totalCalls, 
+          percentage: 100, 
+          dropOffRate: 0 
+        },
+        { 
+          stage: 'Shows', 
+          count: enhancedMetrics.showRate.completedCalls, 
+          percentage: enhancedMetrics.showRate.percentage, 
+          dropOffRate: 100 - enhancedMetrics.showRate.percentage 
+        },
+        { 
+          stage: 'Enhanced Closes', 
+          count: enhancedMetrics.enhancedCloseRate.completedCalls, 
+          percentage: enhancedMetrics.enhancedCloseRate.percentage, 
+          dropOffRate: enhancedMetrics.showRate.percentage - enhancedMetrics.enhancedCloseRate.percentage 
+        }
       ];
 
-      return mockFunnelData;
+      return funnelData;
     } catch (error) {
       console.error('Error fetching conversion funnel data:', error);
       throw new Error('Failed to fetch conversion funnel data');
@@ -120,44 +158,35 @@ class PerformanceService {
     filters: PerformanceFilters
   ): Promise<PerformanceBreakdown[]> {
     try {
-      // Mock breakdown data - replace with actual database queries
-      const mockBreakdownData: PerformanceBreakdown[] = [
+      // Convert PerformanceFilters to EnhancedMetricsFilters
+      const enhancedFilters = {
+        clientId: filters.clientId,
+        userId: filters.userId,
+        dateFrom: filters.dateRange.start,
+        dateTo: filters.dateRange.end,
+        adSpend: 0
+      };
+
+      // Get real enhanced metrics from the database
+      const enhancedMetrics = await EnhancedMetricsService.getEnhancedMetrics(enhancedFilters);
+
+      // For now, return a single breakdown entry with the overall metrics
+      // TODO: Implement proper breakdown by dimension (client, user, campaign, time)
+      const breakdownData: PerformanceBreakdown[] = [
         {
           id: '1',
-          name: dimension === 'client' ? 'Acme Corp' : dimension === 'user' ? 'John Smith' : dimension === 'campaign' ? 'Q1 Lead Gen' : 'January 2024',
-          revenue: 25000,
-          adSpend: 9000,
-          profit: 16000,
-          roas: 2.78,
-          conversions: 45,
-          conversionRate: 3.2,
-          trend: 'up'
-        },
-        {
-          id: '2',
-          name: dimension === 'client' ? 'TechStart Inc' : dimension === 'user' ? 'Sarah Johnson' : dimension === 'campaign' ? 'Brand Awareness' : 'February 2024',
-          revenue: 18000,
-          adSpend: 6500,
-          profit: 11500,
-          roas: 2.77,
-          conversions: 32,
-          conversionRate: 2.8,
-          trend: 'stable'
-        },
-        {
-          id: '3',
-          name: dimension === 'client' ? 'Global Solutions' : dimension === 'user' ? 'Mike Chen' : dimension === 'campaign' ? 'Retargeting' : 'March 2024',
-          revenue: 22000,
-          adSpend: 8000,
-          profit: 14000,
-          roas: 2.75,
-          conversions: 38,
-          conversionRate: 3.1,
-          trend: 'down'
+          name: dimension === 'client' ? 'Current Client' : dimension === 'user' ? 'Current User' : dimension === 'campaign' ? 'Current Campaign' : 'Current Period',
+          revenue: enhancedMetrics.revenue.totalRevenue,
+          adSpend: enhancedMetrics.roas?.totalAdSpend || 0,
+          profit: enhancedMetrics.revenue.totalRevenue - (enhancedMetrics.roas?.totalAdSpend || 0),
+          roas: enhancedMetrics.roas?.roas || 0,
+          conversions: enhancedMetrics.enhancedCloseRate.completedCalls,
+          conversionRate: enhancedMetrics.enhancedCloseRate.percentage,
+          trend: 'stable' // TODO: Calculate actual trend
         }
       ];
 
-      return mockBreakdownData;
+      return breakdownData;
     } catch (error) {
       console.error('Error fetching performance breakdown:', error);
       throw new Error('Failed to fetch performance breakdown');

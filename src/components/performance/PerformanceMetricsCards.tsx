@@ -45,12 +45,12 @@ export function PerformanceMetricsCards({ metrics }: PerformanceMetricsCardsProp
   };
 
   const getTrendBadge = (value: number) => {
-    const color = value > 0 ? 'bg-green-100 text-green-800 border-green-200' : 
-                  value < 0 ? 'bg-red-100 text-red-800 border-red-200' : 
-                  'bg-gray-100 text-gray-800 border-gray-200';
+    const color = value > 0 ? 'bg-green-500/20 text-green-300 border-green-500/50' : 
+                  value < 0 ? 'bg-red-500/20 text-red-300 border-red-500/50' : 
+                  'bg-gray-500/20 text-gray-300 border-gray-500/50';
     
     return (
-      <Badge variant="outline" className={`${color} flex items-center gap-1`}>
+      <Badge variant="outline" className={`${color} flex items-center gap-1 backdrop-blur-sm`}>
         {getTrendIcon(value)}
         {formatPercentage(Math.abs(value))}
       </Badge>
@@ -137,23 +137,30 @@ export function PerformanceMetricsCards({ metrics }: PerformanceMetricsCardsProp
       {metricsCards.map((metric, index) => {
         const Icon = metric.icon;
         return (
-          <Card key={index} className={`${metric.bgColor} hover:shadow-lg transition-all duration-200`}>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground">
+          <Card 
+            key={index} 
+            className="bg-white/5 backdrop-blur-xl border border-white/10 shadow-2xl hover:shadow-blue-500/10 transition-all duration-300 hover:scale-105 group"
+          >
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
+              <CardTitle className="text-sm font-medium text-gray-300 group-hover:text-white transition-colors duration-200">
                 {metric.title}
               </CardTitle>
-              <Icon className={`h-4 w-4 ${metric.color}`} />
+              <div className="p-2 rounded-lg bg-gradient-to-br from-blue-500/20 to-purple-500/20 group-hover:from-blue-500/30 group-hover:to-purple-500/30 transition-all duration-200">
+                <Icon className={`h-4 w-4 ${metric.color} group-hover:scale-110 transition-transform duration-200`} />
+              </div>
             </CardHeader>
             <CardContent>
-              <div className="space-y-2">
-                <div className={`text-2xl font-bold ${metric.color}`}>
+              <div className="space-y-3">
+                <div className={`text-2xl font-bold ${metric.color} group-hover:scale-105 transition-transform duration-200`}>
                   {metric.value}
                 </div>
                 <div className="flex items-center justify-between">
-                  <p className="text-xs text-muted-foreground">
+                  <p className="text-xs text-gray-400 group-hover:text-gray-300 transition-colors duration-200">
                     {metric.description}
                   </p>
-                  {getTrendBadge(metric.trend)}
+                  <div className="transform group-hover:scale-110 transition-transform duration-200">
+                    {getTrendBadge(metric.trend)}
+                  </div>
                 </div>
               </div>
             </CardContent>

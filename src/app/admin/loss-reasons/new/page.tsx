@@ -160,24 +160,16 @@ export default function NewLossReason() {
               required
             />
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Description
-              </label>
-              <textarea
-                name="description"
-                value={formData.description}
-                onChange={handleInputChange}
-                placeholder="Optional description of this loss reason..."
-                rows={3}
-                className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-red-500 ${
-                  getFieldError('description') ? 'border-red-300' : 'border-gray-300'
-                }`}
-              />
-              {getFieldError('description') && (
-                <p className="mt-1 text-sm text-red-600">{getFieldError('description')}</p>
-              )}
-            </div>
+            <FormField
+              label="Description"
+              name="description"
+              type="textarea"
+              value={formData.description}
+              onChange={handleInputChange}
+              error={getFieldError('description')}
+              placeholder="Optional description of this loss reason..."
+              rows={3}
+            />
 
             <FormField
               label="Category"

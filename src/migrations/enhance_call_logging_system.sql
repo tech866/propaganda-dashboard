@@ -226,3 +226,4 @@ SELECT
     'sarah.johnson@example.com'
 FROM clients c
 WHERE NOT EXISTS (SELECT 1 FROM setters WHERE client_id = c.id AND first_name = 'Sarah' AND last_name = 'Johnson');
+

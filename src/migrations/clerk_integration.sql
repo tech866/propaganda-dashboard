@@ -129,3 +129,4 @@ FROM users u
 LEFT JOIN clients c ON u.client_id = c.id;
 
 COMMENT ON VIEW users_with_clerk IS 'Users with Clerk integration data and client information';
+

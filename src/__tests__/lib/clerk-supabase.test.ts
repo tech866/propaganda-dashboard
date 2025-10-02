@@ -356,3 +356,4 @@ describe('Clerk-Supabase Integration', () => {
     });
   });
 });
+
