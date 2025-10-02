@@ -27,7 +27,7 @@ import {
 } from 'lucide-react';
 import { Client } from '@/lib/services/clientService';
 import { EnhancedMetricsService, EnhancedCalculationResult } from '@/lib/services/enhancedMetricsService';
-import { PerformanceService } from '@/lib/services/performanceService';
+import { performanceService } from '@/lib/services/performanceService';
 
 interface ClientPerformanceDashboardProps {
   client: Client;

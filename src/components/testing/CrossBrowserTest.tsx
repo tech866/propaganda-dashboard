@@ -10,10 +10,6 @@ import {
   CheckCircle, 
   XCircle, 
   AlertTriangle,
-  Chrome,
-  Firefox,
-  Safari,
-  Edge,
   Smartphone,
   Monitor
 } from 'lucide-react';
@@ -40,25 +36,25 @@ export default function CrossBrowserTest() {
   const browsers = [
     {
       name: 'Chrome',
-      icon: Chrome,
+      icon: Globe,
       versions: ['120', '119', '118'],
       color: 'text-green-500'
     },
     {
       name: 'Firefox',
-      icon: Firefox,
+      icon: Globe,
       versions: ['121', '120', '119'],
       color: 'text-orange-500'
     },
     {
       name: 'Safari',
-      icon: Safari,
+      icon: Globe,
       versions: ['17', '16', '15'],
       color: 'text-blue-500'
     },
     {
       name: 'Edge',
-      icon: Edge,
+      icon: Globe,
       versions: ['120', '119', '118'],
       color: 'text-blue-600'
     }

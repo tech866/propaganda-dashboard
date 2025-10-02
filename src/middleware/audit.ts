@@ -4,14 +4,13 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { AuditService } from '@/lib/services/auditService';
+import { auditService } from '@/lib/services/auditService';
 import { AuditContext, AuditLevel, AuditCategory, AuditLogCreate } from '@/lib/types/audit';
 import { User } from '@/middleware/auth';
 import { PoolClient } from 'pg';
 import { userIdentificationService, EnhancedUser } from '@/lib/services/userIdentification';
 
-// Get audit service instance
-const auditService = AuditService.getInstance();
+// Use the exported audit service instance
 
 /**
  * Extract audit context from request and user (legacy function)

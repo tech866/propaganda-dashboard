@@ -388,7 +388,7 @@ export default function PerformanceTest() {
                         </div>
                         <div className="text-xs text-muted-foreground">
                           Good: ≤{metric.threshold.good}{metric.unit} | 
-                          Poor: >{metric.threshold.poor}{metric.unit}
+                          Poor: &gt;{metric.threshold.poor}{metric.unit}
                         </div>
                       </div>
                     ))}
