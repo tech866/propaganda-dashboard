@@ -133,17 +133,28 @@ export function RoleProvider({ children }: { children: React.ReactNode }) {
 
   // Clerk integration
   useEffect(() => {
+    console.log('RoleContext useEffect triggered:', {
+      isClerkConfigured,
+      userLoaded,
+      orgLoaded,
+      clerkUser: !!clerkUser,
+      organization: !!organization
+    });
+
     // Only run Clerk integration if Clerk is configured
     if (!isClerkConfigured) {
+      console.log('Clerk not configured, skipping integration');
       return;
     }
 
     if (!userLoaded || !orgLoaded) {
+      console.log('Clerk hooks not loaded yet, setting loading to true');
       setIsLoading(true);
       return;
     }
 
     if (!clerkUser) {
+      console.log('No Clerk user found, setting user to null');
       setUser(null);
       setIsLoading(false);
       return;
@@ -152,6 +163,14 @@ export function RoleProvider({ children }: { children: React.ReactNode }) {
     // Get role from Clerk user metadata
     const role = (clerkUser.publicMetadata?.role as UserRole) || 'agency_user';
     const agencyId = organization?.id || '';
+
+    console.log('Setting user data:', {
+      id: clerkUser.id,
+      email: clerkUser.primaryEmailAddress?.emailAddress || '',
+      name: clerkUser.fullName || '',
+      role: role,
+      clientId: agencyId
+    });
 
     setUser({
       id: clerkUser.id,

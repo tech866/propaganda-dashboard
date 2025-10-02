@@ -17,7 +17,10 @@ export default function ModernDashboardLayout({
 }: ModernDashboardLayoutProps) {
   const { user, isLoading } = useRole();
 
+  console.log('ModernDashboardLayout render:', { user: !!user, isLoading });
+
   if (isLoading) {
+    console.log('ModernDashboardLayout: Showing loading state');
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
@@ -29,6 +32,7 @@ export default function ModernDashboardLayout({
   }
 
   if (!user) {
+    console.log('ModernDashboardLayout: No user found, showing auth required');
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
@@ -38,6 +42,8 @@ export default function ModernDashboardLayout({
       </div>
     );
   }
+
+  console.log('ModernDashboardLayout: Rendering dashboard for user:', user.email);
 
   return (
     <div className="min-h-screen bg-background flex">

@@ -8,19 +8,10 @@ import EnhancedDashboard from '@/components/dashboard/EnhancedDashboard';
 export default function Dashboard() {
   const router = useRouter();
   
-  // Bypass all loading states for development
-  if (process.env.NODE_ENV === 'development') {
-    return (
-      <ModernDashboardLayout>
-        <EnhancedDashboard />
-      </ModernDashboardLayout>
-    );
-  }
-
-  // Production mode would have proper loading states
+  // Always render the dashboard with proper authentication checks
   return (
-    <div className="min-h-screen flex items-center justify-center bg-slate-900">
-      <div className="text-white">Loading...</div>
-    </div>
+    <ModernDashboardLayout>
+      <EnhancedDashboard />
+    </ModernDashboardLayout>
   );
 }
