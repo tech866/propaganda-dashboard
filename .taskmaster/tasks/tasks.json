@@ -1,1 +1,23 @@
-{"version": "2.0.0", "tags": {"master": {"name": "master", "description": "Main development tasks", "created": "2024-12-19T00:00:00.000Z", "tasks": []}}}
+{
+  "version": "2.0.0",
+  "tags": {
+    "master": {
+      "name": "master",
+      "description": "Main development tasks",
+      "created": "2024-12-19T00:00:00.000Z",
+      "tasks": [
+        {
+          "id": "1",
+          "title": "Fix missing useAgency hook causing ProgressiveDashboard build error",
+          "description": "The ProgressiveDashboard component is failing to build because it's trying to import a useAgency hook from @/hooks/useAgency that doesn't exist. This is causing a module resolution error and preventing the dashboard from loading properly.",
+          "status": "pending",
+          "priority": "high",
+          "dependencies": [],
+          "details": "The error occurs in ./src/components/dashboard/ProgressiveDashboard.tsx:4:1 with import: import { useAgency } from '@/hooks/useAgency'; Need to either create the missing hook or remove the import and fix the component to work without it.",
+          "testStrategy": "Verify that the dashboard loads without errors and the ProgressiveDashboard component renders correctly",
+          "subtasks": []
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,220 @@
+---
+description: TweakCN Supabase theme styling guide for consistent UI components
+globs: src/components/**/*.tsx, src/app/**/*.tsx, src/**/*.css
+alwaysApply: true
+---
+
+# TweakCN Supabase Theme Styling Guide
+
+## **MANDATORY STYLING REQUIREMENTS**
+
+All UI components and changes MUST follow this TweakCN Supabase theme styling guide to maintain design consistency.
+
+## **Color System**
+
+### **Primary Colors**
+- **Primary**: `oklch(0.8348 0.1302 160.9080)` - Teal/Green accent
+- **Primary Foreground**: `oklch(0.2626 0.0147 166.4589)` - Dark text on primary
+- **Background**: `oklch(0.9911 0 0)` (light) / `oklch(0.1822 0 0)` (dark)
+- **Foreground**: `oklch(0.2046 0 0)` (light) / `oklch(0.9288 0.0126 255.5078)` (dark)
+
+### **Semantic Colors**
+- **Card**: `oklch(0.9911 0 0)` (light) / `oklch(0.2046 0 0)` (dark)
+- **Muted**: `oklch(0.9461 0 0)` (light) / `oklch(0.2393 0 0)` (dark)
+- **Accent**: `oklch(0.9461 0 0)` (light) / `oklch(0.3132 0 0)` (dark)
+- **Border**: `oklch(0.9037 0 0)` (light) / `oklch(0.2809 0 0)` (dark)
+
+### **Sidebar Colors**
+- **Sidebar**: `oklch(0.9911 0 0)` (light) / `oklch(0.1822 0 0)` (dark)
+- **Sidebar Primary**: `oklch(0.8348 0.1302 160.9080)` - Teal accent
+- **Sidebar Accent**: `oklch(0.9461 0 0)` (light) / `oklch(0.3132 0 0)` (dark)
+
+## **Typography**
+
+### **Font Stack**
+```css
+--font-sans: Outfit, sans-serif;
+--font-serif: ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
+--font-mono: monospace;
+```
+
+### **Letter Spacing**
+```css
+--tracking-normal: 0.025em;
+```
+
+## **Border Radius**
+```css
+--radius: 0.5rem;
+```
+
+## **Shadow System**
+
+### **Available Shadows**
+- `--shadow-2xs`: `0px 1px 3px 0px hsl(0 0% 0% / 0.09)`
+- `--shadow-xs`: `0px 1px 3px 0px hsl(0 0% 0% / 0.09)`
+- `--shadow-sm`: `0px 1px 3px 0px hsl(0 0% 0% / 0.17), 0px 1px 2px -1px hsl(0 0% 0% / 0.17)`
+- `--shadow`: `0px 1px 3px 0px hsl(0 0% 0% / 0.17), 0px 1px 2px -1px hsl(0 0% 0% / 0.17)`
+- `--shadow-md`: `0px 1px 3px 0px hsl(0 0% 0% / 0.17), 0px 2px 4px -1px hsl(0 0% 0% / 0.17)`
+- `--shadow-lg`: `0px 1px 3px 0px hsl(0 0% 0% / 0.17), 0px 4px 6px -1px hsl(0 0% 0% / 0.17)`
+- `--shadow-xl`: `0px 1px 3px 0px hsl(0 0% 0% / 0.17), 0px 8px 10px -1px hsl(0 0% 0% / 0.17)`
+- `--shadow-2xl`: `0px 1px 3px 0px hsl(0 0% 0% / 0.43)`
+
+## **Component Styling Classes**
+
+### **Modern Card Styles**
+```tsx
+// ✅ DO: Use premium card styling
+<div className="card-premium p-6">
+  <h3 className="text-h3 text-foreground">Card Title</h3>
+  <p className="text-body text-muted-foreground">Card content</p>
+</div>
+
+// ✅ DO: Use glass effect for modern look
+<div className="glass-premium p-6 rounded-2xl">
+  <h3 className="text-h3 text-foreground">Glass Card</h3>
+</div>
+```
+
+### **Button Styles**
+```tsx
+// ✅ DO: Use premium button styling
+<button className="btn-premium px-6 py-3 text-primary-foreground font-medium">
+  Premium Button
+</button>
+
+// ✅ DO: Use modern hover effects
+<button className="hover-modern px-4 py-2 bg-primary text-primary-foreground rounded-xl">
+  Hover Button
+</button>
+```
+
+### **Navigation Styles**
+```tsx
+// ✅ DO: Use modern navigation styling
+<nav className="nav-item-modern">
+  <Icon className="w-5 h-5" />
+  <span>Navigation Item</span>
+</nav>
+
+// ✅ DO: Use active state styling
+<nav className="nav-item-modern active">
+  <Icon className="w-5 h-5" />
+  <span>Active Item</span>
+</nav>
+```
+
+### **Sidebar Styles**
+```tsx
+// ✅ DO: Use modern sidebar styling
+<aside className="sidebar-modern">
+  <div className="p-6">
+    <h2 className="text-h2 text-foreground">Sidebar Title</h2>
+  </div>
+</aside>
+```
+
+### **Typography Classes**
+```tsx
+// ✅ DO: Use semantic typography classes
+<h1 className="text-display text-foreground">Display Heading</h1>
+<h2 className="text-h1 text-foreground">Main Heading</h2>
+<h3 className="text-h2 text-foreground">Section Heading</h3>
+<h4 className="text-h3 text-foreground">Subsection Heading</h4>
+<p className="text-body text-muted-foreground">Body text</p>
+<p className="text-body-sm text-muted-foreground">Small body text</p>
+<span className="text-caption text-muted-foreground">Caption text</span>
+```
+
+## **Spacing System**
+```tsx
+// ✅ DO: Use semantic spacing classes
+<div className="space-section"> {/* 8 units spacing */}
+  <div className="space-component"> {/* 4 units spacing */}
+    <div className="space-element"> {/* 2 units spacing */}
+      Content
+    </div>
+  </div>
+</div>
+```
+
+## **Focus and Accessibility**
+```tsx
+// ✅ DO: Use modern focus states
+<button className="focus-modern hover-modern">
+  Accessible Button
+</button>
+
+// ✅ DO: Use screen reader only content
+<span className="sr-only">Screen reader only text</span>
+```
+
+## **❌ FORBIDDEN PATTERNS**
+
+### **Color Usage**
+```tsx
+// ❌ DON'T: Use hardcoded colors
+<div className="bg-blue-500 text-white"> {/* Use semantic colors instead */}
+
+// ❌ DON'T: Use purple colors (project rule)
+<div className="bg-purple-600 text-white"> {/* Use primary colors instead */}
+
+// ✅ DO: Use semantic colors
+<div className="bg-primary text-primary-foreground">
+```
+
+### **Border Radius**
+```tsx
+// ❌ DON'T: Use inconsistent border radius
+<div className="rounded-lg"> {/* Use --radius system */}
+
+// ✅ DO: Use consistent border radius
+<div className="rounded-xl"> {/* Follows --radius: 0.5rem */}
+```
+
+### **Shadows**
+```tsx
+// ❌ DON'T: Use hardcoded shadows
+<div className="shadow-[0_4px_6px_rgba(0,0,0,0.1)]">
+
+// ✅ DO: Use semantic shadow classes
+<div className="shadow-modern">
+```
+
+## **Dark Mode Support**
+
+### **Automatic Dark Mode**
+The theme automatically supports dark mode through CSS custom properties. Components should use semantic color classes:
+
+```tsx
+// ✅ DO: Use semantic colors that adapt to dark mode
+<div className="bg-background text-foreground border-border">
+  <h2 className="text-card-foreground">Title</h2>
+  <p className="text-muted-foreground">Description</p>
+</div>
+```
+
+## **Implementation Checklist**
+
+When creating or modifying UI components:
+
+- [ ] **Colors**: Use semantic color classes (`bg-primary`, `text-foreground`, etc.)
+- [ ] **Typography**: Use semantic typography classes (`text-h1`, `text-body`, etc.)
+- [ ] **Spacing**: Use semantic spacing classes (`space-section`, `space-component`)
+- [ ] **Shadows**: Use semantic shadow classes (`shadow-modern`, `shadow-lg`)
+- [ ] **Borders**: Use semantic border classes (`border-border`, `border-modern`)
+- [ ] **Focus**: Include `focus-modern` for interactive elements
+- [ ] **Hover**: Include `hover-modern` or `hover-modern-subtle` for interactive elements
+- [ ] **Accessibility**: Include `sr-only` for screen reader content
+- [ ] **Dark Mode**: Ensure colors work in both light and dark modes
+- [ ] **Consistency**: Follow the established design patterns
+
+## **Reference Files**
+
+- **Main CSS**: `src/app/globals.css` - Contains all custom properties and utility classes
+- **Theme Source**: TweakCN Supabase theme - `https://tweakcn.com/r/themes/supabase.json`
+- **Components**: `src/components/ui/` - Base UI components following this guide
+
+---
+
+**This rule ensures all UI components maintain the modern, consistent TweakCN Supabase theme aesthetic with proper dark mode support and accessibility features.**
