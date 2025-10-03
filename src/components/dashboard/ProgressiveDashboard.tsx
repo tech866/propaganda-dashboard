@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useAgency } from '@/hooks/useAgency';
+import { useAgency } from '@/contexts/AgencyContext';
 import { useRole } from '@/contexts/RoleContext';
 import { DashboardService, type DashboardKPIs, type ClientSummary, type CampaignMetrics, type FinancialRecord } from '@/lib/services/dashboardService';
 
