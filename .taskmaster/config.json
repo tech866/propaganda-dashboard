@@ -1,37 +1,26 @@
 {
-  "models": {
-    "main": {
-      "provider": "anthropic",
-      "modelId": "claude-3-5-sonnet-20241022",
-      "maxTokens": 8192,
-      "temperature": 0.2
-    },
-    "research": {
-      "provider": "openai",
-      "modelId": "gpt-4o-mini",
-      "maxTokens": 8700,
-      "temperature": 0.1
-    },
-    "fallback": {
-      "provider": "anthropic",
-      "modelId": "claude-3-7-sonnet-20250219",
-      "maxTokens": 120000,
-      "temperature": 0.2
-    }
-  },
+  "projectName": "Propaganda Dashboard",
+  "projectDescription": "A comprehensive dashboard for managing advertising campaigns and call logging",
+  "projectVersion": "1.0.0",
+  "authorName": "Travis",
   "global": {
-    "logLevel": "info",
-    "debug": false,
-    "defaultNumTasks": 10,
-    "defaultSubtasks": 5,
-    "defaultPriority": "medium",
-    "projectName": "Taskmaster",
-    "ollamaBaseURL": "http://localhost:11434/api",
-    "bedrockBaseURL": "https://bedrock.us-east-1.amazonaws.com",
-    "responseLanguage": "English",
     "defaultTag": "master",
-    "azureOpenaiBaseURL": "https://your-endpoint.openai.azure.com/",
-    "userId": "1234567890"
+    "maxTokens": 4000,
+    "temperature": 0.7,
+    "logLevel": "info",
+    "defaultSubtasks": 5,
+    "defaultPriority": "medium"
   },
-  "claudeCode": {}
+  "models": {
+    "main": "claude-3-5-sonnet-20241022",
+    "research": "perplexity-llama-3.1-sonar-large-128k-online",
+    "fallback": "gpt-4o-mini"
+  },
+  "tags": {
+    "master": {
+      "name": "master",
+      "description": "Main development tasks",
+      "created": "2024-12-19T00:00:00.000Z"
+    }
+  }
 }
