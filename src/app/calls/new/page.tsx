@@ -130,10 +130,10 @@ export default function NewCall() {
 
   if (!isLoaded || loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Loading...</p>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
+          <p className="mt-4 text-muted-foreground">Loading...</p>
         </div>
       </div>
     );
@@ -141,15 +141,15 @@ export default function NewCall() {
 
   if (success) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 py-12 px-4 sm:px-6 lg:px-8">
         <div className="max-w-md w-full">
           <FormContainer
             title="Call Logged Successfully!"
             subtitle="You will be redirected to the calls list shortly."
           >
             <div className="text-center">
-              <div className="text-green-600 text-6xl mb-4">✓</div>
-              <p className="text-gray-600">Your call has been logged successfully.</p>
+              <div className="text-green-500 text-6xl mb-4">✓</div>
+              <p className="text-muted-foreground">Your call has been logged successfully.</p>
             </div>
           </FormContainer>
         </div>
@@ -158,7 +158,7 @@ export default function NewCall() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-2xl mx-auto">
         <FormContainer
           title="Log New Call"
@@ -278,7 +278,7 @@ export default function NewCall() {
             />
 
             {error && (
-              <div className="text-red-600 text-sm text-center bg-red-50 p-3 rounded-md">
+              <div className="text-red-400 text-sm text-center bg-red-900/20 border border-red-700/50 p-3 rounded-xl">
                 {error}
               </div>
             )}

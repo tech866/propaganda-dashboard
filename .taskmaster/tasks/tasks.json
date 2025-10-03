@@ -169,7 +169,7 @@
         "id": 3,
         "title": "Design Multi-Tenant Database Schema",
         "description": "Create a PostgreSQL database schema supporting multi-tenancy with separate schemas or tables for each tenant.",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
           1
         ],
@@ -254,7 +254,62 @@
           3
         ],
         "status": "pending",
-        "subtasks": []
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Configure Auth0 for RBAC",
+            "description": "Set up Auth0 to manage roles and permissions for CEO, Admin, and Sales Team roles.",
+            "dependencies": [],
+            "details": "Enable RBAC in the Auth0 Dashboard or via the Management API. Define roles and permissions for each role.",
+            "status": "pending",
+            "testStrategy": "Verify role creation and permission assignment in Auth0."
+          },
+          {
+            "id": 2,
+            "title": "Implement Role-Based Access Control at API Level",
+            "description": "Integrate Auth0 RBAC with API endpoints to enforce role-based access control.",
+            "dependencies": [
+              "4.1"
+            ],
+            "details": "Use Auth0's API Authorization Core feature to restrict access to API endpoints based on user roles.",
+            "status": "pending",
+            "testStrategy": "Test API access permissions for each role."
+          },
+          {
+            "id": 3,
+            "title": "Implement Role-Based Access Control at Database Level",
+            "description": "Ensure database access is restricted based on user roles.",
+            "dependencies": [
+              "4.1"
+            ],
+            "details": "Use database-level permissions or triggers to enforce role-based access control.",
+            "status": "pending",
+            "testStrategy": "Verify database access restrictions for each role."
+          },
+          {
+            "id": 4,
+            "title": "Integrate RBAC with UI Access Control",
+            "description": "Implement UI-level access control based on user roles.",
+            "dependencies": [
+              "4.2",
+              "4.3"
+            ],
+            "details": "Use role information to restrict access to UI components and features.",
+            "status": "pending",
+            "testStrategy": "Test UI access permissions for each role."
+          },
+          {
+            "id": 5,
+            "title": "Fix UI Styling Consistency Issues",
+            "description": "Ensure UI styling consistency across all pages to match the TweakCN Supabase theme.",
+            "dependencies": [
+              "4.4"
+            ],
+            "details": "Apply consistent styling using CSS or a styling framework like Tailwind CSS.",
+            "status": "pending",
+            "testStrategy": "Verify visual consistency across all pages."
+          }
+        ]
       },
       {
         "id": 5,
@@ -412,11 +467,70 @@
         ],
         "status": "pending",
         "subtasks": []
+      },
+      {
+        "id": 16,
+        "title": "Enforce UI Styling Consistency with TweakCN Supabase Theme Across All Pages",
+        "description": "Standardize UI styling on all application pages to match the TweakCN Supabase dark theme, resolving specific inconsistencies and ensuring semantic color usage and component uniformity.",
+        "status": "in-progress",
+        "dependencies": [
+          5
+        ],
+        "priority": "high",
+        "details": "1. **Theme Integration:**\n   - Install and configure the Supabase theme from TweakCN using shadcn/ui and Tailwind CSS. Import the theme preset (e.g., via `npx shadcn@latest add https://www.shadcn.io/registry/supabase.json` or use `@madooei/shadcn-theme-presets` for runtime theme management)[2][3][4].\n   - Ensure the theme is globally applied, including dark mode defaults and semantic color variables in the global CSS.\n\n2. **Component Refactoring:**\n   - Audit all pages (Log Call, View Calls, Enhanced Call Logging, Ad Spend) for deviations from the theme.\n   - Update the Log Call button to use theme-compliant background, border, and hover states (replace white backgrounds with semantic theme colors).\n   - Refactor the View Calls page to remove non-theme colors (white/purple/blue) and apply theme palette for backgrounds, text, and accents.\n   - Fix the Enhanced Call Logging page FormField error by ensuring all form components use shadcn/ui primitives and theme variables for error states, borders, and focus rings.\n   - Update the Ad Spend page to match the styling guide: use theme backgrounds, text, and accent colors, and ensure consistent spacing and typography.\n\n3. **Best Practices:**\n   - Use Tailwind CSS utility classes with theme variables for all custom styles.\n   - Ensure all interactive elements (buttons, inputs, links) have accessible contrast and consistent focus/hover states.\n   - Remove hardcoded colors and replace with semantic tokens from the theme.\n   - Test in both dark and light modes (if supported), but prioritize dark mode as default.\n   - Document any custom overrides in a central theme file for maintainability.\n\n4. **Tooling:**\n   - Use Prettier and ESLint to enforce code style.\n   - Leverage Storybook or a similar tool to visually verify component consistency if available.\n\n5. **Collaboration:**\n   - Communicate with design stakeholders to confirm visual alignment with the TweakCN Supabase theme and the styling guide.\n\n6. **Implementation Progress:**\n   - **Log Call Page (/calls/new):**\n     - Replaced white background (bg-gray-50) with dark theme gradient\n     - Updated loading state to use primary theme colors\n     - Implemented proper dark theme colors for success state\n     - Aligned error message styling with dark theme guidelines\n   \n   - **View Calls Page (/calls):**\n     - Implemented dark theme gradient background throughout\n     - Added slate-800/50 backdrop blur and proper borders to header\n     - Updated navigation with primary color accents and hover states\n     - Redesigned main content card with slate-800/50 background and rounded corners\n     - Applied dark theme colors to table with proper contrast\n     - Converted all status and outcome badges to use theme colors\n     - Implemented dark theme styling for empty state\n     - Replaced purple accent colors with primary theme colors\n     - Added consistent hover effects and transitions\n     - Incorporated glassmorphism effects per TweakCN Supabase guidelines\n\n   - **Enhanced Call Logging Page (/calls/enhanced):**\n     - Fixed FormField import error by replacing all instances with EnhancedFormField\n     - Updated all purple colors to use primary theme colors throughout the page\n     - Implemented dark theme gradient background with proper semantic colors\n     - Added glassmorphism effects with backdrop blur and proper borders\n     - Ensured consistent primary color usage for all interactive elements\n     - Applied proper semantic color classes for text and backgrounds\n     - Enhanced hover and focus states with primary theme colors\n     - All components now follow TweakCN Supabase theme guidelines\n     \n   - **Ad Spend Page (/ad-spend):**\n     - Updated loading state from white background and blue spinner to dark theme gradient and primary colors\n     - Replaced main page background (bg-gray-50) with dark theme gradient (bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900)\n     - Transformed header styling with bg-slate-800/50 backdrop-blur-sm and border-slate-700\n     - Updated all platform & source badge colors to use dark theme with opacity and borders:\n       - Meta: bg-blue-900/30 text-blue-400 border border-blue-700/50\n       - Google: bg-red-900/30 text-red-400 border border-red-700/50\n       - Manual: bg-yellow-900/30 text-yellow-400 border border-yellow-700/50\n       - API: bg-green-900/30 text-green-400 border border-green-700/50\n     - Complete dark theme transformation for table styling with proper containers, headers, and hover states\n     - Updated modal form with dark theme styling including backdrop blur and semantic error messages\n     - Added consistent rounded corners (rounded-xl, rounded-2xl) for modern look\n     - Implemented glassmorphism effects throughout the page",
+        "testStrategy": "1. Manually review each affected page (Log Call, View Calls, Enhanced Call Logging, Ad Spend) to confirm all UI elements use the Supabase theme colors and styles.\n2. Use browser dev tools to inspect elements and verify no hardcoded or legacy color values remain.\n3. Check for consistent button, input, and form styling across all pages, including error and focus states.\n4. Validate dark mode rendering and semantic color usage for accessibility (contrast ratios, focus indicators).\n5. Solicit feedback from design stakeholders and perform a visual regression test (using Storybook or screenshots) to ensure adherence to the styling guide.\n6. Run automated UI tests (if available) to catch regressions.",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Style Log Call Page",
+            "description": "Update the Log Call page (/calls/new) to match the TweakCN Supabase theme",
+            "status": "completed",
+            "dependencies": [],
+            "details": "",
+            "testStrategy": ""
+          },
+          {
+            "id": 2,
+            "title": "Style View Calls Page",
+            "description": "Update the View Calls page (/calls) to match the TweakCN Supabase theme",
+            "status": "completed",
+            "dependencies": [],
+            "details": "",
+            "testStrategy": ""
+          },
+          {
+            "id": 3,
+            "title": "Style Enhanced Call Logging Page",
+            "description": "Fix FormField error and update the Enhanced Call Logging page (/calls/enhanced) to match the TweakCN Supabase theme",
+            "status": "completed",
+            "dependencies": [],
+            "details": "",
+            "testStrategy": ""
+          },
+          {
+            "id": 4,
+            "title": "Style Ad Spend Page",
+            "description": "Update the Ad Spend page to match the TweakCN Supabase theme by applying dark theme gradient backgrounds, glassmorphism effects, and consistent primary color usage throughout all components",
+            "status": "completed",
+            "dependencies": [],
+            "details": "",
+            "testStrategy": ""
+          },
+          {
+            "id": 5,
+            "title": "Final Review and Documentation",
+            "description": "Perform a final review of all pages to ensure consistent styling, document any custom theme overrides, and get stakeholder approval",
+            "status": "in-progress",
+            "dependencies": [],
+            "details": "Conduct a comprehensive review of all styled pages (Log Call, View Calls, Enhanced Call Logging, and Ad Spend) to verify consistent implementation of the TweakCN Supabase theme. Document all custom color tokens, component styles, and theme overrides in a central theme file for future reference and maintainability. Prepare visual documentation showing before/after comparisons for stakeholder review.",
+            "testStrategy": "Verify all pages maintain consistent styling across different screen sizes and browsers. Check for any remaining hardcoded colors or inconsistent styling patterns. Ensure all components follow accessibility guidelines with proper contrast ratios."
+          }
+        ]
       }
     ],
     "metadata": {
       "created": "2025-10-03T13:30:44.692Z",
-      "updated": "2025-10-03T13:32:21.783Z",
+      "updated": "2025-10-03T13:44:51.817Z",
       "description": "Tasks for master context"
     }
   }

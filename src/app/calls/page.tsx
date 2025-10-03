@@ -45,10 +45,10 @@ export default function CallsPage() {
 
   if (!isLoaded || loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Loading calls...</p>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
+          <p className="mt-4 text-muted-foreground">Loading calls...</p>
         </div>
       </div>
     );
@@ -60,45 +60,45 @@ export default function CallsPage() {
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'completed': return 'bg-green-100 text-green-800';
-      case 'no-show': return 'bg-red-100 text-red-800';
-      case 'rescheduled': return 'bg-yellow-100 text-yellow-800';
-      default: return 'bg-gray-100 text-gray-800';
+      case 'completed': return 'bg-green-900/30 text-green-400 border border-green-700/50';
+      case 'no-show': return 'bg-red-900/30 text-red-400 border border-red-700/50';
+      case 'rescheduled': return 'bg-yellow-900/30 text-yellow-400 border border-yellow-700/50';
+      default: return 'bg-slate-700/50 text-slate-300 border border-slate-600/50';
     }
   };
 
   const getOutcomeColor = (outcome: string) => {
     switch (outcome) {
-      case 'won': return 'bg-green-100 text-green-800';
-      case 'lost': return 'bg-red-100 text-red-800';
-      case 'tbd': return 'bg-gray-100 text-gray-800';
-      default: return 'bg-gray-100 text-gray-800';
+      case 'won': return 'bg-green-900/30 text-green-400 border border-green-700/50';
+      case 'lost': return 'bg-red-900/30 text-red-400 border border-red-700/50';
+      case 'tbd': return 'bg-slate-700/50 text-slate-300 border border-slate-600/50';
+      default: return 'bg-slate-700/50 text-slate-300 border border-slate-600/50';
     }
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
       {/* Header */}
-      <header className="bg-white shadow-sm border-b">
+      <header className="bg-slate-800/50 backdrop-blur-sm border-b border-slate-700">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center py-4">
             <div className="flex items-center space-x-4">
-              <h1 className="text-2xl font-bold text-gray-900">Call Logs</h1>
-              <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-purple-100 text-purple-800">
+              <h1 className="text-2xl font-bold text-foreground">Call Logs</h1>
+              <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-slate-700/50 text-slate-300 border border-slate-600/50">
                 {user.publicMetadata?.role?.toString().toUpperCase() || 'USER'}
               </span>
             </div>
             <div className="flex items-center space-x-4">
-              <span className="text-sm text-gray-600">Welcome, {user.fullName || user.firstName}</span>
+              <span className="text-sm text-muted-foreground">Welcome, {user.fullName || user.firstName}</span>
               <Link
                 href="/calls/new"
-                className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors"
+                className="bg-primary hover:bg-primary/90 text-primary-foreground px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200"
               >
                 Log New Call
               </Link>
               <Link
                 href="/calls/enhanced"
-                className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors"
+                className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200"
               >
                 Enhanced Call Logging
               </Link>
@@ -108,29 +108,29 @@ export default function CallsPage() {
       </header>
 
       {/* Navigation */}
-      <nav className="bg-white border-b">
+      <nav className="bg-slate-800/30 backdrop-blur-sm border-b border-slate-700">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex space-x-8 py-3">
-            <Link href="/dashboard" className="text-gray-500 hover:text-gray-700 pb-3 px-1 text-sm font-medium">
+            <Link href="/dashboard" className="text-muted-foreground hover:text-foreground pb-3 px-1 text-sm font-medium transition-colors">
               Dashboard
             </Link>
-            <Link href="/calls" className="text-purple-600 border-b-2 border-purple-600 pb-3 px-1 text-sm font-medium">
+            <Link href="/calls" className="text-primary border-b-2 border-primary pb-3 px-1 text-sm font-medium">
               Call Logs
             </Link>
-            <Link href="/calls/new" className="text-gray-500 hover:text-gray-700 pb-3 px-1 text-sm font-medium">
+            <Link href="/calls/new" className="text-muted-foreground hover:text-foreground pb-3 px-1 text-sm font-medium transition-colors">
               Log Call
             </Link>
-            <Link href="/calls/enhanced" className="text-gray-500 hover:text-gray-700 pb-3 px-1 text-sm font-medium">
+            <Link href="/calls/enhanced" className="text-muted-foreground hover:text-foreground pb-3 px-1 text-sm font-medium transition-colors">
               Enhanced Logging
             </Link>
-            <Link href="/analytics" className="text-gray-500 hover:text-gray-700 pb-3 px-1 text-sm font-medium">
+            <Link href="/analytics" className="text-muted-foreground hover:text-foreground pb-3 px-1 text-sm font-medium transition-colors">
               Analytics
             </Link>
-            <Link href="/ad-spend" className="text-gray-500 hover:text-gray-700 pb-3 px-1 text-sm font-medium">
+            <Link href="/ad-spend" className="text-muted-foreground hover:text-foreground pb-3 px-1 text-sm font-medium transition-colors">
               Ad Spend
             </Link>
             {user.publicMetadata?.role === 'admin' && (
-              <Link href="/admin/users/new" className="text-gray-500 hover:text-gray-700 pb-3 px-1 text-sm font-medium">
+              <Link href="/admin/users/new" className="text-muted-foreground hover:text-foreground pb-3 px-1 text-sm font-medium transition-colors">
                 Manage Users
               </Link>
             )}
@@ -140,63 +140,63 @@ export default function CallsPage() {
 
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="bg-white shadow rounded-lg">
+        <div className="bg-slate-800/50 backdrop-blur-sm border border-slate-700 shadow-xl rounded-2xl">
           <div className="px-4 py-5 sm:p-6">
             <div className="flex justify-between items-center mb-6">
-              <h3 className="text-lg leading-6 font-medium text-gray-900">
+              <h3 className="text-lg leading-6 font-medium text-foreground">
                 All Calls ({calls.length})
               </h3>
             </div>
 
             {calls.length === 0 ? (
               <div className="text-center py-12">
-                <svg className="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <svg className="mx-auto h-12 w-12 text-muted-foreground" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
                 </svg>
-                <h3 className="mt-2 text-sm font-medium text-gray-900">No calls logged</h3>
-                <p className="mt-1 text-sm text-gray-500">Get started by logging your first call.</p>
+                <h3 className="mt-2 text-sm font-medium text-foreground">No calls logged</h3>
+                <p className="mt-1 text-sm text-muted-foreground">Get started by logging your first call.</p>
                 <div className="mt-6">
                   <Link
                     href="/calls/new"
-                    className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-purple-600 hover:bg-purple-700"
+                    className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-xl text-primary-foreground bg-primary hover:bg-primary/90 transition-all duration-200"
                   >
                     Log New Call
                   </Link>
                 </div>
               </div>
             ) : (
-              <div className="overflow-hidden shadow ring-1 ring-black ring-opacity-5 md:rounded-lg">
-                <table className="min-w-full divide-y divide-gray-300">
-                  <thead className="bg-gray-50">
+              <div className="overflow-hidden shadow-xl border border-slate-700 rounded-xl">
+                <table className="min-w-full divide-y divide-slate-700">
+                  <thead className="bg-slate-800/50">
                     <tr>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
                         Prospect
                       </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
                         Type
                       </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
                         Status
                       </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
                         Outcome
                       </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
                         Date
                       </th>
                     </tr>
                   </thead>
-                  <tbody className="bg-white divide-y divide-gray-200">
+                  <tbody className="bg-slate-800/30 divide-y divide-slate-700">
                     {calls.map((call) => (
-                      <tr key={call.id} className="hover:bg-gray-50">
+                      <tr key={call.id} className="hover:bg-slate-700/30 transition-colors">
                         <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="text-sm font-medium text-gray-900">{call.prospect_name}</div>
+                          <div className="text-sm font-medium text-foreground">{call.prospect_name}</div>
                           {call.prospect_email && (
-                            <div className="text-sm text-gray-500">{call.prospect_email}</div>
+                            <div className="text-sm text-muted-foreground">{call.prospect_email}</div>
                           )}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
-                          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 capitalize">
+                          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-900/30 text-blue-400 border border-blue-700/50 capitalize">
                             {call.call_type}
                           </span>
                         </td>
@@ -210,7 +210,7 @@ export default function CallsPage() {
                             {call.outcome.toUpperCase()}
                           </span>
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-muted-foreground">
                           {new Date(call.created_at).toLocaleDateString()}
                         </td>
                       </tr>

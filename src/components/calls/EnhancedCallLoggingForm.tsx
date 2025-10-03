@@ -211,8 +211,8 @@ export default function EnhancedCallLoggingForm() {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="mt-4 text-gray-300">Loading...</p>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
+          <p className="mt-4 text-muted-foreground">Loading...</p>
         </div>
       </div>
     );
@@ -255,7 +255,7 @@ export default function EnhancedCallLoggingForm() {
       <div className="max-w-7xl mx-auto">
         {/* Enhanced Header Section with improved accessibility */}
         <header className="text-center mb-12" role="banner">
-          <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-blue-600 to-purple-600 rounded-full mb-6 shadow-lg shadow-blue-500/25 hover:shadow-blue-500/40 transition-all duration-300 hover:scale-105">
+          <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-primary to-primary/80 rounded-full mb-6 shadow-lg shadow-primary/25 hover:shadow-primary/40 transition-all duration-300 hover:scale-105">
             <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
             </svg>
@@ -270,11 +270,11 @@ export default function EnhancedCallLoggingForm() {
 
         <form onSubmit={handleSubmit} className="space-y-10" role="form" aria-label="Enhanced Call Logging Form">
           {/* Basic Call Information */}
-          <Card className="bg-white/5 backdrop-blur-xl border border-white/10 shadow-2xl hover:shadow-blue-500/10 transition-all duration-300 focus-within:ring-2 focus-within:ring-blue-500/50 focus-within:ring-offset-2 focus-within:ring-offset-slate-900">
+          <Card className="bg-white/5 backdrop-blur-xl border border-white/10 shadow-2xl hover:shadow-primary/10 transition-all duration-300 focus-within:ring-2 focus-within:ring-primary/50 focus-within:ring-offset-2 focus-within:ring-offset-slate-900">
             <CardHeader className="pb-6">
               <div className="flex items-center gap-3 mb-2">
-                <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse" aria-hidden="true"></div>
-                <Badge variant="outline" className="bg-blue-600/20 text-blue-300 border-blue-500/50 px-3 py-1 text-sm font-medium">
+                <div className="w-2 h-2 bg-primary rounded-full animate-pulse" aria-hidden="true"></div>
+                <Badge variant="outline" className="bg-primary/20 text-primary border-primary/50 px-3 py-1 text-sm font-medium">
                   Basic Info
                 </Badge>
               </div>
@@ -300,7 +300,7 @@ export default function EnhancedCallLoggingForm() {
                   isTouched={isFieldTouched('prospect_name')}
                 />
 
-                <FormField
+                <EnhancedFormField
                   label="Prospect Email"
                   name="prospect_email"
                   type="email"
@@ -312,7 +312,7 @@ export default function EnhancedCallLoggingForm() {
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <FormField
+                <EnhancedFormField
                   label="Prospect Phone"
                   name="prospect_phone"
                   type="text"
@@ -322,7 +322,7 @@ export default function EnhancedCallLoggingForm() {
                   placeholder="Enter prospect phone"
                 />
 
-                <FormField
+                <EnhancedFormField
                   label="Call Type"
                   name="call_type"
                   type="select"
@@ -334,11 +334,11 @@ export default function EnhancedCallLoggingForm() {
                   <option value="">Select call type</option>
                   <option value="inbound">Inbound</option>
                   <option value="outbound">Outbound</option>
-                </FormField>
+                </EnhancedFormField>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <FormField
+                <EnhancedFormField
                   label="Status"
                   name="status"
                   type="select"
@@ -351,9 +351,9 @@ export default function EnhancedCallLoggingForm() {
                   <option value="completed">Completed</option>
                   <option value="no-show">No Show</option>
                   <option value="rescheduled">Rescheduled</option>
-                </FormField>
+                </EnhancedFormField>
 
-                <FormField
+                <EnhancedFormField
                   label="Call Duration (minutes)"
                   name="call_duration"
                   type="number"
@@ -365,7 +365,7 @@ export default function EnhancedCallLoggingForm() {
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <FormField
+                <EnhancedFormField
                   label="Scheduled At"
                   name="scheduled_at"
                   type="datetime-local"
@@ -374,7 +374,7 @@ export default function EnhancedCallLoggingForm() {
                   error={getFieldError('scheduled_at')}
                 />
 
-                <FormField
+                <EnhancedFormField
                   label="Completed At"
                   name="completed_at"
                   type="datetime-local"
@@ -404,7 +404,7 @@ export default function EnhancedCallLoggingForm() {
             </CardHeader>
             <CardContent className="space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <FormField
+                <EnhancedFormField
                   label="Source of Set Appointment"
                   name="source_of_set_appointment"
                   type="select"
@@ -419,9 +419,9 @@ export default function EnhancedCallLoggingForm() {
                   <option value="email">Email</option>
                   <option value="vsl">VSL</option>
                   <option value="self_booking">Self Booking</option>
-                </FormField>
+                </EnhancedFormField>
 
-                <FormField
+                <EnhancedFormField
                   label="Call Outcome"
                   name="enhanced_call_outcome"
                   type="select"
@@ -440,11 +440,11 @@ export default function EnhancedCallLoggingForm() {
                   <option value="deposit">Deposit</option>
                   <option value="closed_paid_in_full">Closed/Paid In Full</option>
                   <option value="follow_up_call_scheduled">Follow Up Call Scheduled</option>
-                </FormField>
+                </EnhancedFormField>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <FormField
+                <EnhancedFormField
                   label="Lead Source"
                   name="lead_source"
                   type="select"
@@ -456,9 +456,9 @@ export default function EnhancedCallLoggingForm() {
                   <option value="">Select lead source</option>
                   <option value="organic">Organic</option>
                   <option value="ads">Ads</option>
-                </FormField>
+                </EnhancedFormField>
 
-                <FormField
+                <EnhancedFormField
                   label="Initial Payment Collected On"
                   name="initial_payment_collected_on"
                   type="date"
@@ -471,11 +471,11 @@ export default function EnhancedCallLoggingForm() {
           </Card>
 
           {/* Team Information */}
-          <Card className="bg-white/5 backdrop-blur-xl border border-white/10 shadow-2xl hover:shadow-purple-500/10 transition-all duration-300">
+          <Card className="bg-white/5 backdrop-blur-xl border border-white/10 shadow-2xl hover:shadow-primary/10 transition-all duration-300">
             <CardHeader className="pb-6">
               <div className="flex items-center gap-3 mb-2">
-                <div className="w-2 h-2 bg-purple-500 rounded-full animate-pulse"></div>
-                <Badge variant="outline" className="bg-purple-600/20 text-purple-300 border-purple-500/50 px-3 py-1">
+                <div className="w-2 h-2 bg-primary rounded-full animate-pulse"></div>
+                <Badge variant="outline" className="bg-primary/20 text-primary border-primary/50 px-3 py-1">
                   Team
                 </Badge>
               </div>
@@ -488,7 +488,7 @@ export default function EnhancedCallLoggingForm() {
             </CardHeader>
             <CardContent className="space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <FormField
+                <EnhancedFormField
                   label="Closer First Name"
                   name="closer_first_name"
                   type="text"
@@ -498,7 +498,7 @@ export default function EnhancedCallLoggingForm() {
                   placeholder="Enter closer first name"
                 />
 
-                <FormField
+                <EnhancedFormField
                   label="Closer Last Name"
                   name="closer_last_name"
                   type="text"
@@ -510,7 +510,7 @@ export default function EnhancedCallLoggingForm() {
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <FormField
+                <EnhancedFormField
                   label="Setter First Name"
                   name="setter_first_name"
                   type="text"
@@ -520,7 +520,7 @@ export default function EnhancedCallLoggingForm() {
                   placeholder="Enter setter first name"
                 />
 
-                <FormField
+                <EnhancedFormField
                   label="Setter Last Name"
                   name="setter_last_name"
                   type="text"
@@ -551,7 +551,7 @@ export default function EnhancedCallLoggingForm() {
             </CardHeader>
             <CardContent className="space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <FormField
+                <EnhancedFormField
                   label="Customer Full Name"
                   name="customer_full_name"
                   type="text"
@@ -561,7 +561,7 @@ export default function EnhancedCallLoggingForm() {
                   placeholder="Enter customer full name"
                 />
 
-                <FormField
+                <EnhancedFormField
                   label="Customer Email"
                   name="customer_email"
                   type="email"
@@ -573,7 +573,7 @@ export default function EnhancedCallLoggingForm() {
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <FormField
+                <EnhancedFormField
                   label="Calls Taken"
                   name="calls_taken"
                   type="number"
@@ -629,7 +629,7 @@ export default function EnhancedCallLoggingForm() {
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
-              <FormField
+              <EnhancedFormField
                 label="Call Notes"
                 name="notes"
                 type="textarea"
@@ -639,7 +639,7 @@ export default function EnhancedCallLoggingForm() {
                 placeholder="Enter call notes and details"
               />
 
-              <FormField
+              <EnhancedFormField
                 label="Prospect Notes"
                 name="prospect_notes"
                 type="textarea"
@@ -685,7 +685,7 @@ export default function EnhancedCallLoggingForm() {
                   type="submit"
                   loading={loading}
                   disabled={loading || !isFormValid}
-                  className="flex-1 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white border-0 transition-all duration-300 hover:shadow-lg hover:shadow-blue-500/25 hover:scale-[1.02] focus:ring-2 focus:ring-blue-500/50 focus:ring-offset-2 focus:ring-offset-slate-900 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+                  className="flex-1 bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 text-primary-foreground border-0 transition-all duration-300 hover:shadow-lg hover:shadow-primary/25 hover:scale-[1.02] focus:ring-2 focus:ring-primary/50 focus:ring-offset-2 focus:ring-offset-slate-900 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
                   aria-label="Submit enhanced call logging form"
                 >
                   <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
