@@ -24,7 +24,7 @@ export default function RootLayout({
 }>) {
   return (
     <ClerkProviderWrapper>
-      <html lang="en" suppressHydrationWarning>
+      <html lang="en" className="dark" suppressHydrationWarning>
         <body className={`${inter.variable} font-sans antialiased bg-background text-foreground`}>
           <ThemeProvider
             attribute="class"
