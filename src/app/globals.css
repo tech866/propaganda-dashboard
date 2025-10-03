@@ -189,3 +189,50 @@
     @apply bg-background text-foreground;
   }
 }
+
+@layer components {
+  /* Modern Navigation Styles */
+  .nav-item-modern {
+    @apply flex items-center space-x-3 px-4 py-3 rounded-xl;
+    @apply text-muted-foreground hover:text-foreground;
+    @apply bg-transparent hover:bg-accent;
+    @apply transition-all duration-200 ease-in-out;
+    @apply focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2;
+    @apply relative overflow-hidden;
+  }
+
+  .nav-item-modern.active {
+    @apply bg-accent text-foreground;
+    @apply shadow-sm;
+  }
+
+  .nav-item-modern.active::before {
+    content: '';
+    @apply absolute left-0 top-0 bottom-0 w-1 bg-primary rounded-r-full;
+  }
+
+  .nav-item-modern:hover:not(.active) {
+    @apply transform translate-x-1;
+  }
+
+  /* Modern Sidebar Styles */
+  .sidebar-modern {
+    background-color: var(--sidebar);
+    @apply border-r border-border;
+    @apply backdrop-blur-xl;
+    @apply shadow-xl;
+  }
+
+  /* Modern Hover Effects */
+  .hover-modern {
+    @apply transition-all duration-200 ease-in-out;
+    @apply hover:transform hover:scale-105;
+    @apply hover:shadow-lg;
+  }
+
+  .hover-modern-subtle {
+    @apply transition-all duration-200 ease-in-out;
+    @apply hover:transform hover:scale-[1.02];
+    @apply hover:shadow-md;
+  }
+}
