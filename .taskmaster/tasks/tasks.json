@@ -19,5 +19,405 @@
         }
       ]
     }
+  },
+  "master": {
+    "tasks": [
+      {
+        "id": 1,
+        "title": "Setup Project Repository",
+        "description": "Create a new project repository on GitHub or similar platforms with the required structure for frontend and backend code.",
+        "status": "done",
+        "dependencies": [],
+        "priority": "medium",
+        "details": "Repository has been set up with Next.js 15, TypeScript, and Tailwind CSS. The project includes a proper src/ directory structure, authentication with Clerk, database integration with Supabase, and modern UI components. The repository is hosted at https://github.com/tech866/propaganda-dashboard.git with deployment at https://propaganda-dashboard-jwav00slp-propaganda-incs-projects.vercel.app.",
+        "testStrategy": "Repository structure and initial setup have been verified. All necessary configuration files (package.json, tsconfig.json, tailwind.config.js) are in place and the deployment is functional.",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Initialize Next.js 15 with TypeScript",
+            "description": "",
+            "status": "completed",
+            "dependencies": [],
+            "details": "",
+            "testStrategy": ""
+          },
+          {
+            "id": 2,
+            "title": "Configure Tailwind CSS",
+            "description": "",
+            "status": "completed",
+            "dependencies": [],
+            "details": "",
+            "testStrategy": ""
+          },
+          {
+            "id": 3,
+            "title": "Set up GitHub repository",
+            "description": "",
+            "status": "completed",
+            "dependencies": [],
+            "details": "",
+            "testStrategy": ""
+          },
+          {
+            "id": 4,
+            "title": "Configure Vercel deployment",
+            "description": "",
+            "status": "completed",
+            "dependencies": [],
+            "details": "",
+            "testStrategy": ""
+          },
+          {
+            "id": 5,
+            "title": "Implement Clerk authentication",
+            "description": "",
+            "status": "completed",
+            "dependencies": [],
+            "details": "",
+            "testStrategy": ""
+          },
+          {
+            "id": 6,
+            "title": "Set up Supabase database integration",
+            "description": "",
+            "status": "completed",
+            "dependencies": [],
+            "details": "",
+            "testStrategy": ""
+          },
+          {
+            "id": 7,
+            "title": "Create modern UI components and layouts",
+            "description": "",
+            "status": "completed",
+            "dependencies": [],
+            "details": "",
+            "testStrategy": ""
+          }
+        ]
+      },
+      {
+        "id": 2,
+        "title": "Implement Authentication System",
+        "description": "Authentication system implemented using Clerk with JWT tokens and MFA support.",
+        "status": "done",
+        "dependencies": [
+          1
+        ],
+        "priority": "high",
+        "details": "The authentication system is fully implemented using Clerk, which provides comprehensive features including JWT authentication, user management, session handling, role-based access control, MFA support, secure authentication flows, and user profile management. Clerk is integrated throughout the application and provides more functionality than the originally planned NextAuth.js implementation.",
+        "testStrategy": "Verify login, logout, session persistence, role-based access, MFA functionality, and user profile management through Clerk's authentication system.",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Clerk Authentication Integration",
+            "description": "Integrate Clerk authentication with JWT token support",
+            "status": "completed",
+            "dependencies": [],
+            "details": "",
+            "testStrategy": ""
+          },
+          {
+            "id": 2,
+            "title": "User Management and Session Handling",
+            "description": "Implement user management and session handling through Clerk",
+            "status": "completed",
+            "dependencies": [],
+            "details": "",
+            "testStrategy": ""
+          },
+          {
+            "id": 3,
+            "title": "Role-based Access Control",
+            "description": "Configure role-based access control integration with Clerk",
+            "status": "completed",
+            "dependencies": [],
+            "details": "",
+            "testStrategy": ""
+          },
+          {
+            "id": 4,
+            "title": "MFA Support Implementation",
+            "description": "Enable multi-factor authentication through Clerk's built-in MFA features",
+            "status": "completed",
+            "dependencies": [],
+            "details": "",
+            "testStrategy": ""
+          },
+          {
+            "id": 5,
+            "title": "Secure Authentication Flows",
+            "description": "Implement secure authentication flows for signup, login, and password reset",
+            "status": "completed",
+            "dependencies": [],
+            "details": "",
+            "testStrategy": ""
+          },
+          {
+            "id": 6,
+            "title": "User Profile Management",
+            "description": "Set up user profile management capabilities through Clerk",
+            "status": "completed",
+            "dependencies": [],
+            "details": "",
+            "testStrategy": ""
+          }
+        ]
+      },
+      {
+        "id": 3,
+        "title": "Design Multi-Tenant Database Schema",
+        "description": "Create a PostgreSQL database schema supporting multi-tenancy with separate schemas or tables for each tenant.",
+        "status": "pending",
+        "dependencies": [
+          1
+        ],
+        "priority": "high",
+        "details": "The multi-tenant database schema has been fully implemented in Supabase PostgreSQL with a shared database approach and row-level security for data isolation. The implementation includes client-level data segregation, core tables (clients, users, calls, loss_reasons, audit_logs), optimized indexes, foreign key constraints, RLS policies, audit logging, and role-based access control integration.",
+        "testStrategy": "Schema creation and data isolation have been verified. All aspects of the multi-tenant architecture have been tested and are production-ready.",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Implement core multi-tenant architecture",
+            "description": "Implemented client-level data segregation with separate schemas approach in Supabase PostgreSQL",
+            "status": "completed",
+            "dependencies": [],
+            "details": "",
+            "testStrategy": ""
+          },
+          {
+            "id": 2,
+            "title": "Create core database tables",
+            "description": "Implemented all core tables: clients, users, calls, loss_reasons, audit_logs with proper relationships",
+            "status": "completed",
+            "dependencies": [],
+            "details": "",
+            "testStrategy": ""
+          },
+          {
+            "id": 3,
+            "title": "Implement data security measures",
+            "description": "Implemented row-level security (RLS) policies for data isolation and role-based access control",
+            "status": "completed",
+            "dependencies": [],
+            "details": "",
+            "testStrategy": ""
+          },
+          {
+            "id": 4,
+            "title": "Optimize database performance",
+            "description": "Created 37 optimized indexes for performance and 7 foreign key constraints ensuring data integrity",
+            "status": "completed",
+            "dependencies": [],
+            "details": "",
+            "testStrategy": ""
+          },
+          {
+            "id": 5,
+            "title": "Implement audit logging system",
+            "description": "Developed complete audit logging system to track data changes",
+            "status": "completed",
+            "dependencies": [],
+            "details": "",
+            "testStrategy": ""
+          },
+          {
+            "id": 6,
+            "title": "Implement data validation",
+            "description": "Added check constraints for data validation across all tables",
+            "status": "completed",
+            "dependencies": [],
+            "details": "",
+            "testStrategy": ""
+          },
+          {
+            "id": 7,
+            "title": "Document database schema",
+            "description": "Documented all SQL scripts and made them available in the project files",
+            "status": "completed",
+            "dependencies": [],
+            "details": "",
+            "testStrategy": ""
+          }
+        ]
+      },
+      {
+        "id": 4,
+        "title": "Implement Role-Based Access Control (RBAC)",
+        "description": "Develop RBAC to manage user permissions based on roles (CEO, Admin, Sales Team).",
+        "details": "Use Auth0 or similar for managing roles and permissions. Ensure strict access control at both API and database levels.",
+        "testStrategy": "Test access permissions for each role.",
+        "priority": "high",
+        "dependencies": [
+          2,
+          3
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 5,
+        "title": "Develop Call Logging System",
+        "description": "Create a form-based interface for logging calls with required fields validation.",
+        "details": "Implement a modal for call logging with fields like client selection, prospect information, and call outcome. Use Next.js for the frontend.",
+        "testStrategy": "Test call logging functionality and validation rules.",
+        "priority": "medium",
+        "dependencies": [
+          2,
+          4
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 6,
+        "title": "Implement Calls CRUD Functionality",
+        "description": "Develop API endpoints for creating, reading, updating, and deleting calls with proper authorization.",
+        "details": "Use Next.js API routes for CRUD operations. Ensure authorization checks for each operation based on user roles.",
+        "testStrategy": "Test CRUD operations with different user roles.",
+        "priority": "medium",
+        "dependencies": [
+          4,
+          5
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 7,
+        "title": "Develop Metrics Dashboard",
+        "description": "Create a dashboard displaying Show Rate, Close Rate, and Loss Reasons with real-time calculations.",
+        "details": "Use Tailwind CSS for styling. Implement real-time metric updates using WebSockets or server-sent events.",
+        "testStrategy": "Verify metric calculations and real-time updates.",
+        "priority": "medium",
+        "dependencies": [
+          6
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 8,
+        "title": "Implement Admin Screens",
+        "description": "Develop admin screens for managing users, loss reasons, and client data.",
+        "details": "Use Next.js for the frontend. Ensure role-based access control for these features.",
+        "testStrategy": "Test admin features with appropriate permissions.",
+        "priority": "medium",
+        "dependencies": [
+          4,
+          6
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 9,
+        "title": "Implement Audit Logging",
+        "description": "Track all data changes and access events with user identification and timestamps.",
+        "details": "Use PostgreSQL triggers or application-level logging to track changes. Store logs in a separate table or service.",
+        "testStrategy": "Verify log creation for different actions.",
+        "priority": "medium",
+        "dependencies": [
+          3,
+          6
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 10,
+        "title": "Implement Client Switcher",
+        "description": "Develop a client switcher feature allowing users to toggle between client sub-accounts.",
+        "details": "Use Next.js for the frontend. Ensure seamless switching without full page reloads.",
+        "testStrategy": "Test client switching functionality.",
+        "priority": "medium",
+        "dependencies": [
+          4
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 11,
+        "title": "Implement Filtering Capabilities",
+        "description": "Add filtering options for date range, client, and sales user on the dashboard.",
+        "details": "Use Tailwind CSS for styling filters. Ensure real-time filter application using JavaScript.",
+        "testStrategy": "Test filter functionality and real-time updates.",
+        "priority": "medium",
+        "dependencies": [
+          7
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 12,
+        "title": "Develop API Documentation",
+        "description": "Create comprehensive API documentation for all endpoints.",
+        "details": "Use tools like Swagger or OpenAPI to generate documentation automatically.",
+        "testStrategy": "Verify API documentation completeness.",
+        "priority": "low",
+        "dependencies": [
+          6
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 13,
+        "title": "Develop User Guide",
+        "description": "Create user guides for each role type (CEO, Admin, Sales Team).",
+        "details": "Document role-specific features and access levels. Include screenshots and step-by-step instructions.",
+        "testStrategy": "Review user guide clarity and completeness.",
+        "priority": "low",
+        "dependencies": [
+          8
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 14,
+        "title": "Conduct QA Testing",
+        "description": "Perform thorough QA testing for all features and functionalities.",
+        "details": "Test all user roles, dashboard metrics, and API endpoints. Use tools like Jest for unit testing and Cypress for end-to-end testing.",
+        "testStrategy": "Verify all features work as expected across different user roles.",
+        "priority": "high",
+        "dependencies": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 15,
+        "title": "Deploy Application",
+        "description": "Deploy the application on Vercel or a similar platform.",
+        "details": "Configure environment variables and ensure proper database connections. Set up monitoring tools for performance and errors.",
+        "testStrategy": "Verify application functionality post-deployment.",
+        "priority": "high",
+        "dependencies": [
+          14
+        ],
+        "status": "pending",
+        "subtasks": []
+      }
+    ],
+    "metadata": {
+      "created": "2025-10-03T13:30:44.692Z",
+      "updated": "2025-10-03T13:32:21.783Z",
+      "description": "Tasks for master context"
+    }
   }
 }
