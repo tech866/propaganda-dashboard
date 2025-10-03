@@ -9,28 +9,23 @@
 
 /* Enhanced input styles with better focus states */
 .input-modern {
-  @apply w-full px-4 py-3 bg-slate-800/50 border border-slate-600/50 rounded-xl;
-  @apply text-white placeholder-gray-400;
+  @apply w-full px-4 py-3 bg-card border border-border rounded-xl;
+  @apply text-foreground placeholder-muted-foreground;
   @apply transition-all duration-200 ease-in-out;
-  @apply focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500;
-  @apply hover:border-slate-500/70;
+  @apply focus:outline-none focus:ring-2 focus:ring-ring focus:border-ring;
+  @apply hover:border-border/70;
   @apply backdrop-blur-sm;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  box-shadow: var(--shadow-sm);
 }
 
 .input-modern:focus {
-  box-shadow: 
-    0 4px 6px -1px rgba(0, 0, 0, 0.1), 
-    0 2px 4px -1px rgba(0, 0, 0, 0.06),
-    0 0 0 3px rgba(59, 130, 246, 0.1);
+  box-shadow: var(--shadow-md), 0 0 0 3px var(--ring);
   transform: translateY(-1px);
 }
 
 .input-modern:hover:not(:focus) {
   transform: translateY(-0.5px);
-  box-shadow: 
-    0 6px 8px -1px rgba(0, 0, 0, 0.15), 
-    0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--shadow-lg);
 }
 
 /* Enhanced select styling */
