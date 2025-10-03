@@ -1,0 +1,122 @@
+---
+description: Enforce Task Master workflow for all development tasks and memory bank updates
+globs: **/*
+alwaysApply: true
+---
+
+# Task Master Workflow Enforcement Rule
+
+## **MANDATORY REQUIREMENTS**
+
+- **ALWAYS use Task Master** for any development task, feature request, or change
+- **ALWAYS understand context** by reviewing existing tasks before creating new ones
+- **ALWAYS break down complex tasks** into subtasks using Task Master
+- **ALWAYS use research tools** (Perplexity API, OpenAI API) for documentation and best practices
+- **ALWAYS update memory bank** after completing tasks or making significant progress
+
+## **Workflow Process**
+
+### 1. **Task Analysis & Context**
+- Review existing tasks in Task Master to understand current project state
+- Identify how new requests fit into existing task structure
+- Check for dependencies and relationships with existing tasks
+
+### 2. **Task Creation**
+- Create new tasks in Task Master for any development request
+- Break down complex features into manageable subtasks
+- Use research tools to inform task creation and implementation
+
+### 3. **Implementation**
+- Work through tasks systematically using Task Master
+- Update task status and progress in real-time
+- Document findings and decisions in task details
+
+### 4. **Memory Bank Updates**
+- Update memory bank after completing tasks
+- Document new patterns, solutions, and architectural decisions
+- Record any new rules or best practices discovered
+
+## **Required Tools Usage**
+
+- **Taskmaster MCP**: For all task management operations
+- **Perplexity API**: For research and documentation
+- **OpenAI API**: For code analysis and best practices
+- **Memory Bank**: For persistent knowledge storage
+
+## **Task Creation Examples**
+
+```bash
+# For new features
+task-master add-task --prompt="Implement user authentication system" --research
+
+# For bug fixes
+task-master add-task --prompt="Fix login validation error" --research
+
+# For UI improvements
+task-master add-task --prompt="Enhance dashboard UI with modern design" --research
+```
+
+## **Context Understanding**
+
+Before creating any new task:
+1. Run `task-master list` to see current tasks
+2. Run `task-master next` to understand current priorities
+3. Review related tasks and their status
+4. Identify dependencies and relationships
+
+## **Research Integration**
+
+- Use Perplexity API for current documentation and best practices
+- Use OpenAI API for code analysis and architectural guidance
+- Research before implementing to ensure modern, secure solutions
+
+## **Memory Bank Integration**
+
+After completing tasks:
+- Document new patterns and solutions
+- Record architectural decisions
+- Update best practices and guidelines
+- Store important code snippets and configurations
+
+## **Enforcement**
+
+This rule is **MANDATORY** and must be followed for:
+- All feature requests
+- All bug fixes
+- All UI/UX improvements
+- All database changes
+- All API development
+- All testing and validation
+
+## **Example Workflow**
+
+```bash
+# 1. Understand context
+task-master list
+task-master next
+
+# 2. Create task with research
+task-master add-task --prompt="Implement call logging system" --research
+
+# 3. Break down into subtasks
+task-master expand --id=<task-id> --research --force
+
+# 4. Work through subtasks
+task-master show <subtask-id>
+# Implement code
+task-master set-status --id=<subtask-id> --status=done
+
+# 5. Update memory bank
+# Document new patterns and solutions
+```
+
+## **Quality Assurance**
+
+- All tasks must be properly documented
+- All subtasks must have clear implementation details
+- All research must be documented and applied
+- All memory bank updates must be comprehensive
+
+---
+
+**This rule ensures consistent, well-documented, and research-backed development practices using Task Master as the central task management system.**

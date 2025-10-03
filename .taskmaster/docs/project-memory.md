@@ -360,11 +360,19 @@ propaganda-dashboard/
 - ✅ Maintains accessibility with proper contrast ratios
 - ✅ All FormField components properly using EnhancedFormField
 
-### 📋 Cursor Rule Created:
-- **File:** `.cursor/rules/ui-styling-consistency.mdc`
-- **Purpose:** Enforce UI styling consistency for all future UI work
-- **Requirements:** Always reference TweakCN Supabase theme guidelines
-- **Mandatory:** Use semantic colors, avoid purple colors, maintain dark theme
+### 📋 Cursor Rules Created:
+1. **UI Styling Consistency Rule:**
+   - **File:** `.cursor/rules/ui-styling-consistency.mdc`
+   - **Purpose:** Enforce UI styling consistency for all future UI work
+   - **Requirements:** Always reference TweakCN Supabase theme guidelines
+   - **Mandatory:** Use semantic colors, avoid purple colors, maintain dark theme
+
+2. **Task Master Workflow Enforcement Rule:**
+   - **File:** `.cursor/rules/taskmaster-workflow-enforcement.mdc`
+   - **Purpose:** Enforce Task Master workflow for all development tasks
+   - **Requirements:** Always create tasks, break into subtasks, use research tools
+   - **Mandatory:** Update memory bank after completing tasks
+   - **Workflow:** Task analysis → Task creation → Implementation → Memory bank updates
 
 ## 🌐 Production URLs
 - **Custom Domain:** https://propaganda-dashboard.vercel.app
