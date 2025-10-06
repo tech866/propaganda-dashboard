@@ -10,6 +10,8 @@ import { useTrafficSourceClassification } from '@/hooks/useTrafficSourceClassifi
 import FormContainer from '@/components/forms/FormContainer';
 import FormField from '@/components/forms/FormField';
 import FormButton from '@/components/forms/FormButton';
+import { WorkspaceProvider } from '@/contexts/WorkspaceContext';
+import ModernDashboardLayout from '@/components/layout/ModernDashboardLayout';
 
 interface CallFormData {
   client_id: string;
@@ -37,7 +39,7 @@ interface CallFormData {
   crm_stage: 'scheduled' | 'in_progress' | 'completed' | 'no_show' | 'closed_won' | 'lost';
 }
 
-export default function NewCall() {
+function NewCallContent() {
   const { user, isLoaded } = useAuth();
   const { currentWorkspace, isLoading: workspaceLoading } = useWorkspace();
   const router = useRouter();
@@ -533,5 +535,15 @@ export default function NewCall() {
         </FormContainer>
       </div>
     </div>
+  );
+}
+
+export default function NewCall() {
+  return (
+    <ModernDashboardLayout>
+      <WorkspaceProvider>
+        <NewCallContent />
+      </WorkspaceProvider>
+    </ModernDashboardLayout>
   );
 }
