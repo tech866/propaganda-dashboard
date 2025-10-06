@@ -10,23 +10,30 @@ import {
   UserWithClerk
 } from '@/lib/clerk-supabase';
 
-// Mock Supabase client
-jest.mock('@supabase/supabase-js', () => ({
-  createClient: jest.fn(() => ({
-    from: jest.fn(() => ({
-      select: jest.fn(() => ({
+// Mock environment variables
+process.env.NEXT_PUBLIC_SUPABASE_URL = 'https://test.supabase.co';
+process.env.SUPABASE_SERVICE_ROLE_KEY = 'test-service-key';
+
+// Create a mock client that we can reference
+const mockSupabaseClient = {
+  from: jest.fn(() => ({
+    select: jest.fn(() => ({
+      eq: jest.fn(() => ({
         eq: jest.fn(() => ({
-          eq: jest.fn(() => ({
-            single: jest.fn()
-          }))
+          single: jest.fn()
         }))
-      })),
-      update: jest.fn(() => ({
-        eq: jest.fn()
       }))
     })),
-    rpc: jest.fn()
-  }))
+    update: jest.fn(() => ({
+      eq: jest.fn()
+    }))
+  })),
+  rpc: jest.fn()
+};
+
+// Mock Supabase client
+jest.mock('@supabase/supabase-js', () => ({
+  createClient: jest.fn(() => mockSupabaseClient)
 }));
 
 // Mock Clerk auth
@@ -35,25 +42,9 @@ jest.mock('@clerk/nextjs/server', () => ({
 }));
 
 describe('Clerk-Supabase Integration', () => {
-  const mockSupabaseClient = {
-    from: jest.fn(() => ({
-      select: jest.fn(() => ({
-        eq: jest.fn(() => ({
-          eq: jest.fn(() => ({
-            single: jest.fn()
-          }))
-        }))
-      })),
-      update: jest.fn(() => ({
-        eq: jest.fn()
-      }))
-    })),
-    rpc: jest.fn()
-  };
 
   beforeEach(() => {
     jest.clearAllMocks();
-    (createClient as jest.Mock).mockReturnValue(mockSupabaseClient);
   });
 
   describe('getUserFromSupabase', () => {
@@ -74,36 +65,31 @@ describe('Clerk-Supabase Integration', () => {
         client_name: 'Test Agency'
       };
 
-      const mockQuery = {
-        eq: jest.fn(() => ({
-          eq: jest.fn(() => ({
-            single: jest.fn().mockResolvedValue({ data: mockUser, error: null })
-          }))
-        }))
-      };
+      const mockSingle = jest.fn().mockResolvedValue({ data: mockUser, error: null });
+      const mockEq2 = jest.fn().mockReturnValue({ single: mockSingle });
+      const mockEq1 = jest.fn().mockReturnValue({ eq: mockEq2 });
+      const mockSelect = jest.fn().mockReturnValue({ eq: mockEq1 });
+      const mockFrom = jest.fn().mockReturnValue({ select: mockSelect });
 
-      mockSupabaseClient.from.mockReturnValue({
-        select: jest.fn().mockReturnValue(mockQuery)
-      });
+      mockSupabaseClient.from.mockImplementation(mockFrom);
 
       const result = await getUserFromSupabase('clerk-user-789');
 
       expect(result).toEqual(mockUser);
       expect(mockSupabaseClient.from).toHaveBeenCalledWith('users_with_clerk');
+      expect(mockSelect).toHaveBeenCalledWith('*');
+      expect(mockEq1).toHaveBeenCalledWith('clerk_user_id', 'clerk-user-789');
+      expect(mockEq2).toHaveBeenCalledWith('is_active', true);
     });
 
     it('should return null when user does not exist', async () => {
-      const mockQuery = {
-        eq: jest.fn(() => ({
-          eq: jest.fn(() => ({
-            single: jest.fn().mockResolvedValue({ data: null, error: { message: 'User not found' } })
-          }))
-        }))
-      };
+      const mockSingle = jest.fn().mockResolvedValue({ data: null, error: { message: 'User not found' } });
+      const mockEq2 = jest.fn().mockReturnValue({ single: mockSingle });
+      const mockEq1 = jest.fn().mockReturnValue({ eq: mockEq2 });
+      const mockSelect = jest.fn().mockReturnValue({ eq: mockEq1 });
+      const mockFrom = jest.fn().mockReturnValue({ select: mockSelect });
 
-      mockSupabaseClient.from.mockReturnValue({
-        select: jest.fn().mockReturnValue(mockQuery)
-      });
+      mockSupabaseClient.from.mockImplementation(mockFrom);
 
       const result = await getUserFromSupabase('non-existent-user');
 
@@ -111,17 +97,13 @@ describe('Clerk-Supabase Integration', () => {
     });
 
     it('should return null when Supabase error occurs', async () => {
-      const mockQuery = {
-        eq: jest.fn(() => ({
-          eq: jest.fn(() => ({
-            single: jest.fn().mockRejectedValue(new Error('Database error'))
-          }))
-        }))
-      };
+      const mockSingle = jest.fn().mockRejectedValue(new Error('Database error'));
+      const mockEq2 = jest.fn().mockReturnValue({ single: mockSingle });
+      const mockEq1 = jest.fn().mockReturnValue({ eq: mockEq2 });
+      const mockSelect = jest.fn().mockReturnValue({ eq: mockEq1 });
+      const mockFrom = jest.fn().mockReturnValue({ select: mockSelect });
 
-      mockSupabaseClient.from.mockReturnValue({
-        select: jest.fn().mockReturnValue(mockQuery)
-      });
+      mockSupabaseClient.from.mockImplementation(mockFrom);
 
       const result = await getUserFromSupabase('clerk-user-789');
 
@@ -147,19 +129,15 @@ describe('Clerk-Supabase Integration', () => {
         client_name: 'Test Agency'
       };
 
-      (auth as jest.Mock).mockResolvedValue({ userId: 'clerk-user-789' });
+      (auth as jest.Mock).mockReturnValue({ userId: 'clerk-user-789' });
 
-      const mockQuery = {
-        eq: jest.fn(() => ({
-          eq: jest.fn(() => ({
-            single: jest.fn().mockResolvedValue({ data: mockUser, error: null })
-          }))
-        }))
-      };
+      const mockSingle = jest.fn().mockResolvedValue({ data: mockUser, error: null });
+      const mockEq2 = jest.fn().mockReturnValue({ single: mockSingle });
+      const mockEq1 = jest.fn().mockReturnValue({ eq: mockEq2 });
+      const mockSelect = jest.fn().mockReturnValue({ eq: mockEq1 });
+      const mockFrom = jest.fn().mockReturnValue({ select: mockSelect });
 
-      mockSupabaseClient.from.mockReturnValue({
-        select: jest.fn().mockReturnValue(mockQuery)
-      });
+      mockSupabaseClient.from.mockImplementation(mockFrom);
 
       const result = await getCurrentUser();
 
@@ -167,7 +145,7 @@ describe('Clerk-Supabase Integration', () => {
     });
 
     it('should return null when not authenticated', async () => {
-      (auth as jest.Mock).mockResolvedValue({ userId: null });
+      (auth as jest.Mock).mockReturnValue({ userId: null });
 
       const result = await getCurrentUser();
 
@@ -328,28 +306,28 @@ describe('Clerk-Supabase Integration', () => {
 
   describe('updateLastLogin', () => {
     it('should update last login timestamp', async () => {
-      const mockUpdate = {
-        eq: jest.fn().mockResolvedValue({ error: null })
-      };
+      const mockEq = jest.fn().mockResolvedValue({ error: null });
+      const mockUpdate = jest.fn().mockReturnValue({ eq: mockEq });
+      const mockFrom = jest.fn().mockReturnValue({ update: mockUpdate });
 
-      mockSupabaseClient.from.mockReturnValue({
-        update: jest.fn().mockReturnValue(mockUpdate)
-      });
+      mockSupabaseClient.from.mockImplementation(mockFrom);
 
       await updateLastLogin('clerk-user-789');
 
       expect(mockSupabaseClient.from).toHaveBeenCalledWith('users');
-      expect(mockUpdate.eq).toHaveBeenCalledWith('clerk_user_id', 'clerk-user-789');
+      expect(mockUpdate).toHaveBeenCalledWith({ 
+        last_login: expect.any(String),
+        updated_at: expect.any(String)
+      });
+      expect(mockEq).toHaveBeenCalledWith('clerk_user_id', 'clerk-user-789');
     });
 
     it('should handle update errors gracefully', async () => {
-      const mockUpdate = {
-        eq: jest.fn().mockResolvedValue({ error: { message: 'Update failed' } })
-      };
+      const mockEq = jest.fn().mockResolvedValue({ error: { message: 'Update failed' } });
+      const mockUpdate = jest.fn().mockReturnValue({ eq: mockEq });
+      const mockFrom = jest.fn().mockReturnValue({ update: mockUpdate });
 
-      mockSupabaseClient.from.mockReturnValue({
-        update: jest.fn().mockReturnValue(mockUpdate)
-      });
+      mockSupabaseClient.from.mockImplementation(mockFrom);
 
       // Should not throw error
       await expect(updateLastLogin('clerk-user-789')).resolves.not.toThrow();

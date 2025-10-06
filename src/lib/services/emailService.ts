@@ -1,414 +1,264 @@
-// =====================================================
-// Email Service for Workspace Invitations
-// Task 20.3: Secure Email Invitation System
-// =====================================================
+/**
+ * Email Service
+ * Handles sending emails using Resend API
+ */
 
-import nodemailer from 'nodemailer';
-import { WorkspaceService } from './workspaceService';
+import { Resend } from 'resend';
 
-export interface EmailConfig {
-  host: string;
-  port: number;
-  secure: boolean;
-  auth: {
-    user: string;
-    pass: string;
-  };
-}
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 export interface InvitationEmailData {
-  workspaceName: string;
+  inviteeEmail: string;
   inviterName: string;
+  workspaceName: string;
   role: string;
-  invitationLink: string;
-  expiresAt: string;
-  recipientEmail: string;
+  invitationUrl: string;
+  expiresAt: Date;
+}
+
+export interface WelcomeEmailData {
+  userEmail: string;
+  userName: string;
+  workspaceName: string;
+  loginUrl: string;
 }
 
 export class EmailService {
-  private static transporter: nodemailer.Transporter | null = null;
-
   /**
-   * Initialize email transporter
+   * Send team invitation email
    */
-  private static async getTransporter(): Promise<nodemailer.Transporter> {
-    if (!this.transporter) {
-      const config: EmailConfig = {
-        host: process.env.SMTP_HOST || 'smtp.gmail.com',
-        port: parseInt(process.env.SMTP_PORT || '587'),
-        secure: process.env.SMTP_SECURE === 'true',
-        auth: {
-          user: process.env.SMTP_USER || '',
-          pass: process.env.SMTP_PASS || ''
-        }
-      };
-
-      this.transporter = nodemailer.createTransporter(config);
-    }
-
-    return this.transporter;
-  }
-
-  /**
-   * Send workspace invitation email
-   */
-  static async sendInvitationEmail(
-    invitationData: InvitationEmailData
-  ): Promise<boolean> {
+  static async sendTeamInvitation(data: InvitationEmailData): Promise<{ success: boolean; messageId?: string; error?: string }> {
     try {
-      const transporter = await this.getTransporter();
+      if (!process.env.RESEND_API_KEY) {
+        throw new Error('RESEND_API_KEY is not configured');
+      }
 
-      const mailOptions = {
-        from: {
-          name: 'Propaganda Dashboard',
-          address: process.env.SMTP_FROM || process.env.SMTP_USER || 'noreply@propaganda-dashboard.com'
-        },
-        to: invitationData.recipientEmail,
-        subject: `You're invited to join ${invitationData.workspaceName} workspace`,
-        html: this.generateInvitationEmailHTML(invitationData),
-        text: this.generateInvitationEmailText(invitationData)
-      };
+      const { data: emailData, error } = await resend.emails.send({
+        from: 'Propaganda Dashboard <noreply@propaganda-dashboard.com>',
+        to: [data.inviteeEmail],
+        subject: `You're invited to join ${data.workspaceName} on Propaganda Dashboard`,
+        html: this.generateInvitationEmailHTML(data),
+        text: this.generateInvitationEmailText(data),
+      });
 
-      const result = await transporter.sendMail(mailOptions);
-      console.log('Invitation email sent:', result.messageId);
-      return true;
+      if (error) {
+        console.error('Resend API error:', error);
+        return { success: false, error: error.message };
+      }
 
+      console.log('Team invitation email sent successfully:', emailData);
+      return { success: true, messageId: emailData?.id };
     } catch (error) {
-      console.error('Error sending invitation email:', error);
-      return false;
+      console.error('Error sending team invitation email:', error);
+      return { 
+        success: false, 
+        error: error instanceof Error ? error.message : 'Unknown error' 
+      };
     }
   }
 
   /**
-   * Generate HTML email template for invitation
+   * Send welcome email to new user
+   */
+  static async sendWelcomeEmail(data: WelcomeEmailData): Promise<{ success: boolean; messageId?: string; error?: string }> {
+    try {
+      if (!process.env.RESEND_API_KEY) {
+        throw new Error('RESEND_API_KEY is not configured');
+      }
+
+      const { data: emailData, error } = await resend.emails.send({
+        from: 'Propaganda Dashboard <noreply@propaganda-dashboard.com>',
+        to: [data.userEmail],
+        subject: `Welcome to ${data.workspaceName} on Propaganda Dashboard`,
+        html: this.generateWelcomeEmailHTML(data),
+        text: this.generateWelcomeEmailText(data),
+      });
+
+      if (error) {
+        console.error('Resend API error:', error);
+        return { success: false, error: error.message };
+      }
+
+      console.log('Welcome email sent successfully:', emailData);
+      return { success: true, messageId: emailData?.id };
+    } catch (error) {
+      console.error('Error sending welcome email:', error);
+      return { 
+        success: false, 
+        error: error instanceof Error ? error.message : 'Unknown error' 
+      };
+    }
+  }
+
+  /**
+   * Generate HTML for invitation email
    */
   private static generateInvitationEmailHTML(data: InvitationEmailData): string {
     return `
       <!DOCTYPE html>
-      <html lang="en">
-      <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Workspace Invitation</title>
-        <style>
-          body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            line-height: 1.6;
-            color: #333;
-            max-width: 600px;
-            margin: 0 auto;
-            padding: 20px;
-            background-color: #f8fafc;
-          }
-          .container {
-            background: white;
-            border-radius: 12px;
-            padding: 40px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-          }
-          .header {
-            text-align: center;
-            margin-bottom: 30px;
-          }
-          .logo {
-            font-size: 24px;
-            font-weight: bold;
-            color: #1e40af;
-            margin-bottom: 10px;
-          }
-          .title {
-            font-size: 28px;
-            font-weight: 600;
-            color: #1f2937;
-            margin-bottom: 20px;
-          }
-          .content {
-            margin-bottom: 30px;
-          }
-          .workspace-info {
-            background: #f3f4f6;
-            border-radius: 8px;
-            padding: 20px;
-            margin: 20px 0;
-          }
-          .workspace-name {
-            font-size: 20px;
-            font-weight: 600;
-            color: #1f2937;
-            margin-bottom: 10px;
-          }
-          .role-badge {
-            display: inline-block;
-            background: #3b82f6;
-            color: white;
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 14px;
-            font-weight: 500;
-            text-transform: capitalize;
-          }
-          .cta-button {
-            display: inline-block;
-            background: #3b82f6;
-            color: white;
-            text-decoration: none;
-            padding: 16px 32px;
-            border-radius: 8px;
-            font-weight: 600;
-            font-size: 16px;
-            margin: 20px 0;
-            transition: background-color 0.2s;
-          }
-          .cta-button:hover {
-            background: #2563eb;
-          }
-          .footer {
-            margin-top: 40px;
-            padding-top: 20px;
-            border-top: 1px solid #e5e7eb;
-            font-size: 14px;
-            color: #6b7280;
-            text-align: center;
-          }
-          .expiry-notice {
-            background: #fef3c7;
-            border: 1px solid #f59e0b;
-            border-radius: 6px;
-            padding: 12px;
-            margin: 20px 0;
-            font-size: 14px;
-            color: #92400e;
-          }
-        </style>
-      </head>
-      <body>
-        <div class="container">
+      <html>
+        <head>
+          <meta charset="utf-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <title>Team Invitation</title>
+          <style>
+            body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px; }
+            .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px; text-align: center; border-radius: 8px 8px 0 0; }
+            .content { background: #f8f9fa; padding: 30px; border-radius: 0 0 8px 8px; }
+            .button { display: inline-block; background: #667eea; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: 600; margin: 20px 0; }
+            .button:hover { background: #5a6fd8; }
+            .footer { text-align: center; margin-top: 30px; color: #666; font-size: 14px; }
+            .role-badge { background: #e3f2fd; color: #1976d2; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; }
+          </style>
+        </head>
+        <body>
           <div class="header">
-            <div class="logo">Propaganda Dashboard</div>
-            <h1 class="title">You're Invited!</h1>
+            <h1>You're Invited!</h1>
+            <p>Join ${data.workspaceName} on Propaganda Dashboard</p>
           </div>
-          
           <div class="content">
-            <p>Hello!</p>
-            <p><strong>${data.inviterName}</strong> has invited you to join their workspace on Propaganda Dashboard.</p>
+            <h2>Hello!</h2>
+            <p><strong>${data.inviterName}</strong> has invited you to join <strong>${data.workspaceName}</strong> on Propaganda Dashboard.</p>
             
-            <div class="workspace-info">
-              <div class="workspace-name">${data.workspaceName}</div>
-              <div>Role: <span class="role-badge">${data.role.replace('_', ' ')}</span></div>
-            </div>
+            <p>Your role: <span class="role-badge">${data.role}</span></p>
             
-            <p>Click the button below to accept the invitation and get started:</p>
+            <p>Propaganda Dashboard is a powerful CRM and analytics platform that helps teams track sales performance, manage leads, and analyze business metrics.</p>
             
             <div style="text-align: center;">
-              <a href="${data.invitationLink}" class="cta-button">Accept Invitation</a>
+              <a href="${data.invitationUrl}" class="button">Accept Invitation</a>
             </div>
             
-            <div class="expiry-notice">
-              <strong>⏰ This invitation expires on ${data.expiresAt}</strong>
-            </div>
+            <p><strong>This invitation expires on:</strong> ${data.expiresAt.toLocaleDateString()} at ${data.expiresAt.toLocaleTimeString()}</p>
             
-            <p>If you can't click the button, copy and paste this link into your browser:</p>
-            <p style="word-break: break-all; color: #6b7280; font-size: 14px;">${data.invitationLink}</p>
+            <p>If you have any questions, feel free to reach out to ${data.inviterName} or our support team.</p>
           </div>
-          
           <div class="footer">
-            <p>This invitation was sent to ${data.recipientEmail}</p>
+            <p>This invitation was sent by Propaganda Dashboard</p>
             <p>If you didn't expect this invitation, you can safely ignore this email.</p>
-            <p>&copy; 2024 Propaganda Dashboard. All rights reserved.</p>
           </div>
-        </div>
-      </body>
+        </body>
       </html>
     `;
   }
 
   /**
-   * Generate plain text email for invitation
+   * Generate text version of invitation email
    */
   private static generateInvitationEmailText(data: InvitationEmailData): string {
     return `
-      You're Invited to Join ${data.workspaceName}
-      
-      Hello!
-      
-      ${data.inviterName} has invited you to join their workspace on Propaganda Dashboard.
-      
-      Workspace: ${data.workspaceName}
-      Role: ${data.role.replace('_', ' ')}
-      
-      To accept this invitation, click the link below:
-      ${data.invitationLink}
-      
-      This invitation expires on ${data.expiresAt}
-      
-      If you can't click the link, copy and paste it into your browser.
-      
-      This invitation was sent to ${data.recipientEmail}
-      If you didn't expect this invitation, you can safely ignore this email.
-      
-      © 2024 Propaganda Dashboard. All rights reserved.
+You're Invited to Join ${data.workspaceName}!
+
+Hello!
+
+${data.inviterName} has invited you to join ${data.workspaceName} on Propaganda Dashboard.
+
+Your role: ${data.role}
+
+Propaganda Dashboard is a powerful CRM and analytics platform that helps teams track sales performance, manage leads, and analyze business metrics.
+
+Accept your invitation: ${data.invitationUrl}
+
+This invitation expires on: ${data.expiresAt.toLocaleDateString()} at ${data.expiresAt.toLocaleTimeString()}
+
+If you have any questions, feel free to reach out to ${data.inviterName} or our support team.
+
+---
+This invitation was sent by Propaganda Dashboard
+If you didn't expect this invitation, you can safely ignore this email.
     `;
   }
 
   /**
-   * Send welcome email after invitation acceptance
+   * Generate HTML for welcome email
    */
-  static async sendWelcomeEmail(
-    userEmail: string,
-    workspaceName: string,
-    role: string
-  ): Promise<boolean> {
-    try {
-      const transporter = await this.getTransporter();
-
-      const mailOptions = {
-        from: {
-          name: 'Propaganda Dashboard',
-          address: process.env.SMTP_FROM || process.env.SMTP_USER || 'noreply@propaganda-dashboard.com'
-        },
-        to: userEmail,
-        subject: `Welcome to ${workspaceName}!`,
-        html: this.generateWelcomeEmailHTML(workspaceName, role),
-        text: this.generateWelcomeEmailText(workspaceName, role)
-      };
-
-      const result = await transporter.sendMail(mailOptions);
-      console.log('Welcome email sent:', result.messageId);
-      return true;
-
-    } catch (error) {
-      console.error('Error sending welcome email:', error);
-      return false;
-    }
-  }
-
-  /**
-   * Generate HTML welcome email
-   */
-  private static generateWelcomeEmailHTML(workspaceName: string, role: string): string {
+  private static generateWelcomeEmailHTML(data: WelcomeEmailData): string {
     return `
       <!DOCTYPE html>
-      <html lang="en">
-      <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Welcome to ${workspaceName}</title>
-        <style>
-          body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            line-height: 1.6;
-            color: #333;
-            max-width: 600px;
-            margin: 0 auto;
-            padding: 20px;
-            background-color: #f8fafc;
-          }
-          .container {
-            background: white;
-            border-radius: 12px;
-            padding: 40px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-          }
-          .header {
-            text-align: center;
-            margin-bottom: 30px;
-          }
-          .logo {
-            font-size: 24px;
-            font-weight: bold;
-            color: #1e40af;
-            margin-bottom: 10px;
-          }
-          .title {
-            font-size: 28px;
-            font-weight: 600;
-            color: #1f2937;
-            margin-bottom: 20px;
-          }
-          .cta-button {
-            display: inline-block;
-            background: #10b981;
-            color: white;
-            text-decoration: none;
-            padding: 16px 32px;
-            border-radius: 8px;
-            font-weight: 600;
-            font-size: 16px;
-            margin: 20px 0;
-            transition: background-color 0.2s;
-          }
-          .cta-button:hover {
-            background: #059669;
-          }
-          .footer {
-            margin-top: 40px;
-            padding-top: 20px;
-            border-top: 1px solid #e5e7eb;
-            font-size: 14px;
-            color: #6b7280;
-            text-align: center;
-          }
-        </style>
-      </head>
-      <body>
-        <div class="container">
+      <html>
+        <head>
+          <meta charset="utf-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <title>Welcome to Propaganda Dashboard</title>
+          <style>
+            body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px; }
+            .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px; text-align: center; border-radius: 8px 8px 0 0; }
+            .content { background: #f8f9fa; padding: 30px; border-radius: 0 0 8px 8px; }
+            .button { display: inline-block; background: #667eea; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: 600; margin: 20px 0; }
+            .button:hover { background: #5a6fd8; }
+            .footer { text-align: center; margin-top: 30px; color: #666; font-size: 14px; }
+            .feature { margin: 15px 0; padding: 15px; background: white; border-radius: 6px; border-left: 4px solid #667eea; }
+          </style>
+        </head>
+        <body>
           <div class="header">
-            <div class="logo">Propaganda Dashboard</div>
-            <h1 class="title">Welcome to ${workspaceName}!</h1>
+            <h1>Welcome to Propaganda Dashboard!</h1>
+            <p>You're now part of ${data.workspaceName}</p>
           </div>
-          
           <div class="content">
-            <p>Congratulations! You've successfully joined the <strong>${workspaceName}</strong> workspace as a <strong>${role.replace('_', ' ')}</strong>.</p>
+            <h2>Hello ${data.userName}!</h2>
+            <p>Welcome to <strong>${data.workspaceName}</strong> on Propaganda Dashboard! We're excited to have you on the team.</p>
             
-            <p>You can now access your workspace and start collaborating with your team.</p>
+            <p>Here's what you can do with Propaganda Dashboard:</p>
             
-            <div style="text-align: center;">
-              <a href="${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/workspaces" class="cta-button">Go to Workspace</a>
+            <div class="feature">
+              <strong>📊 Analytics Dashboard</strong><br>
+              Track sales performance, conversion rates, and key business metrics in real-time.
             </div>
             
-            <p>If you have any questions or need help getting started, don't hesitate to reach out to your workspace administrator.</p>
+            <div class="feature">
+              <strong>🎯 CRM Pipeline</strong><br>
+              Manage leads and opportunities with our intuitive Kanban-style interface.
+            </div>
+            
+            <div class="feature">
+              <strong>📈 Performance Tracking</strong><br>
+              Monitor team performance and identify areas for improvement.
+            </div>
+            
+            <div style="text-align: center;">
+              <a href="${data.loginUrl}" class="button">Get Started</a>
+            </div>
+            
+            <p>If you have any questions or need help getting started, don't hesitate to reach out to your team lead or our support team.</p>
           </div>
-          
           <div class="footer">
-            <p>&copy; 2024 Propaganda Dashboard. All rights reserved.</p>
+            <p>Welcome to Propaganda Dashboard</p>
+            <p>Your team collaboration platform</p>
           </div>
-        </div>
-      </body>
+        </body>
       </html>
     `;
   }
 
   /**
-   * Generate plain text welcome email
+   * Generate text version of welcome email
    */
-  private static generateWelcomeEmailText(workspaceName: string, role: string): string {
+  private static generateWelcomeEmailText(data: WelcomeEmailData): string {
     return `
-      Welcome to ${workspaceName}!
-      
-      Congratulations! You've successfully joined the ${workspaceName} workspace as a ${role.replace('_', ' ')}.
-      
-      You can now access your workspace and start collaborating with your team.
-      
-      Go to your workspace: ${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/workspaces
-      
-      If you have any questions or need help getting started, don't hesitate to reach out to your workspace administrator.
-      
-      © 2024 Propaganda Dashboard. All rights reserved.
-    `;
-  }
+Welcome to Propaganda Dashboard!
 
-  /**
-   * Test email configuration
-   */
-  static async testEmailConfiguration(): Promise<boolean> {
-    try {
-      const transporter = await this.getTransporter();
-      await transporter.verify();
-      console.log('Email configuration is valid');
-      return true;
-    } catch (error) {
-      console.error('Email configuration test failed:', error);
-      return false;
-    }
+Hello ${data.userName}!
+
+Welcome to ${data.workspaceName} on Propaganda Dashboard! We're excited to have you on the team.
+
+Here's what you can do with Propaganda Dashboard:
+
+📊 Analytics Dashboard
+Track sales performance, conversion rates, and key business metrics in real-time.
+
+🎯 CRM Pipeline
+Manage leads and opportunities with our intuitive Kanban-style interface.
+
+📈 Performance Tracking
+Monitor team performance and identify areas for improvement.
+
+Get started: ${data.loginUrl}
+
+If you have any questions or need help getting started, don't hesitate to reach out to your team lead or our support team.
+
+---
+Welcome to Propaganda Dashboard
+Your team collaboration platform
+    `;
   }
 }

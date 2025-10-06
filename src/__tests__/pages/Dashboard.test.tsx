@@ -1,6 +1,8 @@
 import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import Dashboard from '@/app/dashboard/page';
+import { AgencyProvider } from '@/contexts/AgencyContext';
+import { RoleProvider } from '@/contexts/RoleContext';
 
 // Mock Next.js router
 jest.mock('next/navigation', () => ({
@@ -11,6 +13,27 @@ jest.mock('next/navigation', () => ({
     back: jest.fn(),
     forward: jest.fn(),
     refresh: jest.fn(),
+  }))
+}));
+
+// Mock Clerk hooks
+jest.mock('@clerk/nextjs', () => ({
+  useUser: jest.fn(() => ({
+    user: {
+      id: 'test-user-id',
+      emailAddresses: [{ emailAddress: 'test@example.com' }],
+      firstName: 'Test',
+      lastName: 'User'
+    },
+    isLoaded: true,
+    isSignedIn: true
+  })),
+  useOrganization: jest.fn(() => ({
+    organization: {
+      id: 'test-org-id',
+      name: 'Test Organization'
+    },
+    isLoaded: true
   }))
 }));
 
@@ -27,27 +50,57 @@ jest.mock('@/components/dashboard/EnhancedDashboard', () => {
   };
 });
 
+jest.mock('@/components/dashboard/ProgressiveDashboard', () => {
+  return function MockProgressiveDashboard() {
+    return <div data-testid="progressive-dashboard">Progressive Dashboard</div>;
+  };
+});
+
+// Mock the contexts to prevent real context usage
+jest.mock('@/contexts/AgencyContext', () => ({
+  AgencyProvider: ({ children }: { children: React.ReactNode }) => <>{children}</>,
+  useAgency: () => ({
+    agency: { id: '1', name: 'Test Agency' },
+    isLoading: false,
+    error: null
+  })
+}));
+
+jest.mock('@/contexts/RoleContext', () => ({
+  RoleProvider: ({ children }: { children: React.ReactNode }) => <>{children}</>,
+  useRole: () => ({
+    user: { id: 'test-user', role: 'admin' },
+    isLoading: false,
+    error: null
+  })
+}));
+
+// Helper function to render Dashboard (components are mocked so no providers needed)
+const renderDashboard = () => {
+  return render(<Dashboard />);
+};
+
 describe('Dashboard Page', () => {
   afterEach(() => {
     jest.clearAllMocks();
   });
 
-  it('renders dashboard layout and enhanced dashboard', async () => {
-    render(<Dashboard />);
+  it('renders dashboard layout and progressive dashboard', async () => {
+    renderDashboard();
 
     // Wait for loading to complete
     await waitFor(() => {
       expect(screen.getByTestId('dashboard-layout')).toBeInTheDocument();
-      expect(screen.getByTestId('enhanced-dashboard')).toBeInTheDocument();
+      expect(screen.getByTestId('progressive-dashboard')).toBeInTheDocument();
     });
   });
 
-  it('renders the enhanced dashboard after loading', async () => {
-    render(<Dashboard />);
+  it('renders the progressive dashboard after loading', async () => {
+    renderDashboard();
 
     // Wait for loading to complete and dashboard to render
     await waitFor(() => {
-      expect(screen.getByTestId('enhanced-dashboard')).toBeInTheDocument();
+      expect(screen.getByTestId('progressive-dashboard')).toBeInTheDocument();
     });
 
     // Should render the dashboard layout
@@ -55,11 +108,11 @@ describe('Dashboard Page', () => {
   });
 
   it('renders without loading state in development mode', () => {
-    render(<Dashboard />);
+    renderDashboard();
 
     // In development mode with placeholder Clerk key, loading is bypassed
     // So we should see the dashboard immediately
     expect(screen.getByTestId('dashboard-layout')).toBeInTheDocument();
-    expect(screen.getByTestId('enhanced-dashboard')).toBeInTheDocument();
+    expect(screen.getByTestId('progressive-dashboard')).toBeInTheDocument();
   });
 });

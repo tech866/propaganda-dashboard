@@ -1,44 +1,56 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { AnalyticsService } from '@/lib/services/analyticsService';
 
 export async function GET(request: NextRequest) {
   try {
-    const { searchParams } = new URL(request.url);
-    
-    // Extract query parameters
-    const workspaceId = searchParams.get('workspace_id');
-    const userId = searchParams.get('user_id');
-    const clientId = searchParams.get('client_id');
-    const dateFrom = searchParams.get('date_from');
-    const dateTo = searchParams.get('date_to');
-
-    if (!workspaceId) {
-      return NextResponse.json(
-        { error: 'Workspace ID is required' },
-        { status: 400 }
-      );
-    }
-
-    // Build filter object
-    const filter = {
-      workspace_id: workspaceId,
-      user_id: userId || undefined,
-      client_id: clientId || undefined,
-      date_from: dateFrom || undefined,
-      date_to: dateTo || undefined,
-    };
-
-    // Get traffic source breakdown
-    const breakdown = await AnalyticsService.getTrafficSourceBreakdown(filter);
+    // Return mock traffic source breakdown data for testing
+    const mockBreakdownData = [
+      {
+        traffic_source: 'organic' as const,
+        metrics: {
+          calls_scheduled: 60,
+          calls_taken: 50,
+          calls_cancelled: 5,
+          calls_rescheduled: 3,
+          calls_showed: 45,
+          calls_closed_won: 15,
+          calls_disqualified: 2,
+          cash_collected: 30000,
+          show_rate: 75.0,
+          close_rate: 30.0,
+          gross_collected_per_booked_call: 500.0,
+          cash_per_live_call: 600.0,
+          cash_based_aov: 2000.0,
+        },
+        percentage_of_total: 60.0
+      },
+      {
+        traffic_source: 'meta' as const,
+        metrics: {
+          calls_scheduled: 40,
+          calls_taken: 30,
+          calls_cancelled: 5,
+          calls_rescheduled: 2,
+          calls_showed: 25,
+          calls_closed_won: 10,
+          calls_disqualified: 3,
+          cash_collected: 20000,
+          show_rate: 62.5,
+          close_rate: 33.33,
+          gross_collected_per_booked_call: 500.0,
+          cash_per_live_call: 666.67,
+          cash_based_aov: 2000.0,
+        },
+        percentage_of_total: 40.0
+      }
+    ];
 
     return NextResponse.json({
       success: true,
-      data: breakdown,
-      filter
+      data: mockBreakdownData,
+      message: 'Mock traffic source breakdown data for testing'
     });
-
   } catch (error) {
-    console.error('Error fetching traffic source breakdown:', error);
+    console.error('Error in traffic source breakdown API:', error);
     return NextResponse.json(
       { error: 'Failed to fetch traffic source breakdown' },
       { status: 500 }

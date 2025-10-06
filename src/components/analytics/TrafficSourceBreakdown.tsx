@@ -123,7 +123,7 @@ export default function TrafficSourceBreakdown({ filters, className = '' }: Traf
     );
   }
 
-  if (breakdown.length === 0) {
+  if (!breakdown || !Array.isArray(breakdown) || breakdown.length === 0) {
     return (
       <Card className={`bg-slate-800/50 backdrop-blur-sm border border-slate-700 ${className}`}>
         <CardHeader>
@@ -142,8 +142,8 @@ export default function TrafficSourceBreakdown({ filters, className = '' }: Traf
     );
   }
 
-  const totalCalls = breakdown.reduce((sum, item) => sum + item.metrics.calls_scheduled, 0);
-  const totalRevenue = breakdown.reduce((sum, item) => sum + item.metrics.cash_collected, 0);
+  const totalCalls = breakdown.reduce((sum, item) => sum + (item?.metrics?.calls_scheduled || 0), 0);
+  const totalRevenue = breakdown.reduce((sum, item) => sum + (item?.metrics?.cash_collected || 0), 0);
 
   return (
     <Card className={`bg-slate-800/50 backdrop-blur-sm border border-slate-700 ${className}`}>
@@ -185,7 +185,7 @@ export default function TrafficSourceBreakdown({ filters, className = '' }: Traf
                         {item.traffic_source} Traffic
                       </h3>
                       <Badge variant="outline" className="text-xs">
-                        {item.percentage_of_total.toFixed(1)}% of total
+                        {(item?.percentage_of_total || 0).toFixed(1)}% of total
                       </Badge>
                     </div>
                   </div>
@@ -193,19 +193,19 @@ export default function TrafficSourceBreakdown({ filters, className = '' }: Traf
 
                 <div className="grid grid-cols-2 gap-4 mb-4">
                   <div>
-                    <div className="text-2xl font-bold text-foreground">{item.metrics.calls_scheduled}</div>
+                    <div className="text-2xl font-bold text-foreground">{item?.metrics?.calls_scheduled || 0}</div>
                     <div className="text-xs text-muted-foreground">Calls Scheduled</div>
                   </div>
                   <div>
-                    <div className="text-2xl font-bold text-foreground">{item.metrics.calls_showed}</div>
+                    <div className="text-2xl font-bold text-foreground">{item?.metrics?.calls_showed || 0}</div>
                     <div className="text-xs text-muted-foreground">Calls Showed</div>
                   </div>
                   <div>
-                    <div className="text-2xl font-bold text-foreground">{item.metrics.calls_closed_won}</div>
+                    <div className="text-2xl font-bold text-foreground">{item?.metrics?.calls_closed_won || 0}</div>
                     <div className="text-xs text-muted-foreground">Closed Won</div>
                   </div>
                   <div>
-                    <div className="text-2xl font-bold text-foreground">${item.metrics.cash_collected.toLocaleString()}</div>
+                    <div className="text-2xl font-bold text-foreground">${(item?.metrics?.cash_collected || 0).toLocaleString()}</div>
                     <div className="text-xs text-muted-foreground">Revenue</div>
                   </div>
                 </div>
@@ -214,8 +214,8 @@ export default function TrafficSourceBreakdown({ filters, className = '' }: Traf
                   <div className="flex justify-between items-center">
                     <span className="text-sm text-muted-foreground">Show Rate:</span>
                     <div className="flex items-center gap-1">
-                      <span className="text-sm font-medium text-foreground">{item.metrics.show_rate}%</span>
-                      {item.metrics.show_rate > 50 ? (
+                      <span className="text-sm font-medium text-foreground">{item?.metrics?.show_rate || 0}%</span>
+                      {(item?.metrics?.show_rate || 0) > 50 ? (
                         <TrendingUp className="h-3 w-3 text-green-400" />
                       ) : (
                         <TrendingDown className="h-3 w-3 text-red-400" />
@@ -225,8 +225,8 @@ export default function TrafficSourceBreakdown({ filters, className = '' }: Traf
                   <div className="flex justify-between items-center">
                     <span className="text-sm text-muted-foreground">Close Rate:</span>
                     <div className="flex items-center gap-1">
-                      <span className="text-sm font-medium text-foreground">{item.metrics.close_rate}%</span>
-                      {item.metrics.close_rate > 30 ? (
+                      <span className="text-sm font-medium text-foreground">{item?.metrics?.close_rate || 0}%</span>
+                      {(item?.metrics?.close_rate || 0) > 30 ? (
                         <TrendingUp className="h-3 w-3 text-green-400" />
                       ) : (
                         <TrendingDown className="h-3 w-3 text-red-400" />
@@ -235,7 +235,7 @@ export default function TrafficSourceBreakdown({ filters, className = '' }: Traf
                   </div>
                   <div className="flex justify-between items-center">
                     <span className="text-sm text-muted-foreground">AOV:</span>
-                    <span className="text-sm font-medium text-foreground">${item.metrics.cash_based_aov.toLocaleString()}</span>
+                    <span className="text-sm font-medium text-foreground">${(item?.metrics?.cash_based_aov || 0).toLocaleString()}</span>
                   </div>
                 </div>
               </div>
@@ -251,24 +251,24 @@ export default function TrafficSourceBreakdown({ filters, className = '' }: Traf
                   <div className="text-sm text-muted-foreground mb-2">Best Show Rate</div>
                   <div className="text-lg font-bold text-foreground">
                     {breakdown.reduce((best, current) => 
-                      current.metrics.show_rate > best.metrics.show_rate ? current : best
-                    ).traffic_source} - {Math.max(...breakdown.map(b => b.metrics.show_rate)).toFixed(1)}%
+                      (current?.metrics?.show_rate || 0) > (best?.metrics?.show_rate || 0) ? current : best
+                    ).traffic_source} - {Math.max(...breakdown.map(b => b?.metrics?.show_rate || 0)).toFixed(1)}%
                   </div>
                 </div>
                 <div className="text-center">
                   <div className="text-sm text-muted-foreground mb-2">Best Close Rate</div>
                   <div className="text-lg font-bold text-foreground">
                     {breakdown.reduce((best, current) => 
-                      current.metrics.close_rate > best.metrics.close_rate ? current : best
-                    ).traffic_source} - {Math.max(...breakdown.map(b => b.metrics.close_rate)).toFixed(1)}%
+                      (current?.metrics?.close_rate || 0) > (best?.metrics?.close_rate || 0) ? current : best
+                    ).traffic_source} - {Math.max(...breakdown.map(b => b?.metrics?.close_rate || 0)).toFixed(1)}%
                   </div>
                 </div>
                 <div className="text-center">
                   <div className="text-sm text-muted-foreground mb-2">Highest AOV</div>
                   <div className="text-lg font-bold text-foreground">
                     {breakdown.reduce((best, current) => 
-                      current.metrics.cash_based_aov > best.metrics.cash_based_aov ? current : best
-                    ).traffic_source} - ${Math.max(...breakdown.map(b => b.metrics.cash_based_aov)).toLocaleString()}
+                      (current?.metrics?.cash_based_aov || 0) > (best?.metrics?.cash_based_aov || 0) ? current : best
+                    ).traffic_source} - ${Math.max(...breakdown.map(b => b?.metrics?.cash_based_aov || 0)).toLocaleString()}
                   </div>
                 </div>
               </div>

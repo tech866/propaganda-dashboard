@@ -59,6 +59,12 @@ const navigationItems: SidebarNavigationItem[] = [
     description: 'Manage calls in CRM pipeline with drag & drop'
   },
   {
+    name: 'Workspace Settings',
+    href: '/workspace/settings',
+    icon: Settings,
+    description: 'Manage workspace settings and team members'
+  },
+  {
     name: 'Client Management',
     href: '/clients',
     icon: Building2,

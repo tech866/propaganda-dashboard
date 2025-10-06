@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { TrendingUp, TrendingDown, Activity, Zap } from 'lucide-react';
@@ -11,8 +11,18 @@ interface RealTimeMetricsProps {
 }
 
 interface RealTimeData {
-  current: any;
-  previous_period: any;
+  current: {
+    calls_scheduled?: number;
+    calls_showed?: number;
+    calls_closed_won?: number;
+    cash_collected?: number;
+  };
+  previous_period: {
+    calls_scheduled?: number;
+    calls_showed?: number;
+    calls_closed_won?: number;
+    cash_collected?: number;
+  };
   trends: Array<{
     metric: string;
     change: number;
@@ -25,16 +35,7 @@ export default function RealTimeMetrics({ workspaceId, className = '' }: RealTim
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    if (workspaceId) {
-      fetchRealTimeMetrics();
-      // Set up polling for real-time updates
-      const interval = setInterval(fetchRealTimeMetrics, 30000); // Update every 30 seconds
-      return () => clearInterval(interval);
-    }
-  }, [workspaceId]);
-
-  const fetchRealTimeMetrics = async () => {
+  const fetchRealTimeMetrics = useCallback(async () => {
     if (!workspaceId) return;
 
     setLoading(true);
@@ -55,7 +56,16 @@ export default function RealTimeMetrics({ workspaceId, className = '' }: RealTim
     } finally {
       setLoading(false);
     }
-  };
+  }, [workspaceId]);
+
+  useEffect(() => {
+    if (workspaceId) {
+      fetchRealTimeMetrics();
+      // Set up polling for real-time updates
+      const interval = setInterval(fetchRealTimeMetrics, 30000); // Update every 30 seconds
+      return () => clearInterval(interval);
+    }
+  }, [workspaceId, fetchRealTimeMetrics]);
 
   const getTrendIcon = (change: number) => {
     if (change > 0) return <TrendingUp className="h-4 w-4 text-green-400" />;
@@ -81,6 +91,11 @@ export default function RealTimeMetrics({ workspaceId, className = '' }: RealTim
       return `$${value.toLocaleString()}`;
     }
     return value.toString();
+  };
+
+  // Helper function to safely get nested property values
+  const getSafeValue = (obj: Record<string, unknown> | null | undefined, key: string, defaultValue: number = 0): number => {
+    return (obj?.[key] as number) ?? defaultValue;
   };
 
   if (loading) {
@@ -146,15 +161,19 @@ export default function RealTimeMetrics({ workspaceId, className = '' }: RealTim
 
   // Get top performing metrics
   const topMetrics = data.trends
-    .filter(trend => trend.change > 0)
-    .sort((a, b) => b.change_percentage - a.change_percentage)
-    .slice(0, 3);
+    ? data.trends
+        .filter(trend => trend && typeof trend.change === 'number' && trend.change > 0)
+        .sort((a, b) => (b.change_percentage || 0) - (a.change_percentage || 0))
+        .slice(0, 3)
+    : [];
 
   // Get metrics that need attention
   const attentionMetrics = data.trends
-    .filter(trend => trend.change < 0)
-    .sort((a, b) => a.change_percentage - b.change_percentage)
-    .slice(0, 3);
+    ? data.trends
+        .filter(trend => trend && typeof trend.change === 'number' && trend.change < 0)
+        .sort((a, b) => (a.change_percentage || 0) - (b.change_percentage || 0))
+        .slice(0, 3)
+    : [];
 
   return (
     <Card className={`bg-slate-800/50 backdrop-blur-sm border border-slate-700 ${className}`}>
@@ -176,19 +195,19 @@ export default function RealTimeMetrics({ workspaceId, className = '' }: RealTim
               <div className="space-y-2">
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Calls Scheduled:</span>
-                  <span className="text-foreground font-medium">{data.current.calls_scheduled}</span>
+                  <span className="text-foreground font-medium">{getSafeValue(data.current, 'calls_scheduled')}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Calls Showed:</span>
-                  <span className="text-foreground font-medium">{data.current.calls_showed}</span>
+                  <span className="text-foreground font-medium">{getSafeValue(data.current, 'calls_showed')}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Calls Closed:</span>
-                  <span className="text-foreground font-medium">{data.current.calls_closed_won}</span>
+                  <span className="text-foreground font-medium">{getSafeValue(data.current, 'calls_closed_won')}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Cash Collected:</span>
-                  <span className="text-foreground font-medium">${data.current.cash_collected.toLocaleString()}</span>
+                  <span className="text-foreground font-medium">${getSafeValue(data.current, 'cash_collected').toLocaleString()}</span>
                 </div>
               </div>
             </div>
@@ -198,19 +217,19 @@ export default function RealTimeMetrics({ workspaceId, className = '' }: RealTim
               <div className="space-y-2">
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Calls Scheduled:</span>
-                  <span className="text-foreground font-medium">{data.previous_period.calls_scheduled}</span>
+                  <span className="text-foreground font-medium">{getSafeValue(data.previous_period, 'calls_scheduled')}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Calls Showed:</span>
-                  <span className="text-foreground font-medium">{data.previous_period.calls_showed}</span>
+                  <span className="text-foreground font-medium">{getSafeValue(data.previous_period, 'calls_showed')}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Calls Closed:</span>
-                  <span className="text-foreground font-medium">{data.previous_period.calls_closed_won}</span>
+                  <span className="text-foreground font-medium">{getSafeValue(data.previous_period, 'calls_closed_won')}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Cash Collected:</span>
-                  <span className="text-foreground font-medium">${data.previous_period.cash_collected.toLocaleString()}</span>
+                  <span className="text-foreground font-medium">${getSafeValue(data.previous_period, 'cash_collected').toLocaleString()}</span>
                 </div>
               </div>
             </div>
@@ -225,16 +244,16 @@ export default function RealTimeMetrics({ workspaceId, className = '' }: RealTim
               </h3>
               <div className="space-y-2">
                 {topMetrics.map((trend, index) => (
-                  <div key={trend.metric} className="flex justify-between items-center">
-                    <span className="text-muted-foreground">{formatMetricName(trend.metric)}:</span>
+                  <div key={trend.metric || `trend-${index}`} className="flex justify-between items-center">
+                    <span className="text-muted-foreground">{formatMetricName(trend.metric || 'Unknown')}:</span>
                     <div className="flex items-center gap-2">
                       <span className="text-foreground font-medium">
-                        {formatValue(trend.change, trend.metric)}
+                        {formatValue(trend.change || 0, trend.metric || '')}
                       </span>
                       <div className="flex items-center gap-1">
-                        {getTrendIcon(trend.change)}
-                        <span className={`text-sm font-medium ${getTrendColor(trend.change)}`}>
-                          +{trend.change_percentage.toFixed(1)}%
+                        {getTrendIcon(trend.change || 0)}
+                        <span className={`text-sm font-medium ${getTrendColor(trend.change || 0)}`}>
+                          +{(trend.change_percentage || 0).toFixed(1)}%
                         </span>
                       </div>
                     </div>
@@ -253,16 +272,16 @@ export default function RealTimeMetrics({ workspaceId, className = '' }: RealTim
               </h3>
               <div className="space-y-2">
                 {attentionMetrics.map((trend, index) => (
-                  <div key={trend.metric} className="flex justify-between items-center">
-                    <span className="text-muted-foreground">{formatMetricName(trend.metric)}:</span>
+                  <div key={trend.metric || `attention-${index}`} className="flex justify-between items-center">
+                    <span className="text-muted-foreground">{formatMetricName(trend.metric || 'Unknown')}:</span>
                     <div className="flex items-center gap-2">
                       <span className="text-foreground font-medium">
-                        {formatValue(trend.change, trend.metric)}
+                        {formatValue(trend.change || 0, trend.metric || '')}
                       </span>
                       <div className="flex items-center gap-1">
-                        {getTrendIcon(trend.change)}
-                        <span className={`text-sm font-medium ${getTrendColor(trend.change)}`}>
-                          {trend.change_percentage.toFixed(1)}%
+                        {getTrendIcon(trend.change || 0)}
+                        <span className={`text-sm font-medium ${getTrendColor(trend.change || 0)}`}>
+                          {(trend.change_percentage || 0).toFixed(1)}%
                         </span>
                       </div>
                     </div>

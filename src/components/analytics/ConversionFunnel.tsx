@@ -147,7 +147,7 @@ export default function ConversionFunnel({ filters, className = '' }: Conversion
     );
   }
 
-  if (funnel.length === 0) {
+  if (!funnel || !Array.isArray(funnel) || funnel.length === 0) {
     return (
       <Card className={`bg-slate-800/50 backdrop-blur-sm border border-slate-700 ${className}`}>
         <CardHeader>
@@ -181,25 +181,25 @@ export default function ConversionFunnel({ filters, className = '' }: Conversion
           {/* Funnel Visualization */}
           <div className="space-y-4">
             {funnel.map((stage, index) => {
-              const widthPercentage = maxCount > 0 ? (stage.count / maxCount) * 100 : 0;
+              const widthPercentage = maxCount > 0 ? ((stage?.count || 0) / maxCount) * 100 : 0;
               const isLastStage = index === funnel.length - 1;
               
               return (
-                <div key={stage.stage} className="relative">
+                <div key={stage?.stage || `stage-${index}`} className="relative">
                   {/* Stage Label */}
                   <div className="flex items-center justify-between mb-2">
                     <div className="flex items-center gap-2">
-                      <div className={`p-1 rounded ${getStageColor(stage.stage)}`}>
-                        {getStageIcon(stage.stage)}
+                      <div className={`p-1 rounded ${getStageColor(stage?.stage || '')}`}>
+                        {getStageIcon(stage?.stage || '')}
                       </div>
-                      <span className="text-sm font-medium text-foreground">{stage.stage}</span>
+                      <span className="text-sm font-medium text-foreground">{stage?.stage || 'Unknown'}</span>
                     </div>
                     <div className="flex items-center gap-2">
-                      <span className="text-lg font-bold text-foreground">{stage.count}</span>
+                      <span className="text-lg font-bold text-foreground">{stage?.count || 0}</span>
                       {!isLastStage && (
-                        <div className={`flex items-center gap-1 ${getConversionRateColor(stage.conversion_rate)}`}>
-                          {getConversionRateIcon(stage.conversion_rate)}
-                          <span className="text-sm font-medium">{stage.conversion_rate.toFixed(1)}%</span>
+                        <div className={`flex items-center gap-1 ${getConversionRateColor(stage?.conversion_rate || 0)}`}>
+                          {getConversionRateIcon(stage?.conversion_rate || 0)}
+                          <span className="text-sm font-medium">{(stage?.conversion_rate || 0).toFixed(1)}%</span>
                         </div>
                       )}
                     </div>
@@ -209,7 +209,7 @@ export default function ConversionFunnel({ filters, className = '' }: Conversion
                   <div className="relative">
                     <div className="w-full bg-slate-700 rounded-lg h-8 overflow-hidden">
                       <div
-                        className={`h-full ${getStageColor(stage.stage)} transition-all duration-500 ease-out`}
+                        className={`h-full ${getStageColor(stage?.stage || '')} transition-all duration-500 ease-out`}
                         style={{ width: `${widthPercentage}%` }}
                       />
                     </div>
@@ -219,9 +219,9 @@ export default function ConversionFunnel({ filters, className = '' }: Conversion
                       <div className="absolute -right-2 top-1/2 transform -translate-y-1/2">
                         <Badge 
                           variant="outline" 
-                          className={`text-xs ${getConversionRateColor(stage.conversion_rate)} border-current`}
+                          className={`text-xs ${getConversionRateColor(stage?.conversion_rate || 0)} border-current`}
                         >
-                          {stage.conversion_rate.toFixed(1)}%
+                          {(stage?.conversion_rate || 0).toFixed(1)}%
                         </Badge>
                       </div>
                     )}
@@ -237,19 +237,19 @@ export default function ConversionFunnel({ filters, className = '' }: Conversion
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div className="text-center">
                 <div className="text-2xl font-bold text-foreground">
-                  {funnel.length > 0 ? funnel[0].count : 0}
+                  {funnel.length > 0 ? (funnel[0]?.count || 0) : 0}
                 </div>
                 <div className="text-xs text-muted-foreground">Total Scheduled</div>
               </div>
               <div className="text-center">
                 <div className="text-2xl font-bold text-foreground">
-                  {funnel.length > 1 ? funnel[1].count : 0}
+                  {funnel.length > 1 ? (funnel[1]?.count || 0) : 0}
                 </div>
                 <div className="text-xs text-muted-foreground">Total Showed</div>
               </div>
               <div className="text-center">
                 <div className="text-2xl font-bold text-foreground">
-                  {funnel.length > 2 ? funnel[2].count : 0}
+                  {funnel.length > 2 ? (funnel[2]?.count || 0) : 0}
                 </div>
                 <div className="text-xs text-muted-foreground">Total Closed</div>
               </div>
@@ -264,13 +264,15 @@ export default function ConversionFunnel({ filters, className = '' }: Conversion
                 if (index === funnel.length - 1) return null;
                 
                 const nextStage = funnel[index + 1];
-                const dropOff = stage.count - nextStage.count;
-                const dropOffRate = stage.count > 0 ? ((dropOff / stage.count) * 100) : 0;
+                const currentCount = stage?.count || 0;
+                const nextCount = nextStage?.count || 0;
+                const dropOff = currentCount - nextCount;
+                const dropOffRate = currentCount > 0 ? ((dropOff / currentCount) * 100) : 0;
                 
                 return (
-                  <div key={`insight-${stage.stage}`} className="flex justify-between items-center text-sm">
+                  <div key={`insight-${stage?.stage || index}`} className="flex justify-between items-center text-sm">
                     <span className="text-muted-foreground">
-                      {stage.stage} → {nextStage.stage}
+                      {stage?.stage || 'Unknown'} → {nextStage?.stage || 'Unknown'}
                     </span>
                     <div className="flex items-center gap-2">
                       <span className="text-foreground font-medium">

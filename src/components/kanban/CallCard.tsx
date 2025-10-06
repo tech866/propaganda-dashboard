@@ -73,7 +73,7 @@ export default function CallCard({ call, isDragging = false, canUpdate = true }:
       <div className="flex items-start justify-between mb-3">
         <div className="flex-1">
           <h4 className="font-semibold text-foreground text-sm leading-tight">
-            {call.prospect_first_name} {call.prospect_last_name}
+            {call.prospect_name || `${call.prospect_first_name || ''} ${call.prospect_last_name || ''}`.trim()}
           </h4>
           {call.company_name && (
             <p className="text-xs text-muted-foreground mt-1">{call.company_name}</p>

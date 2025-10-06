@@ -79,13 +79,13 @@ export default function TimeSeriesChart({ filters, className = '' }: TimeSeriesC
   };
 
   const getMaxValue = () => {
-    if (timeSeries.length === 0) return 0;
-    return Math.max(...timeSeries.map(item => item.metrics[selectedMetric]));
+    if (!timeSeries || !Array.isArray(timeSeries) || timeSeries.length === 0) return 0;
+    return Math.max(...timeSeries.map(item => item?.metrics?.[selectedMetric] || 0));
   };
 
   const getMinValue = () => {
-    if (timeSeries.length === 0) return 0;
-    return Math.min(...timeSeries.map(item => item.metrics[selectedMetric]));
+    if (!timeSeries || !Array.isArray(timeSeries) || timeSeries.length === 0) return 0;
+    return Math.min(...timeSeries.map(item => item?.metrics?.[selectedMetric] || 0));
   };
 
   if (loading) {
@@ -130,7 +130,7 @@ export default function TimeSeriesChart({ filters, className = '' }: TimeSeriesC
     );
   }
 
-  if (timeSeries.length === 0) {
+  if (!timeSeries || !Array.isArray(timeSeries) || timeSeries.length === 0) {
     return (
       <Card className={`bg-slate-800/50 backdrop-blur-sm border border-slate-700 ${className}`}>
         <CardHeader>
@@ -181,13 +181,13 @@ export default function TimeSeriesChart({ filters, className = '' }: TimeSeriesC
           <div className="bg-slate-700/30 rounded-lg p-4 border border-slate-600">
             <div className="space-y-2">
               {timeSeries.map((item, index) => {
-                const value = item.metrics[selectedMetric];
+                const value = item?.metrics?.[selectedMetric] || 0;
                 const heightPercentage = range > 0 ? ((value - minValue) / range) * 100 : 50;
                 
                 return (
-                  <div key={item.date} className="flex items-center gap-4">
+                  <div key={item?.date || `item-${index}`} className="flex items-center gap-4">
                     <div className="w-20 text-xs text-muted-foreground">
-                      {new Date(item.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                      {item?.date ? new Date(item.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) : 'N/A'}
                     </div>
                     <div className="flex-1 flex items-center gap-2">
                       <div className="flex-1 bg-slate-600 rounded-full h-6 relative overflow-hidden">
@@ -212,7 +212,7 @@ export default function TimeSeriesChart({ filters, className = '' }: TimeSeriesC
               <div className="text-sm text-muted-foreground mb-1">Average</div>
               <div className="text-lg font-bold text-foreground">
                 {formatValue(
-                  timeSeries.reduce((sum, item) => sum + item.metrics[selectedMetric], 0) / timeSeries.length,
+                  timeSeries.reduce((sum, item) => sum + (item?.metrics?.[selectedMetric] || 0), 0) / timeSeries.length,
                   selectedMetric
                 )}
               </div>
@@ -233,7 +233,7 @@ export default function TimeSeriesChart({ filters, className = '' }: TimeSeriesC
               <div className="text-sm text-muted-foreground mb-1">Total</div>
               <div className="text-lg font-bold text-foreground">
                 {formatValue(
-                  timeSeries.reduce((sum, item) => sum + item.metrics[selectedMetric], 0),
+                  timeSeries.reduce((sum, item) => sum + (item?.metrics?.[selectedMetric] || 0), 0),
                   selectedMetric
                 )}
               </div>
@@ -249,7 +249,7 @@ export default function TimeSeriesChart({ filters, className = '' }: TimeSeriesC
                 <div className="text-lg font-bold text-foreground">
                   {formatValue(
                     timeSeries.slice(0, Math.floor(timeSeries.length / 2))
-                      .reduce((sum, item) => sum + item.metrics[selectedMetric], 0) / Math.floor(timeSeries.length / 2),
+                      .reduce((sum, item) => sum + (item?.metrics?.[selectedMetric] || 0), 0) / Math.floor(timeSeries.length / 2),
                     selectedMetric
                   )}
                 </div>
@@ -259,7 +259,7 @@ export default function TimeSeriesChart({ filters, className = '' }: TimeSeriesC
                 <div className="text-lg font-bold text-foreground">
                   {formatValue(
                     timeSeries.slice(Math.floor(timeSeries.length / 2))
-                      .reduce((sum, item) => sum + item.metrics[selectedMetric], 0) / Math.ceil(timeSeries.length / 2),
+                      .reduce((sum, item) => sum + (item?.metrics?.[selectedMetric] || 0), 0) / Math.ceil(timeSeries.length / 2),
                     selectedMetric
                   )}
                 </div>

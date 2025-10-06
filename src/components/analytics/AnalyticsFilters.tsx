@@ -155,7 +155,7 @@ export default function AnalyticsFilters({
               </SelectTrigger>
               <SelectContent className="bg-slate-800 border-slate-700">
                 <SelectItem value="all">All Sales Reps</SelectItem>
-                {users.map((user) => (
+                {users && Array.isArray(users) && users.map((user) => (
                   <SelectItem key={user.id} value={user.id}>
                     {user.name}
                   </SelectItem>
@@ -176,7 +176,7 @@ export default function AnalyticsFilters({
               </SelectTrigger>
               <SelectContent className="bg-slate-800 border-slate-700">
                 <SelectItem value="all">All Clients</SelectItem>
-                {clients.map((client) => (
+                {clients && Array.isArray(clients) && clients.map((client) => (
                   <SelectItem key={client.id} value={client.id}>
                     {client.name}
                   </SelectItem>

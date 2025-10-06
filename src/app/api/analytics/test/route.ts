@@ -17,6 +17,11 @@ export async function GET(request: NextRequest) {
       gross_collected_per_booked_call: 500.0,
       cash_per_live_call: 625.0,
       cash_based_aov: 2000.0,
+      trends: [
+        { metric: 'calls_scheduled', change: 10, change_percentage: 5.0 },
+        { metric: 'show_rate', change: -2, change_percentage: -2.5 },
+        { metric: 'close_rate', change: 5, change_percentage: 3.2 }
+      ]
     };
 
     return NextResponse.json({

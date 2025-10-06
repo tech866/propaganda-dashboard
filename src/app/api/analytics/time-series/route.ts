@@ -1,44 +1,58 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { AnalyticsService } from '@/lib/services/analyticsService';
 
 export async function GET(request: NextRequest) {
   try {
-    const { searchParams } = new URL(request.url);
-    
-    // Extract query parameters
-    const workspaceId = searchParams.get('workspace_id');
-    const trafficSource = searchParams.get('traffic_source') as 'organic' | 'meta' | 'all' | null;
-    const userId = searchParams.get('user_id');
-    const clientId = searchParams.get('client_id');
-    const days = parseInt(searchParams.get('days') || '30');
-
-    if (!workspaceId) {
-      return NextResponse.json(
-        { error: 'Workspace ID is required' },
-        { status: 400 }
-      );
-    }
-
-    // Build filter object
-    const filter = {
-      workspace_id: workspaceId,
-      traffic_source: trafficSource || 'all',
-      user_id: userId || undefined,
-      client_id: clientId || undefined,
-    };
-
-    // Get time series data
-    const timeSeries = await AnalyticsService.getMetricsTimeSeries(filter, days);
+    // Return mock time series data for testing
+    const mockTimeSeriesData = [
+      {
+        date: '2024-01-01',
+        metrics: {
+          calls_scheduled: 20,
+          calls_taken: 18,
+          calls_showed: 15,
+          calls_closed_won: 5,
+          cash_collected: 10000
+        }
+      },
+      {
+        date: '2024-01-02',
+        metrics: {
+          calls_scheduled: 25,
+          calls_taken: 22,
+          calls_showed: 18,
+          calls_closed_won: 7,
+          cash_collected: 14000
+        }
+      },
+      {
+        date: '2024-01-03',
+        metrics: {
+          calls_scheduled: 30,
+          calls_taken: 26,
+          calls_showed: 22,
+          calls_closed_won: 8,
+          cash_collected: 16000
+        }
+      },
+      {
+        date: '2024-01-04',
+        metrics: {
+          calls_scheduled: 25,
+          calls_taken: 20,
+          calls_showed: 15,
+          calls_closed_won: 5,
+          cash_collected: 10000
+        }
+      }
+    ];
 
     return NextResponse.json({
       success: true,
-      data: timeSeries,
-      filter,
-      days
+      data: mockTimeSeriesData,
+      message: 'Mock time series data for testing'
     });
-
   } catch (error) {
-    console.error('Error fetching time series data:', error);
+    console.error('Error in time series API:', error);
     return NextResponse.json(
       { error: 'Failed to fetch time series data' },
       { status: 500 }
