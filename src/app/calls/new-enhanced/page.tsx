@@ -10,6 +10,8 @@ import { useTrafficSourceClassification } from '@/hooks/useTrafficSourceClassifi
 import FormContainer from '@/components/forms/FormContainer';
 import FormField from '@/components/forms/FormField';
 import FormButton from '@/components/forms/FormButton';
+import { WorkspaceProvider } from '@/contexts/WorkspaceContext';
+import ModernDashboardLayout from '@/components/layout/ModernDashboardLayout';
 
 interface EnhancedCallFormData {
   client_id: string;
@@ -44,7 +46,7 @@ interface EnhancedCallFormData {
   completed_at: string;
 }
 
-export default function NewEnhancedCall() {
+function NewEnhancedCallContent() {
   const { user, isLoaded } = useAuth();
   const { currentWorkspace, isLoading: workspaceLoading } = useWorkspace();
   const router = useRouter();
@@ -551,5 +553,15 @@ export default function NewEnhancedCall() {
         </FormContainer>
       </div>
     </div>
+  );
+}
+
+export default function NewEnhancedCall() {
+  return (
+    <ModernDashboardLayout>
+      <WorkspaceProvider>
+        <NewEnhancedCallContent />
+      </WorkspaceProvider>
+    </ModernDashboardLayout>
   );
 }
