@@ -11,11 +11,14 @@ const supabase = createClient(supabaseUrl, supabaseServiceKey);
 // Clerk webhook secret
 const WEBHOOK_SECRET = process.env.CLERK_WEBHOOK_SECRET;
 
-if (!WEBHOOK_SECRET) {
-  throw new Error('Please add CLERK_WEBHOOK_SECRET to .env.local');
-}
-
 export async function POST(req: NextRequest) {
+  // Check for webhook secret
+  if (!WEBHOOK_SECRET) {
+    return new Response('CLERK_WEBHOOK_SECRET not configured', {
+      status: 500,
+    });
+  }
+
   // Get the headers
   const headerPayload = await headers();
   const svix_id = headerPayload.get('svix-id');
