@@ -463,4 +463,4 @@ If you encounter any issues:
 
 ---
 
-**Built with ❤️ using Next.js, Supabase, and Clerk**
+**Built with ❤️ using Next.js, Supabase, and Clerk**# Deployment trigger - Mon Oct  6 10:16:18 EDT 2025
