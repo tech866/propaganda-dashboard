@@ -4,6 +4,7 @@ import React, { createContext, useContext, useEffect, useState } from 'react';
 import { useUser, useOrganization } from '@clerk/nextjs';
 import { UserRole } from '@/lib/clerk';
 import { getUserFromSupabase, UserWithClerk } from '@/lib/clerk-supabase';
+import { ClientUserSyncService } from '@/lib/services/clientUserSync';
 
 // Check if Clerk is configured - simplified for production
 const isClerkConfigured = !!process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY;
@@ -172,6 +173,20 @@ export function RoleProvider({ children }: { children: React.ReactNode }) {
       clearTimeout(timeoutId);
       return;
     }
+
+    // Auto-sync user to database if they don't exist (client-safe)
+    const syncUserToDatabase = async () => {
+      try {
+        await ClientUserSyncService.syncCurrentUser();
+        console.log('User sync initiated successfully');
+      } catch (error) {
+        console.error('Failed to sync user to database:', error);
+        // Don't block the UI if sync fails
+      }
+    };
+
+    // Sync user to database (non-blocking)
+    syncUserToDatabase();
 
     // Get role from Clerk user metadata
     const role = (clerkUser.publicMetadata?.role as UserRole) || 'agency_user';

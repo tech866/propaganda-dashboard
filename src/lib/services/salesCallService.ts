@@ -1,5 +1,6 @@
 import { query, withTransaction } from '../database';
 import { User } from '@/middleware/auth';
+import { TrafficSourceService, TrafficSource, SourceOfAppointment, LeadSource } from './trafficSourceService';
 
 // Define the structure of the existing sales_calls table
 export interface SalesCall {
@@ -35,8 +36,13 @@ export interface SalesCall {
 export interface CreateSalesCallData {
   client_id: string;
   prospect_name: string;
+  // Split prospect name into first and last name
+  prospect_first_name?: string;
+  prospect_last_name?: string;
   prospect_email?: string;
   prospect_phone?: string;
+  // Company name (pre-selected from workspace)
+  company_name?: string;
   call_type: 'inbound' | 'outbound'; // No direct mapping, will be part of notes or default
   status: 'completed' | 'no-show' | 'rescheduled'; // No direct mapping, will be part of notes or default
   outcome: 'won' | 'lost' | 'tbd'; // No direct mapping, will be part of notes or default
@@ -46,10 +52,22 @@ export interface CreateSalesCallData {
   scheduled_at?: Date; // Maps to scheduled_date_time
   completed_at?: Date; // No direct mapping, can be part of notes or updated_at
 
-  // Enhanced call logging form fields (mapped to sales_calls where possible)
+  // SCRM-specific fields
+  source_of_set_appointment?: 'sdr_booked_call' | 'non_sdr_booked_call';
+  sdr_type?: 'dialer' | 'dm_setter';
+  sdr_first_name?: string;
+  sdr_last_name?: string;
+  non_sdr_source?: 'vsl_booking' | 'regular_booking';
+  scrms_outcome?: 'call_booked' | 'no_show' | 'no_close' | 'cancelled' | 'disqualified' | 'rescheduled' | 'payment_plan' | 'deposit' | 'closed_paid_in_full' | 'follow_up_call_scheduled';
+  
+  // CRM and Traffic Source fields
+  traffic_source?: 'organic' | 'meta';
+  crm_stage?: 'scheduled' | 'in_progress' | 'completed' | 'no_show' | 'closed_won' | 'lost';
+
+  // Enhanced call logging form fields (legacy - mapped to sales_calls where possible)
   closer_first_name?: string;
   closer_last_name?: string;
-  source_of_set_appointment?: 'sdr_booked_call' | 'non_sdr_booked_call' | 'email' | 'vsl' | 'self_booking'; // Maps to 'source'
+  source_of_set_appointment_legacy?: 'sdr_booked_call' | 'non_sdr_booked_call' | 'email' | 'vsl' | 'self_booking'; // Maps to 'source'
   enhanced_call_outcome?: 'no_show' | 'no_close' | 'cancelled' | 'disqualified' | 'rescheduled' | 'payment_plan' | 'deposit' | 'closed_paid_in_full' | 'follow_up_call_scheduled'; // Maps to 'call_outcome' or 'enhanced_outcome'
   initial_payment_collected_on?: Date; // No direct mapping
   customer_full_name?: string; // No direct mapping
@@ -92,6 +110,10 @@ export interface UpdateSalesCallData {
   total_amount_owed?: number;
   prospect_notes?: string;
   lead_source?: 'organic' | 'ads';
+  
+  // CRM and Traffic Source fields
+  traffic_source?: 'organic' | 'meta';
+  crm_stage?: 'scheduled' | 'in_progress' | 'completed' | 'no_show' | 'closed_won' | 'lost';
 }
 
 export class SalesCallService {
@@ -210,46 +232,72 @@ export class SalesCallService {
    * Create a new sales call.
    */
   static async createSalesCall(callData: CreateSalesCallData, user: User): Promise<SalesCall> {
+    // Classify traffic source using the new classification service
+    const trafficSourceClassification = TrafficSourceService.classifyTrafficSource({
+      sourceOfAppointment: callData.source_of_set_appointment as SourceOfAppointment,
+      leadSource: callData.lead_source as LeadSource,
+      trafficSource: callData.traffic_source as TrafficSource,
+      manualOverride: callData.traffic_source as TrafficSource // Use manual selection if provided
+    });
+
+    // Use the classified traffic source, with manual override taking precedence
+    const finalTrafficSource = callData.traffic_source || trafficSourceClassification.traffic_source;
+
     const sql = `
-      INSERT INTO sales_calls (
-        client_id, user_id, prospect_name, prospect_email, prospect_phone, 
-        scheduled_date_time, duration, call_outcome, notes,
-        closer_first_name, closer_last_name, source, traffic_source, 
-        enhanced_outcome, setter_first_name, setter_last_name, 
-        cash_collected_upfront, total_amount_owed, prospect_notes
-      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19)
-      RETURNING 
-        id, client_id, campaign_id, scheduled_date_time, duration, call_outcome, 
-        notes, follow_up_actions, attendee_list, created_at, updated_at,
-        prospect_name, prospect_email, prospect_phone, closer_first_name, closer_last_name,
-        source, traffic_source, enhanced_outcome, setter_first_name, setter_last_name,
-        cash_collected_upfront, total_amount_owed, prospect_notes
+      INSERT INTO calls (
+        client_id, user_id, prospect_name, prospect_first_name, prospect_last_name, 
+        prospect_email, prospect_phone, company_name, call_type, status, outcome,
+        scheduled_at, call_duration, notes, loss_reason_id, completed_at,
+        source_of_set_appointment, sdr_type, sdr_first_name, sdr_last_name,
+        non_sdr_source, scrms_outcome, closer_first_name, closer_last_name,
+        source_of_set_appointment_legacy, enhanced_call_outcome, initial_payment_collected_on,
+        customer_full_name, customer_email, calls_taken, setter_first_name, setter_last_name,
+        cash_collected_upfront, total_amount_owed, prospect_notes, lead_source,
+        traffic_source, crm_stage
+      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, $23, $24, $25, $26, $27, $28, $29, $30, $31, $32, $33, $34, $35, $36, $37, $38)
+      RETURNING *
     `;
 
-    // Map form fields to sales_calls table columns
+    // Map form fields to calls table columns
     const params = [
       callData.client_id,
       user.id, // user_id is always the current user
-      callData.prospect_name,
+      callData.prospect_name || `${callData.prospect_first_name} ${callData.prospect_last_name}`,
+      callData.prospect_first_name || null,
+      callData.prospect_last_name || null,
       callData.prospect_email || null,
       callData.prospect_phone || null,
+      callData.company_name || null,
+      callData.call_type,
+      callData.status,
+      callData.outcome || 'tbd',
       callData.scheduled_at || null,
       callData.call_duration || null,
-      callData.enhanced_call_outcome || callData.outcome || 'tbd', // Use enhanced_call_outcome if available
       callData.notes || null,
+      callData.loss_reason_id || null,
+      callData.completed_at || null,
+      callData.source_of_set_appointment || null,
+      callData.sdr_type || null,
+      callData.sdr_first_name || null,
+      callData.sdr_last_name || null,
+      callData.non_sdr_source || null,
+      callData.scrms_outcome || 'call_booked',
       callData.closer_first_name || null,
       callData.closer_last_name || null,
-      // Map source_of_set_appointment to 'source'
-      callData.source_of_set_appointment === 'sdr_booked_call' ? 'sdr_call' : 
-      (callData.source_of_set_appointment === 'non_sdr_booked_call' ? 'non_sdr_booked' : null),
-      // Map lead_source to 'traffic_source'
-      callData.lead_source === 'organic' ? 'organic' : (callData.lead_source === 'ads' ? 'paid_ads' : null),
+      callData.source_of_set_appointment_legacy || null,
       callData.enhanced_call_outcome || null,
+      callData.initial_payment_collected_on || null,
+      callData.customer_full_name || null,
+      callData.customer_email || null,
+      callData.calls_taken || null,
       callData.setter_first_name || null,
       callData.setter_last_name || null,
       callData.cash_collected_upfront || 0,
       callData.total_amount_owed || 0,
       callData.prospect_notes || null,
+      callData.lead_source || null,
+      finalTrafficSource,
+      callData.crm_stage || 'scheduled',
     ];
 
     const result = await query(sql, params);
@@ -260,6 +308,17 @@ export class SalesCallService {
    * Update an existing sales call.
    */
   static async updateSalesCall(id: string, updateData: UpdateSalesCallData, user: User): Promise<SalesCall | null> {
+    // Classify traffic source if source_of_set_appointment is being updated
+    let finalTrafficSource = updateData.traffic_source;
+    if (updateData.source_of_set_appointment && !updateData.traffic_source) {
+      const trafficSourceClassification = TrafficSourceService.classifyTrafficSource({
+        sourceOfAppointment: updateData.source_of_set_appointment as SourceOfAppointment,
+        leadSource: updateData.lead_source as LeadSource,
+        trafficSource: updateData.traffic_source as TrafficSource
+      });
+      finalTrafficSource = trafficSourceClassification.traffic_source;
+    }
+
     const fields: string[] = [];
     const params: any[] = [id];
     let paramIndex = 2;
@@ -281,7 +340,15 @@ export class SalesCallService {
     }
     if (updateData.lead_source !== undefined) { 
       fields.push(`traffic_source = $${paramIndex++}`); 
-      params.push(updateData.lead_source === 'organic' ? 'organic' : (updateData.lead_source === 'ads' ? 'paid_ads' : null)); 
+      params.push(updateData.lead_source === 'organic' ? 'organic' : (updateData.lead_source === 'ads' ? 'meta' : null)); 
+    }
+    if (finalTrafficSource !== undefined) { 
+      fields.push(`traffic_source = $${paramIndex++}`); 
+      params.push(finalTrafficSource); 
+    }
+    if (updateData.crm_stage !== undefined) { 
+      fields.push(`crm_stage = $${paramIndex++}`); 
+      params.push(updateData.crm_stage); 
     }
     if (updateData.enhanced_call_outcome !== undefined) { fields.push(`enhanced_outcome = $${paramIndex++}`); params.push(updateData.enhanced_call_outcome); }
     if (updateData.setter_first_name !== undefined) { fields.push(`setter_first_name = $${paramIndex++}`); params.push(updateData.setter_first_name); }
@@ -301,15 +368,10 @@ export class SalesCallService {
     }
 
     const sql = `
-      UPDATE sales_calls
+      UPDATE calls
       SET ${fields.join(', ')}, updated_at = CURRENT_TIMESTAMP
       WHERE id = $1
-      RETURNING 
-        id, client_id, campaign_id, scheduled_date_time, duration, call_outcome, 
-        notes, follow_up_actions, attendee_list, created_at, updated_at,
-        prospect_name, prospect_email, prospect_phone, closer_first_name, closer_last_name,
-        source, traffic_source, enhanced_outcome, setter_first_name, setter_last_name,
-        cash_collected_upfront, total_amount_owed, prospect_notes
+      RETURNING *
     `;
 
     const result = await query(sql, params);

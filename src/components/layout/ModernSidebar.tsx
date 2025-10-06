@@ -19,7 +19,8 @@ import {
   Activity,
   Building2,
   Plug,
-  TrendingUp
+  TrendingUp,
+  Plus
 } from 'lucide-react';
 
 interface SidebarNavigationItem {
@@ -52,10 +53,23 @@ const navigationItems: SidebarNavigationItem[] = [
     description: 'View all your calls'
   },
   {
+    name: 'CRM Pipeline',
+    href: '/calls/kanban',
+    icon: Activity,
+    description: 'Manage calls in CRM pipeline with drag & drop'
+  },
+  {
     name: 'Client Management',
     href: '/clients',
     icon: Building2,
     description: 'Manage client accounts and settings',
+    requiredRoles: ['admin', 'ceo']
+  },
+  {
+    name: 'Create Workspace',
+    href: '/workspaces/new',
+    icon: Plus,
+    description: 'Create a new workspace for your team',
     requiredRoles: ['admin', 'ceo']
   },
   {
@@ -66,7 +80,7 @@ const navigationItems: SidebarNavigationItem[] = [
   },
   {
     name: 'Performance',
-    href: '/performance',
+    href: '/analytics',
     icon: TrendingUp,
     description: 'Advanced analytics and performance metrics'
   },

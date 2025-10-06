@@ -5,7 +5,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { withAnyRole, User } from '@/middleware/auth';
-import { auditService } from '@/lib/services/auditService';
+import { AuditService } from '@/lib/services/auditService';
 
 const getAuditStats = withAnyRole(['admin', 'ceo'], async (request: NextRequest, user: User) => {
   try {
@@ -40,7 +40,7 @@ const getAuditStats = withAnyRole(['admin', 'ceo'], async (request: NextRequest,
       );
     }
 
-    const result = await auditService.getAuditStats(user.clientId, dateFrom, dateTo);
+    const result = await AuditService.getAuditStats(user.clientId, dateFrom, dateTo);
 
     return NextResponse.json(result, { status: 200 });
   } catch (error) {

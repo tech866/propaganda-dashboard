@@ -119,3 +119,4 @@ If you continue to experience issues:
 - [Clerk Documentation](https://clerk.com/docs)
 - [Clerk Next.js Integration](https://clerk.com/docs/quickstarts/nextjs)
 - [Vercel Environment Variables](https://vercel.com/docs/concepts/projects/environment-variables)
+

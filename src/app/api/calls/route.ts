@@ -92,9 +92,13 @@ const createCall = withErrorHandling(async (request: NextRequest, user: User) =>
   // Create call data object with validated data
   const callData: CreateSalesCallData = {
     client_id: validatedData.client_id,
-    prospect_name: validatedData.prospect_name,
+    // Handle both new split names and legacy prospect_name
+    prospect_name: validatedData.prospect_name || `${validatedData.prospect_first_name} ${validatedData.prospect_last_name}`,
+    prospect_first_name: validatedData.prospect_first_name,
+    prospect_last_name: validatedData.prospect_last_name,
     prospect_email: validatedData.prospect_email,
     prospect_phone: validatedData.prospect_phone,
+    company_name: validatedData.company_name,
     call_type: validatedData.call_type,
     status: validatedData.status,
     outcome: validatedData.outcome || 'tbd',
@@ -103,10 +107,20 @@ const createCall = withErrorHandling(async (request: NextRequest, user: User) =>
     call_duration: validatedData.call_duration,
     scheduled_at: validatedData.scheduled_at,
     completed_at: validatedData.completed_at,
-    // Enhanced call logging form fields
+    // SCRM-specific fields
+    source_of_set_appointment: validatedData.source_of_set_appointment,
+    sdr_type: validatedData.sdr_type,
+    sdr_first_name: validatedData.sdr_first_name,
+    sdr_last_name: validatedData.sdr_last_name,
+    non_sdr_source: validatedData.non_sdr_source,
+    scrms_outcome: validatedData.scrms_outcome || 'call_booked',
+    // CRM and Traffic Source fields
+    traffic_source: validatedData.traffic_source,
+    crm_stage: validatedData.crm_stage || 'scheduled',
+    // Enhanced call logging form fields (legacy)
     closer_first_name: validatedData.closer_first_name,
     closer_last_name: validatedData.closer_last_name,
-    source_of_set_appointment: validatedData.source_of_set_appointment,
+    source_of_set_appointment_legacy: validatedData.source_of_set_appointment_legacy,
     enhanced_call_outcome: validatedData.enhanced_call_outcome,
     initial_payment_collected_on: validatedData.initial_payment_collected_on,
     customer_full_name: validatedData.customer_full_name,

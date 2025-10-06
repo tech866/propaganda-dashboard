@@ -6,7 +6,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { withAuth, withRole, User } from '@/middleware/auth';
 import { withErrorHandling } from '@/middleware/errors';
-import { auditService } from '@/lib/services/auditService';
+import { AuditService } from '@/lib/services/auditService';
 
 // DELETE /api/audit/cleanup - Clean up old audit logs
 const cleanupAuditLogs = withErrorHandling(async (request: NextRequest, user: User) => {
@@ -23,7 +23,7 @@ const cleanupAuditLogs = withErrorHandling(async (request: NextRequest, user: Us
     );
   }
 
-  const deletedCount = await auditService.cleanupOldLogs(retentionDays);
+  const deletedCount = await AuditService.cleanupOldLogs(retentionDays);
 
   return NextResponse.json(
     {

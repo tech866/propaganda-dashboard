@@ -30,10 +30,17 @@ export default function Clients() {
         
         <Card>
           <CardHeader>
-            <CardTitle>Test Page with RoleBasedAccess</CardTitle>
+            <CardTitle>Client Overview</CardTitle>
           </CardHeader>
           <CardContent>
-            <p>This is a test page with RoleBasedAccess to isolate the error.</p>
+            <p className="text-muted-foreground">
+              Manage your client accounts, view performance metrics, and configure client settings.
+            </p>
+            <div className="mt-4">
+              <button className="bg-primary text-primary-foreground px-4 py-2 rounded-lg hover:bg-primary/90 transition-colors">
+                Add New Client
+              </button>
+            </div>
           </CardContent>
         </Card>
       </div>

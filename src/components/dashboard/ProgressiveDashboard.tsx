@@ -46,12 +46,19 @@ export default function ProgressiveDashboard({ onRefresh }: ProgressiveDashboard
       <div className="p-6">
         <div className="space-y-6">
           <div className="bg-slate-800/50 backdrop-blur-sm border border-slate-700 rounded-2xl p-6">
-            <h1 className="text-2xl font-bold text-white mb-2">🚀 Development Mode</h1>
-            <p className="text-slate-300">Dashboard loading optimized for development.</p>
+            <h1 className="text-2xl font-bold text-white mb-2">📊 Dashboard</h1>
+            <p className="text-slate-300">Welcome to your Propaganda Agency Dashboard. Manage your workspaces, track calls, and monitor performance.</p>
           </div>
           <div className="bg-slate-800/50 backdrop-blur-sm border border-slate-700 rounded-2xl p-6">
-            <h2 className="text-xl font-semibold text-white mb-4">✨ Next Steps</h2>
-            <p className="text-slate-300">Start building your UI components and features!</p>
+            <h2 className="text-xl font-semibold text-white mb-4">🚀 Quick Actions</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+              <a href="/workspaces/new" className="bg-primary text-primary-foreground px-4 py-3 rounded-lg hover:bg-primary/90 transition-colors text-center">
+                Create Workspace
+              </a>
+              <a href="/calls/new" className="bg-slate-700 text-white px-4 py-3 rounded-lg hover:bg-slate-600 transition-colors text-center">
+                Log Call
+              </a>
+            </div>
           </div>
         </div>
       </div>

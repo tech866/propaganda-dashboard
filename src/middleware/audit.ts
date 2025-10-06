@@ -4,7 +4,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { auditService } from '@/lib/services/auditService';
+import { AuditService } from '@/lib/services/auditService';
 import { AuditContext, AuditLevel, AuditCategory, AuditLogCreate } from '@/lib/types/audit';
 import { User } from '@/middleware/auth';
 import { PoolClient } from 'pg';
