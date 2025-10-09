@@ -29,7 +29,7 @@ import {
   TableRow 
 } from '@/components/ui/table';
 import { 
-  FunnelIcon, 
+  Filter, 
   DownloadIcon, 
   RefreshCw, 
   CalendarIcon,
@@ -274,7 +274,7 @@ export default function EnhancedDashboard({ onRefresh }: EnhancedDashboardProps)
             </div>
             <div className="flex gap-2">
               <Button variant="outline" size="sm">
-                <FunnelIcon className="mr-2 h-4 w-4" />
+                <Filter className="mr-2 h-4 w-4" />
                 Filters
               </Button>
               <Button variant="outline" size="sm">

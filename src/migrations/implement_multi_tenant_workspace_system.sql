@@ -464,3 +464,6 @@ COMMENT ON COLUMN workspace_audit_logs.details IS 'Additional context about the 
 -- =====================================================
 -- MIGRATION COMPLETE
 -- =====================================================
+
+
+

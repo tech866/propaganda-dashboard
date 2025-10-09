@@ -147,3 +147,6 @@ The Supabase MCP integration will make database operations much more intuitive a
 
 
 
+
+
+

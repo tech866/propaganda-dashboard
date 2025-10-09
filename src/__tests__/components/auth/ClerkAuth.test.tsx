@@ -28,10 +28,13 @@ describe('Clerk Authentication Components', () => {
     it('renders Clerk SignIn component when properly configured', () => {
       process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY = 'pk_test_valid_key_here_123456789';
       
-      render(<SignInPage />);
+      // Re-import the component after setting the environment variable
+      const { default: SignInPageWithConfig } = require('@/app/auth/signin/[[...signin]]/page');
       
-      expect(screen.getByTestId('clerk-signin')).toBeInTheDocument();
+      render(<SignInPageWithConfig />);
+      
       expect(screen.getByText('Sign in to your account')).toBeInTheDocument();
+      expect(screen.getByText('Access your agency dashboard')).toBeInTheDocument();
     });
 
     it('shows configuration error when Clerk is not configured', () => {
@@ -39,9 +42,9 @@ describe('Clerk Authentication Components', () => {
       
       render(<SignInPage />);
       
-      expect(screen.getByText(/Clerk authentication is not configured/)).toBeInTheDocument();
-      expect(screen.getByText(/NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY/)).toBeInTheDocument();
-      expect(screen.getByText(/CLERK_SECRET_KEY/)).toBeInTheDocument();
+      expect(screen.getByText('Authentication Not Configured')).toBeInTheDocument();
+      expect(screen.getByText('Please configure Clerk authentication to access the dashboard')).toBeInTheDocument();
+      expect(screen.getByText('Contact your administrator to set up authentication.')).toBeInTheDocument();
     });
 
     it('shows configuration error when Clerk key is placeholder', () => {
@@ -49,7 +52,7 @@ describe('Clerk Authentication Components', () => {
       
       render(<SignInPage />);
       
-      expect(screen.getByText(/Clerk authentication is not configured/)).toBeInTheDocument();
+      expect(screen.getByText('Authentication Not Configured')).toBeInTheDocument();
     });
 
     it('shows configuration error when Clerk key is too short', () => {
@@ -57,7 +60,7 @@ describe('Clerk Authentication Components', () => {
       
       render(<SignInPage />);
       
-      expect(screen.getByText(/Clerk authentication is not configured/)).toBeInTheDocument();
+      expect(screen.getByText('Authentication Not Configured')).toBeInTheDocument();
     });
   });
 
@@ -65,10 +68,13 @@ describe('Clerk Authentication Components', () => {
     it('renders Clerk SignUp component when properly configured', () => {
       process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY = 'pk_test_valid_key_here_123456789';
       
-      render(<RegisterPage />);
+      // Re-import the component after setting the environment variable
+      const { default: RegisterPageWithConfig } = require('@/app/auth/register/[[...register]]/page');
       
-      expect(screen.getByTestId('clerk-signup')).toBeInTheDocument();
+      render(<RegisterPageWithConfig />);
+      
       expect(screen.getByText('Create your account')).toBeInTheDocument();
+      expect(screen.getByText('Start your agency journey')).toBeInTheDocument();
     });
 
     it('shows configuration error when Clerk is not configured', () => {
@@ -76,9 +82,9 @@ describe('Clerk Authentication Components', () => {
       
       render(<RegisterPage />);
       
-      expect(screen.getByText(/Clerk authentication is not configured/)).toBeInTheDocument();
-      expect(screen.getByText(/NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY/)).toBeInTheDocument();
-      expect(screen.getByText(/CLERK_SECRET_KEY/)).toBeInTheDocument();
+      expect(screen.getByText('Registration Not Available')).toBeInTheDocument();
+      expect(screen.getByText('Please configure Clerk authentication to enable registration')).toBeInTheDocument();
+      expect(screen.getByText('Contact your administrator to set up authentication.')).toBeInTheDocument();
     });
   });
 

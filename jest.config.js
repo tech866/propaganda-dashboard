@@ -7,9 +7,16 @@ const createJestConfig = nextJest({
 
 // Add any custom config to be passed to Jest
 const customJestConfig = {
+  setupFiles: ['<rootDir>/src/__tests__/setup/nextjs-setup.ts'],
   setupFilesAfterEnv: ['<rootDir>/src/__tests__/setup/test-setup.ts'],
   testEnvironment: 'jest-environment-jsdom',
-  testPathIgnorePatterns: ['<rootDir>/.next/', '<rootDir>/node_modules/', '<rootDir>/tests/e2e/'],
+  testPathIgnorePatterns: [
+    '<rootDir>/.next/', 
+    '<rootDir>/node_modules/', 
+    '<rootDir>/tests/e2e/',
+    '<rootDir>/src/__tests__/setup/nextjs-setup.ts',
+    '<rootDir>/src/__tests__/setup/test-setup.ts'
+  ],
   moduleNameMapper: {
     '^@/(.*)$': '<rootDir>/src/$1',
   },
@@ -28,7 +35,6 @@ const customJestConfig = {
   silent: false,
   verbose: true,
   // Mock console methods to reduce noise
-  setupFilesAfterEnv: ['<rootDir>/src/__tests__/setup/test-setup.ts'],
   // Clear mocks between tests
   clearMocks: true,
   restoreMocks: true,

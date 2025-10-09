@@ -5,5 +5,6 @@ export * from './schemas';
 export * from './validator';
 
 // Re-export commonly used types and functions
-export { validationSchemas, validators } from './validator';
+export { validators } from './validator';
+export { validationSchemas } from './schemas';
 export type { ValidationResult } from './validator';
